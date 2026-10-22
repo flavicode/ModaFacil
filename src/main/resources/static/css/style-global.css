@@ -1,0 +1,54 @@
+:root {
+    --color-primary: #2c1212; /* texto*/
+    --color-success: #c36363; /* botones */
+    --color-background: #f2e7e5; /*footer */
+    --color-white: #f8f8f8; /* fondo */
+    --color-placeholder: #c0a0a0;/* form */
+
+    /*--color-success-dark: color-mix(in srgb, var(--color-success), #000 15%);    --color-white: #ffffff;
+    */
+}
+body {
+    font-family: "Outfit", sans-serif;
+    letter-spacing: -0.01em;
+    background-color: var(--color-white);
+}
+
+/* TEXTO */
+.text-primary {
+    color: var(--color-primary) !important;
+}
+.text-success {
+    color: var(--color-success) !important;
+}
+.text-background {
+    color: var(--color-background) !important;
+}
+.text-white {
+    color: var(--color-white) !important;
+}
+.text-placeholder {
+    color: var(--color-placeholder) !important;
+}
+
+/* FONDOS */
+.bg-primary {
+    background-color: var(--color-primary)!important;
+}
+.bg-success {
+    background-color: var(--color-success) !important;
+}
+.bg-background {
+    background-color: var(--color-background) !important;
+}
+.bg-white {
+    background-color: var(--color-white) !important;
+}
+.bg-placeholder {
+    background-color: var(--color-placeholder) !important;
+}
+
+/* ENLACES */
+.nav-link-custom{
+    color: var(--color-success) !important;
+}
