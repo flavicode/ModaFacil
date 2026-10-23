@@ -2,7 +2,8 @@
     --color-primary: #2c1212; /* texto*/
     --color-success: #c36363; /* botones */
     --color-background: #f2e7e5; /*footer */
-    --color-white: #f8f8f8; /* fondo */
+    --color-light: #f8f8f8; /* fondo */
+    --color-white: #ffffff; /* fondo */
     --color-placeholder: #c0a0a0;/* form */
 
     /*--color-success-dark: color-mix(in srgb, var(--color-success), #000 15%);    --color-white: #ffffff;
@@ -27,13 +28,13 @@ body {
 .text-white {
     color: var(--color-white) !important;
 }
-.text-placeholder {
+input::placeholder {
     color: var(--color-placeholder) !important;
 }
 
 /* FONDOS */
 .bg-primary {
-    background-color: var(--color-primary)!important;
+    background-color: var(--color-white)!important;
 }
 .bg-success {
     background-color: var(--color-success) !important;
@@ -46,6 +47,12 @@ body {
 }
 .bg-placeholder {
     background-color: var(--color-placeholder) !important;
+}
+.bg-success-subtle-hover {
+    transition: background-color 0.3s ease;
+    &:hover {
+        background-color: rgba(var(--color-success), 0.5) !important;
+    }
 }
 
 /* ENLACES */

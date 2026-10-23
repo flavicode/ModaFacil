@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://thymeleaf.org">
-    <head th:replace="~{layout :: head('login.css')}">
-        <title>Iniciar sesión - ImportaFácil</title>
-    </head>
+    <head th:replace="~{layout :: head('login.css', 'Iniciar sesión')}"></head>
 
     <body class="bg-light-layout min-vh-100 d-flex flex-column">
 
@@ -18,16 +16,13 @@
                     <p class="text-muted small">Ingresa tus credenciales para acceder a tu cuenta</p>
                 </div>
 
+                <!-- Alerta de Registro Exitoso -->
                 <div th:if="${param.registrado != null}" class="alert alert-success border-0 rounded-3 small fw-medium mb-4 d-flex align-items-center gap-2">
                     <i class="bi bi-check-circle-fill"></i>
                     <span>¡Cuenta creada con éxito! Ya puedes iniciar sesión con tus credenciales.</span>
                 </div>
-
-                <div th:if="${errorRegistro != null}" class="alert alert-warning border-0 rounded-3 small fw-medium mb-4 d-flex align-items-center gap-2">
-                    <i class="bi bi-exclamation-octagon-fill"></i>
-                    <span th:text="${errorRegistro}">Mensaje de error de registro genérico</span>
-                </div>
                 
+                <!-- Alerta de Error en Login -->
                 <div th:if="${errorLogin != null}" class="alert alert-danger border-0 rounded-3 small fw-medium mb-4 d-flex align-items-center gap-2">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                     <span th:text="${errorLogin}">Mensaje de error genérico</span>
@@ -35,6 +30,7 @@
 
                 <form id="formulario-login" th:action="@{/login}" method="POST" class="needs-validation" novalidate>
                     
+                    <!-- Campo Correo -->
                     <div class="mb-3">
                         <label for="username" class="form-label small fw-bold text-dark mb-2">Correo electrónico</label>
                         <div class="input-group input-group-custom">
@@ -45,6 +41,7 @@
                         <div class="text-danger small mt-1 d-none" id="error-login-correo">Ingresa un correo electrónico válido.</div>
                     </div>
 
+                    <!-- Campo Contraseña -->
                     <div class="mb-4">
                         <label for="password" class="form-label small fw-bold text-dark mb-2">Contraseña</label>
                         <div class="input-group input-group-custom">
@@ -56,76 +53,22 @@
                         <div class="text-danger small mt-1 d-none" id="error-login-password">La contraseña es obligatoria.</div>
                     </div>
 
-                    <button type="submit" class="btn btn-success btn-login-submit w-100 py-3 fw-bold rounded-3 border-0 mb-4 shadow-sm">
+                    <!-- Botón de Envío -->
+                    <button type="submit" class="btn bg-success text-white w-100 py-3 fw-bold rounded-3 border-0 mb-4 shadow-sm">
                         Iniciar Sesión
                     </button>
                     
+                    <!-- Enlace redirigiendo a una página externa de registro -->
                     <div class="text-center small">
-                        <span class="text-muted">¿Eres nuevo en ImportaFácil? </span>
-                        <a href="#" class="text-success-link fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalRegistro">Crear cuenta</a>
+                        <span class="text-muted">¿Eres nuevo en ModaFácil? </span>
+                        <a href="/registro" class="text-success fw-bold text-decoration-none">Crear cuenta</a>
                     </div>
                 </form>
             </div>
         </main>
 
-        <!-- Modal de Registro -->
-        <div class="modal fade" id="modalRegistro" tabindex="-1" aria-labelledby="modalRegistroLabel" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 rounded-4 shadow-lg p-3">
-                    <div class="modal-header border-0 pb-0">
-                        <h2 class="modal-title h4 fw-bold text-dark" id="modalRegistroLabel">Crear Cuenta</h2>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted small mb-4">Regístrate en ImportaFácil y empieza a conectar con los mejores proveedores.</p>
-                        <form id="formulario-registro" th:action="@{/registro}" method="POST" class="needs-validation" novalidate>
-                            <!-- Dentro del modal de registro -->
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-dark mb-2">Nombre completo</label>
-                                <div class="input-group input-group-custom">
-                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-person"></i></span>
-                                    <input type="text" id="reg-nombre" name="nombre" class="form-control border-start-0 ps-0 text-dark fw-medium" placeholder="Juan Pérez" required>
-                                </div>
-                                <div class="text-danger small mt-1 d-none" id="error-nombre">Ingresa un nombre válido sin números ni símbolos.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-dark mb-2">Correo electrónico</label>
-                                <div class="input-group input-group-custom">
-                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
-                                    <input type="email" id="reg-correo" name="correo" class="form-control border-start-0 ps-0 text-dark fw-medium" placeholder="ejemplo@correo.com" required>
-                                </div>
-                                <div class="text-danger small mt-1 d-none" id="error-correo">Ingresa un correo electrónico válido.</div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label small fw-bold text-dark mb-2">Contraseña</label>
-                                <div class="input-group input-group-custom">
-                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-lock"></i></span>
-                                    <input type="password" id="reg-password" name="password" class="form-control border-start-0 ps-0 text-dark fw-medium" placeholder="••••••••" required>
-                                </div>
-                                <div class="text-danger small mt-1 d-none" id="error-password">La contraseña debe tener mínimo 8 caracteres, incluir una mayúscula, una minúscula, un número y un símbolo</div>
-                            </div>
-                            <button type="submit" class="btn btn-success btn-login-submit w-100 py-3 fw-bold rounded-3 border-0 shadow-sm mb-2">
-                                Registrarme Gratis
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+        <script th:src="@{/js/login.js}"></script>
         <!-- FOOTER -->
         <div th:replace="~{layout :: footer}"></div>
-
-        <script th:src="@{/js/login.js}"></script>
-
-        <script th:if="${param.registrar != null}">
-            document.addEventListener('DOMContentLoaded', () => {
-                const modalElemento = document.getElementById('modalRegistro');
-                if (modalElemento) {
-                    const miModal = new bootstrap.Modal(modalElemento);
-                    miModal.show();
-                }
-            });
-        </script>
     </body>
 </html>

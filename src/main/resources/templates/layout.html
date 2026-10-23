@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://thymeleaf.org">
-    <head th:fragment="head(page_style)">
+    <head th:fragment="head(page_style, titleText)">
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>ModaFacil</title>
+        <title th:text="|ModaFacil - ${titleText}|">ModaFacil</title>
         <!-- Fuentes -->
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -41,20 +41,49 @@
                         <!-- Si NO hay sesión iniciada -->
                         <div th:if="${session.logged == null}" class="d-flex flex-column flex-lg-row align-items-center gap-3 pt-2 pt-lg-0 ms-lg-auto">
                             <a href="/login" class="nav-link nav-link-custom fw-bold text-nowrap py-lg-0">Iniciar Sesión</a>
-                            <a href="/login?registrar=true" class="btn bg-success px-4 py-2 rounded-3 fw-bold w-100 w-lg-auto text-nowrap border-0">Registrarme</a>
+                            <a href="/login?registrar=true" class="btn bg-success text-white px-4 py-2 rounded-3 fw-bold w-100 w-lg-auto text-nowrap border-0">Registrarme</a>
                         </div>
 
                         <!-- Si SÍ hay sesión iniciada -->
-                        <div th:if="${session.logged != null}" class="d-flex align-items-center gap-3 border-start ps-3 mt-3 mt-lg-0 ms-lg-auto flex-shrink-0 justify-content-center justify-content-lg-end">
-                            <div class="text-start">
-                                <div class="fw-bold small text-dark lh-1" th:text="${session.logged.nombre}">Invitado</div>
-                                <span th:if="${session.logged.perfilPremium == null}" class="badge text-white bg-secondary xsmall mt-1 px-2 py-1">Cliente Estándar</span>
-                                <span th:if="${session.logged.perfilPremium != null}" class="badge text-dark bg-success xsmall mt-1 px-2 py-1">
-                                    Premium (<span th:text="${session.logged.perfilPremium.cantidadPuntos}">0</span> pts)
-                                </span>
+                        <div th:if="${session.logged != null}" class="dropdown ms-lg-auto mt-3 mt-lg-0 border-start ps-lg-3 d-flex justify-content-center justify-content-lg-end">
+                            <div class="dropdown d-none d-lg-block">
+                                <div class="d-none d-lg-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-success-subtle-hover cursor-pointer user-select-none user-dropdown-toggle" 
+                                    id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="fw-bold small text-dark lh-1" th:text="${session.logged?.nombre}">Usuario</span>
+                                    <i class="bi bi-person-circle fs-3 text-primary flex-shrink-0"></i>
+                                </div>
+                                
+                                <!-- Menú desplegable -->
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="userMenuDropdown">
+                                    <li>
+                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" href="/compras">
+                                            <i class="bi bi-bag-check text-muted"></i> Ver compras
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" href="/perfil">
+                                            <i class="bi bi-gear text-muted"></i> Editar perfil
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-danger text-decoration-none" href="/logout">
+                                            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
-                            <i class="bi bi-person-circle fs-3 text-primary flex-shrink-0"></i>
-                            <a href="/logout" class="btn btn-sm btn-outline-danger ms-2" title="Cerrar Sesión"><i class="bi bi-box-arrow-right"></i></a>
+                            <div class="d-flex d-lg-none justify-content-around align-items-center w-100 py-2 border-top mt-2">
+                                <a href="/compras" class="text-secondary p-2" title="Ver compras">
+                                    <i class="bi bi-bag-check fs-3"></i>
+                                </a>
+                                <a href="/perfil" class="text-secondary p-2" title="Editar perfil">
+                                    <i class="bi bi-gear fs-3"></i>
+                                </a>
+                                <a href="/logout" class="text-danger p-2" title="Cerrar sesión">
+                                    <i class="bi bi-box-arrow-right fs-3"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -78,7 +107,7 @@
                         <ul class="list-unstyled d-flex flex-column gap-2 small">
                             <li><a href="/" class="nav-link-custom text-decoration-none">Página Principal</a></li>
                             <li><a href="/login" class="nav-link-custom text-decoration-none">Iniciar Sesión</a></li>
-                            <li><a href="/productos" class="nav-link-custom text-decoration-none">Catálogo de Productos</a></li>
+                            <li><a th:href="@{/productos}" class="nav-link-custom text-decoration-none">Catálogo de Productos</a></li>
                             <li><a href="/comparar" class="nav-link-custom text-decoration-none btn-nav-comparar">Comparar Precios</a></li>
                         </ul>
                     </div>
@@ -100,5 +129,6 @@
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
             <script th:src="@{/js/main.js}"></script>
         </footer>
+
     </body>
 </html>

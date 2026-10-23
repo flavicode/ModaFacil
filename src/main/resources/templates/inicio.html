@@ -1,23 +1,160 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://thymeleaf.org">
-    <head th:replace="~{layout :: head('inicio.css')}">
-        <title>Iniciar sesión - ImportaFácil</title>
-    </head>
+    <head th:replace="~{layout :: head('inicio.css', 'Conecta con proveedores')}"></head>
 
-    <body class="bg-light-layout min-vh-100 d-flex flex-column">
+    <body class="bg-white text-dark">
 
         <!-- HEADER -->
         <div th:replace="~{layout :: header}"></div>
 
         <!-- MAIN -->
-        <main class="flex-grow-1">
-            xd
+        <main>
+            <!-- Banner -->
+            <section class="py-5 my-md-4 bg-light">
+                <div class="container color-light">
+                    <div class="row align-items-center gy-5">
+                        <div class="col-lg-6">
+                            <span class="badge text-wrap text-start text-uppercase tracking-wider px-3 py-2 mb-3 bg-light text-danger border border-danger-subtle rounded-pill fw-bold lh-base">
+                                <i class="bi bi-pin-angle-fill me-1 flex-shrink-0"></i> Para microemprendedores en el Perú
+                            </span>
+                            <h1 class="display-4 fw-bold text-dark mb-4 lh-sm">
+                                Encuentra las mejores prendas y proveedores en un solo lugar
+                            </h1>
+                            <p class="text-muted fs-5 mb-4 lh-base max-w-xl">
+                                Explora diferentes modelos de ropa, compara precios entre proveedores y encuentra la mejor opción para tu negocio.
+                            </p>
+                            <a href="/login?registrar=true" class="btn bg-success text-white btn-lg px-5 py-3 fw-bold shadow-sm rounded-3">
+                                Registrarme Gratis
+                            </a>
+                        </div>
+                        <div class="col-lg-6 position-relative text-center">
+                            <div class="position-absolute badge-discount p-4 bg-success text-white rounded-4 shadow-lg text-start z-3">
+                                <div class="display-5 fw-extrabold">-40%</div>
+                                <div class="small">En costos de<br>compra.</div>
+                            </div>
+                            <div class="image-wrapper rounded-4 shadow-sm mx-auto hero-image-container">
+                                <div class="w-100 h-100 rounded-4 overflow-hidden position-relative z-2">
+                                    <img th:src="@{/img/img_principal.jpg}" class="img-fluid w-100 h-100 object-fit-cover" alt="Trabajo en almacén">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Estadísticas -->
+            <section class="py-5 bg-yellow-pastel border-top border-bottom">
+                <div class="container">
+                    <div class="row text-center gy-4 justify-content-center">
+                        <div class="col-6 col-md-3">
+                            <div class="display-6 fw-extrabold text-dark">+2,500</div>
+                            <div class="text-secondary small text-uppercase tracking-wider fw-medium mt-1">Proveedores Verificados</div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="display-6 fw-extrabold text-dark">+15,000</div>
+                            <div class="text-secondary small text-uppercase tracking-wider fw-medium mt-1">Prendas Disponibles</div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="display-6 fw-extrabold text-dark">+8,000</div>
+                            <div class="text-secondary small text-uppercase tracking-wider fw-medium mt-1">Microemprendedores Activos</div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="display-6 fw-extrabold text-dark">98%</div>
+                            <div class="text-secondary small text-uppercase tracking-wider fw-medium mt-1">Satisfacción</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Características -->
+            <section class="py-5 my-md-5">
+                <div class="container">
+                    <div class="text-center mb-5">
+                        <span class="text-success text-uppercase fw-bold tracking-wider small">Beneficios</span>
+                        <h2 class="h1 fw-bold text-dark mt-2">Todo lo que Necesitas en un Solo Lugar</h2>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm card-feature">
+                                <div class="icon-shape bg-white text-success rounded-3 shadow-sm mb-4 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-lightning-charge fs-4"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-dark mb-3">Búsqueda de Prendas</h3>
+                                <p class="text-muted mb-0">
+                                    Encuentra rápidamente prendas según categoría, modelo, talla, color o tipo de ropa.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm card-feature">
+                                <div class="icon-shape bg-white text-success rounded-3 shadow-sm mb-4 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-bar-chart-steps fs-4"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-dark mb-3">Comparación de Precios</h3>
+                                <p class="text-muted mb-0">
+                                    Compara los precios de una misma prenda entre diferentes proveedores y encuentra la mejor opción.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 p-4 border-0 bg-light rounded-4 shadow-sm card-feature">
+                                <div class="icon-shape bg-white text-success rounded-3 shadow-sm mb-4 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-chat-left-text fs-4"></i>
+                                </div>
+                                <h3 class="h4 fw-bold text-dark mb-3">Proveedores Especializados</h3>
+                                <p class="text-muted mb-0">
+                                    Consulta diferentes proveedores de ropa y conoce sus precios, tallas disponibles y condiciones de compra.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ¿Cómo funciona? -->
+            <section class="py-5 bg-blue-pastel border-top border-bottom">
+                <div class="container py-md-4">
+                    <div class="text-center mb-5">
+                        <span class="text-uppercase fw-bold tracking-wider small text-secondary">Paso a Paso</span>
+                        <h2 class="h1 fw-bold text-dark mt-2">¿Cómo Funciona?</h2>
+                    </div>
+                    <div class="row g-4 text-start">
+                        <div class="col-md-4">
+                            <div class="display-4 fw-extrabold text-success mb-2">01</div>
+                            <h3 class="h5 fw-bold text-dark mb-2">Explora</h3>
+                            <p class="text-secondary small">Explora diferentes prendas según categoría, modelo, talla, color y precio.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="display-4 fw-extrabold text-success mb-2">02</div>
+                            <h3 class="h5 fw-bold text-dark mb-2">Compara</h3>
+                            <p class="text-secondary small">Compara precios, proveedores y condiciones para encontrar la mejor alternativa.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="display-4 fw-extrabold text-success mb-2">03</div>
+                            <h3 class="h5 fw-bold text-dark mb-2">Elige</h3>
+                            <p class="text-secondary small">Selecciona el proveedor que mejor se adapte a tus necesidades y realiza tu consulta.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Registrate -->
+            <section class="py-5 bg-yellow-pastel border-top border-bottom text-center">
+                <div class="container py-4">
+                    <h2 class="display-5 fw-bold text-dark mb-3">Encuentra las mejores prendas para tu negocio</h2>
+                    <p class="text-secondary fs-5 mb-4 mx-auto max-w-xl">
+                        Explora modelos de ropa, compara precios entre proveedores y encuentra las mejores opciones para hacer crecer tu negocio.
+                    </p>
+                    <a href="login?registrar=true" class="btn bg-success text-white btn-lg px-5 py-3 fw-bold shadow-sm rounded-3">
+                        Registrarme Gratis
+                    </a>
+                </div>
+            </section>
         </main>
 
         <!-- FOOTER -->
         <div th:replace="~{layout :: footer}"></div>
-
-        <script th:src="@{/js/inicio.js}"></script>
 
     </body>
 </html>
