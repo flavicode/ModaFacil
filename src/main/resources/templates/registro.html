@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org">
+    <head th:replace="~{layout :: head('registro.css', 'Crear cuenta')}"></head>
+
+    <body class="bg-light-layout min-vh-100 d-flex flex-column">
+
+        <!-- HEADER -->
+        <div th:replace="~{layout :: header}"></div>
+
+        <!-- MAIN -->
+        <main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+            <!-- Formulario Registro Completo (Se muestra siempre) -->
+            <div class="card card-login border-0 p-4 p-sm-5 rounded-5 shadow-sm bg-white">
+                <div class="text-center mb-4">
+                    <h1 class="h2 fw-bold text-dark mb-2">Crear Cuenta</h1>
+                    <p class="text-muted small">Regístrate en ImportaFácil y empieza a conectar con los mejores proveedores.</p>
+                </div>
+
+                <!-- Alertas de Error exclusivas de Registro -->
+                <div th:if="${errorRegistro != null}" class="alert alert-warning border-0 rounded-3 small fw-medium mb-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-octagon-fill"></i>
+                    <span th:text="${errorRegistro}">Mensaje de error de registro genérico</span>
+                </div>
+
+                <form id="formulario-registro" th:action="@{/registro}" method="POST" class="needs-validation" novalidate>
+                    
+                    <!-- Nombre Completo -->
+                    <div class="mb-3">
+                        <label for="reg-nombre" class="form-label small fw-bold text-dark mb-2">Nombre completo</label>
+                        <div class="input-group input-group-custom">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-person"></i></span>
+                            <input type="text" id="reg-nombre" name="nombre" class="form-control border-start-0 ps-0 text-dark fw-medium" placeholder="Juan Pérez" required>
+                        </div>
+                        <div class="text-danger small mt-1 d-none" id="error-nombre">Ingresa un nombre válido sin números ni símbolos.</div>
+                    </div>
+
+                    <!-- Correo Electrónico -->
+                    <div class="mb-3">
+                        <label for="reg-correo" class="form-label small fw-bold text-dark mb-2">Correo electrónico</label>
+                        <div class="input-group input-group-custom">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                            <input type="email" id="reg-correo" name="correo" class="form-control border-start-0 ps-0 text-dark fw-medium" placeholder="ejemplo@correo.com" required>
+                        </div>
+                        <div class="text-danger small mt-1 d-none" id="error-correo">Ingresa un correo electrónico válido.</div>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="mb-4">
+                        <label for="reg-password" class="form-label small fw-bold text-dark mb-2">Contraseña</label>
+                        <div class="input-group input-group-custom">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                            <input type="password" id="reg-password" name="password" class="form-control border-start-0 ps-0 text-dark fw-medium" placeholder="••••••••" required>
+                        </div>
+                        <div class="text-danger small mt-1 d-none" id="error-password">La contraseña debe tener mínimo 8 caracteres, incluir una mayúscula, una minúscula, un número y un símbolo</div>
+                    </div>
+
+                    <!-- Botón de Envío -->
+                    <button type="submit" class="btn btn-success btn-login-submit w-100 py-3 fw-bold rounded-3 border-0 shadow-sm mb-4">
+                        Registrarme Gratis
+                    </button>
+                    
+                    <!-- Enlace de retorno al Login -->
+                    <div class="text-center small">
+                        <span class="text-muted">¿Ya tienes una cuenta? </span>
+                        <a th:href="@{/login}" class="text-success-link fw-bold text-decoration-none">Inicia sesión aquí</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <div th:replace="~{layout :: footer}"></div>
+    </body>
+</html>

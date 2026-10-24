@@ -1,0 +1,249 @@
+/* Contenedor del buscador */
+.buscador-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Icono de lupa */
+.buscador-icono {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #64748b;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Campo de búsqueda */
+.buscador-input {
+    width: 100%;
+    height: 45px;
+    padding: 10px 15px 10px 45px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* FILTROS */
+.genero-tabs {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 25px;
+}
+
+.genero-btn,
+.genero-reset {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px 12px;
+}
+
+.genero-btn {
+    font-size: 18px;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+}
+
+.genero-btn.active {
+    color: #c65f65;
+    border-bottom-color: #c65f65;
+}
+
+.genero-reset {
+    margin-left: auto;
+    color: #c65f65;
+}
+
+/* FILTROS POR GENEROS */
+.categoria-btn {
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    padding: 6px 18px;
+    cursor: pointer;
+}
+
+.categoria-btn.active {
+    background: #dfb9bb;
+    border-color: #dfb9bb;
+}
+
+
+/* CARRUSEL HORIZONTAL DE CATEGORÍAS */
+/* Contenedor general */
+.categorias-carrusel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Área visible de categorías */
+.categorias-viewport {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+/* Ocultar barra de desplazamiento */
+.categorias-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+/* Categorías en una sola fila */
+.categorias-track {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 12px;
+    width: max-content;
+    min-width: 100%;
+}
+
+/* Botones dentro del carrusel */
+.categorias-track .categoria-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+/* Botones de navegación */
+.categoria-mas,
+.categoria-navegacion {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Ocultar botones cuando corresponda */
+.categoria-navegacion[hidden],
+.categoria-mas[hidden] {
+    display: none !important;
+}
+
+
+
+/*1. TARJETA DEL PRODUCTO*/
+
+.producto-card {
+    border: 1px solid #eeeeee;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+    height: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto-card:hover {
+    transform: translateY(-3px);
+    
+}
+
+
+/*IMAGEN DEL PRODUCTO*/
+
+.producto-imagen-wrapper {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    background: #f8f8f8;
+    border-radius: 12px 12px 0 0;
+}
+
+.producto-imagen {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: cover;
+}
+
+
+/*BOTÓN DE FAVORITOS*/
+
+.producto-favorito {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 7px;
+    color: #333333;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.producto-favorito:hover,
+.producto-favorito.activo {
+    color: #c65f65;
+}
+
+
+/*INFORMACIÓN DEL PRODUCTO*/
+
+.producto-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.producto-nombre {
+    font-size: 17px;
+    font-weight: 600;
+    color: #252525;
+    margin: 0;
+}
+
+.producto-precio {
+    font-size: 15px;
+    font-weight: 400;
+    color: #666666;
+    margin: 0 0 12px;
+}
+
+
+/*CANTIDAD DE PROVEEDORES*/
+
+.producto-proveedores {
+    font-size: 12px;
+    font-weight: 500;
+    color: #c65f65;
+    background: #fff4f4;
+    padding: 5px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+
+/*BOTÓN COMPARAR PRECIOS*/
+  
+.btn-comparar {
+    background: #c65f65;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.btn-comparar:hover {
+    background: #a94c52;
+    color: #ffffff;
+}

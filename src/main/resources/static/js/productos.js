@@ -8,53 +8,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const sinResultados = document.getElementById("sin-resultados");
     const botonVerTodo = document.getElementById("btn-ver-todo");
 
-    let categoriaActual = "Todas";
+    let filtrosActuales = {
+    genero: "Todos",
+    categoria: "Todas"
+    };
+
     let mostrarTodos = false;
+    const productos = Array.isArray(window.productosCatalogo)
+    ? window.productosCatalogo
+    : [];
 
-    // 1. OBTENER PRODUCTOS DEL SERVIDOR
+    console.log("Productos recibidos:", productos.length);
 
-    const relaciones = Array.isArray(relacionesServidor)
-        ? relacionesServidor
-        : [];
-
-    // 2. AGRUPAR PRECIOS Y PROVEEDORES POR PRODUCTO
-
-    const mapaProductos = new Map();
-
-    relaciones.forEach(rel => {
-
-        if (!rel.producto) return;
-
-        const p = rel.producto;
-        const id = p.idProducto;
-
-        if (id == null) return;
-
-        if (!mapaProductos.has(id)) {
-            mapaProductos.set(id, {
-                id: id,
-                nombre: p.nombre || "",
-                descripcion: p.descripcion || "",
-                imagen: p.imagen || "",
-                categoria: p.categoria?.nombre || "",
-                precios: [],
-                proveedores: new Set()
-            });
-        }
-
-        const producto = mapaProductos.get(id);
-        const precio = Number(rel.precio);
-
-        if (rel.precio != null && Number.isFinite(precio)) {
-            producto.precios.push(precio);
-        }
-
-        if (rel.importador?.idImportador != null) {
-            producto.proveedores.add(rel.importador.idImportador);
-        }
-    });
-
-    const productos = Array.from(mapaProductos.values());
+    if (productos.length === 0) {
+        console.warn(
+            "No se recibieron productos desde productos-data.js"
+        );
+    }
 
     // 3. FUNCIONES AUXILIARES
 
@@ -71,19 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function obtenerPrecio(producto) {
+
         if (producto.precios.length === 0) {
             return "Precio no disponible";
         }
 
-        const minimo = Math.min(...producto.precios);
-        const maximo = Math.max(...producto.precios);
+        const precioMinimo = Math.min(...producto.precios);
 
-        if (minimo === maximo) {
-            return "Desde " + dinero(minimo);
-        }
-
-        return "Desde " + dinero(minimo) +
-               " - " + dinero(maximo);
+        return "S/ " + precioMinimo.toFixed(2);
     }
 
     function obtenerImagen(ruta) {
@@ -97,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return ruta;
         }
 
-        return "/images/" + ruta;
+        return "/img/" + ruta;
     }
 
     // 4. CREAR UNA TARJETA
@@ -176,8 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
         proveedores.className = "producto-proveedores";
 
         const cantidad = producto.proveedores.size;
+
         proveedores.textContent =
-            cantidad + (cantidad === 1 ? " proveedor" : " proveedores");
+            cantidad > 5
+                ? "5+ proveedores"
+                : cantidad + (cantidad === 1 ? " proveedor" : " proveedores");
 
         const comparar = document.createElement("a");
         comparar.className = "btn btn-comparar";
@@ -200,21 +168,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const filtrados = productos.filter(producto => {
 
+            // FILTRO POR BÚSQUEDA
             const coincideBusqueda =
                 normalizar(producto.nombre).includes(texto) ||
                 normalizar(producto.categoria).includes(texto) ||
                 normalizar(producto.descripcion).includes(texto);
 
-            const categoriaProducto = normalizar(producto.categoria);
-            const filtroCategoria = normalizar(categoriaActual);
+            // FILTRO POR GÉNERO
+            const coincideGenero =
+                filtrosActuales.genero === "Todos" ||
+                normalizar(producto.genero) ===
+                normalizar(filtrosActuales.genero);
 
+            // FILTRO POR CATEGORÍA
             const coincideCategoria =
-                categoriaActual === "Todas" ||
-                categoriaProducto === filtroCategoria ||
-                categoriaProducto.includes(filtroCategoria) ||
-                filtroCategoria.includes(categoriaProducto);
+                filtrosActuales.categoria === "Todas" ||
+                normalizar(producto.categoria) ===
+                normalizar(filtrosActuales.categoria);
 
-            return coincideBusqueda && coincideCategoria;
+            return coincideBusqueda &&
+                coincideGenero &&
+                coincideCategoria;
         });
 
         const visibles = mostrarTodos
@@ -227,8 +201,13 @@ document.addEventListener("DOMContentLoaded", () => {
             contenedor.appendChild(crearTarjeta(producto));
         });
 
-        contador.textContent = filtrados.length + " productos";
-        categoriaTexto.textContent = categoriaActual;
+        if (contador) {
+            contador.textContent = filtrados.length + " productos";
+        }
+
+        if (categoriaTexto) {
+            categoriaTexto.textContent = filtrosActuales.categoria;
+        }
 
         sinResultados.classList.toggle(
             "d-none",
@@ -252,24 +231,23 @@ document.addEventListener("DOMContentLoaded", () => {
         renderizarProductos();
     });
 
-    // 7. BOTONES DE CATEGORÍAS
+    // 7. RECIBIR FILTROS DESDE catalogo.js
 
-    document.querySelectorAll(".categoria-btn").forEach(boton => {
+    document.addEventListener(
+        "catalogo:filtros-cambiados",
+        (evento) => {
 
-        boton.addEventListener("click", () => {
+            filtrosActuales = {
+                genero: evento.detail.genero,
+                categoria: evento.detail.categoria
+            };
 
-            document.querySelectorAll(".categoria-btn")
-                .forEach(b => b.classList.remove("active"));
-
-            boton.classList.add("active");
-
-            categoriaActual = boton.dataset.categoria;
             mostrarTodos = false;
 
             renderizarProductos();
-        });
-    });
-
+        }
+    );
+    
     // 8. BOTÓN VER TODO
 
     botonVerTodo.addEventListener("click", () => {

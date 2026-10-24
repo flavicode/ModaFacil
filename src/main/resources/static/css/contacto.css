@@ -1,0 +1,23 @@
+.btn-success-dark {
+    background-color: var(--color-success-dark) !important;
+}
+
+.btn-success-dark:hover {
+    opacity: 0.9;
+}
+
+.form-custom {
+    top: -20px;
+    right: -20px;
+    width: 120px;
+    height: 120px;
+    opacity: 0.7;
+    background-color: var(--color-success-dark) !important;
+}
+
+.nav-icon-box {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important; /* Evita que el contenedor se encoja */
+    min-height: 50px !important; /* Evita que el contenedor se aplaste */
+}

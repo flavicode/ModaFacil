@@ -1,9 +1,10 @@
 :root {
     --color-primary: #2c1212; /* texto*/
     --color-success: #c36363; /* botones */
-    --color-background: #f2e7e5; /*footer */
-    --color-light: #f8f8f8; /* fondo */
-    --color-white: #ffffff; /* fondo */
+    --color-success-light: #e7cdcd; /* botones hover */
+    --color-background: #f2e7e5; /*header and footer */
+    --color-light: #f8f8f8; /* fondo plomo*/
+    --color-white: #ffffff; /* fondo blanco */
     --color-placeholder: #c0a0a0;/* form */
 
     /*--color-success-dark: color-mix(in srgb, var(--color-success), #000 15%);    --color-white: #ffffff;
@@ -16,6 +17,9 @@ body {
 }
 
 /* TEXTO */
+.font-serif {
+    font-family: 'Playfair Display', serif !important;
+}
 .text-primary {
     color: var(--color-primary) !important;
 }
@@ -42,6 +46,9 @@ input::placeholder {
 .bg-background {
     background-color: var(--color-background) !important;
 }
+.bg-light{
+    background-color: var(--color-light) !important;
+}
 .bg-white {
     background-color: var(--color-white) !important;
 }
@@ -57,5 +64,18 @@ input::placeholder {
 
 /* ENLACES */
 .nav-link-custom{
-    color: var(--color-success) !important;
+    color: var(--color-primary) !important; /* Texto color oscuro por defecto */
+    padding: 8px 16px; /* Da el espacio interno para que se vea como un botón */
+    border-radius: 50px; /* Hace que los bordes sean completamente curvos (píldora) */
+    transition: all 0.3s ease; /* Animación suave al cambiar de color */
+    text-decoration: none; /* Quita el subrayado de los enlaces */
+    font-weight: 500;
+}
+
+/* Efecto al pasar el mouse (Hover) y estado Activo (página actual) */
+.nav-link-custom:hover,
+.nav-link-custom.active {
+    background-color: var(--color-success-light); /* Color rosado pastel para el fondo del resaltado */
+    color: var(--color-primary) !important; /* Mantiene el texto oscuro para que resalte */
+    font-weight: 700; /* Pone el texto en negrita para destacar más */
 }

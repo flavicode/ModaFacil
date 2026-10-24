@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org">
+    <head th:replace="~{layout :: head('contacto.css', 'Contacto')}"></head>
+
+    <body class="bg-white text-dark">
+
+        <!-- HEADER -->
+        <div th:replace="~{layout :: header}"></div>
+
+        <!-- MAIN  -->
+        <main class="bg-light py-5">
+            <div class="container py-md-4">
+                <div class="row g-5 align-items-center">
+                    <div class="col-lg-5">
+                        <h1 class="display-5 fw-bold text-dark mb-3">Contáctanos</h1>
+                        <p class="text-muted fs-5 mb-5">Estamos aquí para ayudarte. Escríbenos y te responderemos lo antes posible.</p>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-2 shadow-sm border border-light">
+                                <div class="nav-icon-box bg-success text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="bi bi-envelope-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark small">Correo electrónico</div>
+                                    <a href="mailto:hola@modafacil.com" class="text-muted small text-decoration-none">hola@modafacil.com</a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-4 shadow-sm border border-light">
+                                <div class="nav-icon-box bg-success-light rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="bi bi-telephone-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark small">Teléfono</div>
+                                    <span class="text-muted small">+51 972 528 304</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-4 shadow-sm border border-light">
+                                <div class="nav-icon-box bg-success-light rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                                    <i class="bi bi-clock-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark small">Horario de atención</div>
+                                    <div class="text-muted small">Lunes a Viernes: 9:00 a.m. - 6:00 p.m.</div>
+                                    <div class="text-muted small">Sábados: 9:00 a.m. - 1:00 p.m.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 offset-lg-1 position-relative">
+                        <div class="position-absolute bg-success-dark rounded-4 d-none d-lg-block z-1 form-custom"></div>
+                        <div class="card p-4 p-sm-5 border-0 shadow rounded-4 bg-white position-relative z-2">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">Nombre completo</label>
+                                    <input type="text" class="form-control bg-light-layout border-light-subtle rounded-3 py-2 text-dark small" placeholder="Ej. María García" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">Correo electrónico</label>
+                                    <input type="email" class="form-control bg-light-layout border-light-subtle rounded-3 py-2 text-dark small" placeholder="ejemplo@correo.com" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">Asunto</label>
+                                    <input type="text" class="form-control bg-light-layout border-light-subtle rounded-3 py-2 text-dark small" placeholder="¿En qué podemos ayudarte?" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label small fw-bold text-dark">Mensaje</label>
+                                    <textarea class="form-control bg-light-layout border-light-subtle rounded-3 py-2 text-dark small" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success-dark text-white w-100 py-2.5 rounded-3 fw-bold border-0 shadow-sm transition">
+                                    Enviar mensaje
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <div th:replace="~{layout :: footer}"></div>
+
+    </body>
+</html>

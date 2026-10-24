@@ -22,7 +22,7 @@
                 </p>
 
                 <!-- BUSCADOR -->
-                <div class="buscador-wrapper position-relative">
+                <div class="buscador-wrapper">
                     <i class="bi bi-search buscador-icono"></i>
 
                     <input
@@ -34,125 +34,61 @@
                 </div>
             </section>
 
-            <!-- CATEGORÍAS -->
+            <!-- FILTROS DE GÉNERO -->
             <section class="mb-4">
-                <div id="contenedor-categorias"
-                    class="d-flex flex-wrap justify-content-center gap-3">
-
-                    <button type="button"
-                            class="btn categoria-btn active"
-                            data-categoria="Todas">
-                        Todas
-                    </button>
-
-                    <button type="button"
-                            class="btn categoria-btn"
-                            data-categoria="Polos">
-                        Polos
-                    </button>
-
-                    <button type="button"
-                            class="btn categoria-btn"
-                            data-categoria="Pantalones">
-                        Pantalones
-                    </button>
-
-                    <button type="button"
-                            class="btn categoria-btn"
-                            data-categoria="Vestidos">
-                        Vestidos
-                    </button>
-
-                    <button type="button"
-                            class="btn categoria-btn"
-                            data-categoria="Blusas">
-                        Blusas
-                    </button>
-
-                    <button type="button"
-                            class="btn categoria-btn"
-                            data-categoria="Chaquetas">
-                        Chaquetas
-                    </button>
-
-                </div>
-            </section>
-
-            <!-- CONTADOR -->
-            <section class="mb-3">
-                <p class="text-secondary small mb-0">
-                    Mostrando
-                    <span id="contador-productos-texto" class="fw-semibold">
-                        0 productos
-                    </span>
-                    en
-                    <span id="categoria-actual-texto"
-                        class="fw-semibold text-dark">
-                        Todas
-                    </span>
-                </p>
-            </section>
-
-            <!-- CATÁLOGO -->
-            <section>
                 
-                <!-- CONTENEDOR DE PRODUCTOS -->
-                <div id="contenedor-productos"
-                    class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <div class="genero-tabs">
+                    <button type="button"
+                            class="genero-btn"
+                            data-genero="Mujer">Mujer</button>
 
-                    <!-- RECORRER LOS PRODUCTOS -->
-                    <div class="col" th:each="producto : ${productos}">
+                    <button type="button"
+                            class="genero-btn"
+                            data-genero="Hombre">Hombre</button>
 
-                        <div class="card producto-card shadow-sm h-100">
+                    <button type="button"
+                            class="genero-reset"
+                            id="ver-todos">Ver todos</button>
+                </div>
 
-                            <!-- IMAGEN -->
-                            <div class="producto-imagen-wrapper">
+                <!-- CARRUSEL HORIZONTAL DE CATEGORÍAS -->
+                <div class="categorias-carrusel">
 
-                                <img class="producto-imagen img-fluid"
-                                    th:src="@{'/img/' + ${producto.imagen}}"
-                                    th:alt="${producto.nombre}">
+                    <button type="button"
+                            id="btn-categorias-anterior"
+                            class="btn categoria-btn categoria-navegacion"
+                            aria-label="Categorías anteriores"
+                            hidden>
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
 
-                                <button type="button"
-                                        class="producto-favorito"
-                                        aria-label="Agregar a favoritos">
-                                    <i class="bi bi-heart"></i>
-                                </button>
+                    <div id="categorias-viewport"
+                        class="categorias-viewport">
 
-                            </div>
-
-                            <!-- INFORMACIÓN -->
-                            <div class="card-body producto-body d-flex flex-column">
-
-                                <!-- NOMBRE -->
-                                <h5 class="producto-nombre"
-                                    th:text="${producto.nombre}">
-                                    Nombre del producto
-                                </h5>
-
-                                <!-- CATEGORÍA -->
-                                <p class="text-secondary small"
-                                th:text="${producto.categoria.nombre}">
-                                    Categoría
-                                </p>
-
-                                <!-- BOTÓN -->
-                                <div class="mt-auto">
-
-                                    <a class="btn btn-comparar"
-                                    th:href="@{/comparar(id=${producto.idProducto})}">
-                                        Comparar Precios
-                                    </a>
-
-                                </div>
-
-                            </div>
-
+                        <div id="contenedor-categorias"
+                            class="categorias-track">
                         </div>
 
                     </div>
 
+                    <button type="button"
+                            id="btn-categorias-mas"
+                            class="btn categoria-btn categoria-mas">
+                        + Más
+                    </button>
+
                 </div>
 
+            </section>
+
+
+            <!-- CATÁLOGO -->
+            <section>
+                
+                <!-- PRODUCTOS GENERADOS DESDE JAVASCRIPT -->
+                <div id="contenedor-productos"
+                    class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                </div>
 
                 <!-- SIN RESULTADOS -->
                 <div id="sin-resultados"
@@ -170,7 +106,7 @@
                 <button type="button"
                         id="btn-ver-todo"
                         class="btn btn-catalogo px-4 py-2">
-                    Ver Todo el Catálogo
+                    Ver más
                 </button>
             </section>
 
@@ -186,8 +122,20 @@
             const relacionesServidor = /*[[${listaRelaciones}]]*/ [];
         </script>
 
-        <!-- JAVASCRIPT -->
-        <!--script th:src="@{/js/productos.js}"></script>-->
+        
+        <!-- DATOS ENVIADOS DESDE SPRING BOOT -->
+        <script th:inline="javascript">
+            window.relacionesServidor =
+                /*[[${relacionesServidor}]]*/ [];
+        </script>
 
+        <!-- 1. PROCESAMIENTO DE DATOS -->
+        <script th:src="@{/js/productos-data.js}" defer></script>
+
+        <!-- JAVASCRIPT DE PRODUCTO-->
+        <script th:src="@{/js/productos.js}" defer></script>
+
+        <!-- JAVASCRIPT DEL CATÁLOGO -->
+        <script th:src="@{/js/catalogo.js}" defer></script>
     </body>
 </html>
