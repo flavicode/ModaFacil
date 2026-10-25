@@ -7,12 +7,12 @@
 }
 
 .form-custom {
-    top: -20px;
-    right: -20px;
-    width: 120px;
-    height: 120px;
-    opacity: 0.7;
-    background-color: var(--color-success-dark) !important;
+    top: -35px;      /* Lo sube un poco más */
+    right: -35px;    /* Lo saca un poco más a la derecha */
+    width: 170px;    /* Tamaño aumentado para coincidir con el diseño */
+    height: 170px;
+    background-color: var(--color-success) !important; 
+    z-index: 1;      /* Lo coloca exactamente una capa por detrás de la tarjeta (z-2) */
 }
 
 .nav-icon-box {

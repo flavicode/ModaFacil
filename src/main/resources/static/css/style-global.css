@@ -6,10 +6,9 @@
     --color-light: #f8f8f8; /* fondo plomo*/
     --color-white: #ffffff; /* fondo blanco */
     --color-placeholder: #c0a0a0;/* form */
-
-    /*--color-success-dark: color-mix(in srgb, var(--color-success), #000 15%);    --color-white: #ffffff;
-    */
+    --color-success-dark: color-mix(in srgb, var(--color-success), #000 15%);
 }
+
 body {
     font-family: "Outfit", sans-serif;
     letter-spacing: -0.01em;

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,25 +26,6 @@ public class TiendaController implements ErrorController {
     }
 
 
-    // Vistas exclusivas de usuarios autenticados
-
-    @GetMapping("/comparar")
-    public String comparar(
-            @RequestParam(required = false) Long id,
-            Model model,
-            HttpSession session) {
-        model.addAttribute("paginaActual", "comparar");
-        if (session.getAttribute("logged") == null) {
-            return "redirect:/login";
-        }
-        if (id == null) {
-            model.addAttribute("productoSeleccionado", null);
-            return "comparar";
-        }
-        return "comparar";
-
-    }
-
     // Cerrar sesion
     @GetMapping("/logout")
     public String logout(HttpSession session) {
@@ -65,4 +45,3 @@ public class TiendaController implements ErrorController {
         return "layout";
     }
 }
-

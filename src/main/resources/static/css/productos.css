@@ -247,3 +247,23 @@
     background: #a94c52;
     color: #ffffff;
 }
+
+
+/* BOTÓN VER MÁS */
+
+.btn-catalogo {
+    display: inline-block;
+    background-color: #c65f65;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 25px;
+    cursor: pointer;
+}
+
+.btn-catalogo:hover {
+    background-color: #a94c52;
+    color: #ffffff;
+}

@@ -1,0 +1,432 @@
+/* =====================================
+   PÁGINA COMPARAR PRECIOS
+===================================== */
+
+.comparar-main {
+    padding-top: 45px;
+    padding-bottom: 65px;
+}
+
+/* DISTRIBUCIÓN PRINCIPAL */
+
+.comparar-producto {
+    align-items: flex-start;
+}
+
+/* =====================================
+   COLUMNA DE IMAGEN
+===================================== */
+
+.comparar-imagen-wrapper {
+    width: 100%;
+    height: 460px;
+    background-color: #f8f8f8;
+    border: 1px solid #e8e3e3;
+    border-radius: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+}
+
+.comparar-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* =====================================
+   INFORMACIÓN DEL PRODUCTO
+===================================== */
+
+.comparar-informacion {
+    padding: 2px 8px;
+}
+
+.comparar-titulo {
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #171717;
+    margin-bottom: 16px;
+}
+
+.comparar-descripcion {
+    font-size: 15px;
+    color: #454545;
+    line-height: 1.65;
+    margin-bottom: 23px;
+    max-width: 480px;
+}
+
+/* =====================================
+   ESPECIFICACIONES
+===================================== */
+
+.comparar-subtitulo {
+    font-size: 17px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 13px;
+}
+
+.comparar-especificaciones {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.comparar-especificaciones li {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 7px;
+}
+
+.comparar-especificaciones strong {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.especificacion-icono {
+    width: 21px;
+    min-width: 21px;
+    color: #555;
+    text-align: center;
+    font-size: 15px;
+}
+
+/* =====================================
+   TALLAS DISPONIBLES
+===================================== */
+
+.comparar-tallas {
+    margin-top: 25px;
+}
+
+.comparar-tallas-titulo {
+    font-size: 15px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 12px;
+}
+
+.comparar-tallas-opciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+/* BOTÓN DE TALLA */
+
+.comparar-talla-btn {
+    min-width: 42px;
+    height: 38px;
+    padding: 0 11px;
+
+    background-color: #fff;
+    color: #333;
+
+    border: 1px solid #ded5d5;
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+/* HOVER */
+
+.comparar-talla-btn:hover {
+    border-color: #bc6465;
+    background-color: #fcf3f3;
+}
+
+/* TALLA SELECCIONADA */
+
+.comparar-talla-btn.activa,
+.comparar-talla-btn.activa:hover {
+    background-color: #bc6465;
+    color: #fff;
+    border-color: #bc6465;
+}
+
+/* ACCESIBILIDAD CON TECLADO */
+
+.comparar-talla-btn:focus-visible {
+    outline: 2px solid #8d4548;
+    outline-offset: 3px;
+}
+
+
+/* =========================================
+   TARJETA MEJOR PRECIO
+========================================= */
+
+.mejor-precio-card {
+    background: #fff;
+    border: 1px solid #e8dddd;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* CABECERA */
+
+.mejor-precio-header {
+    background: #bc6465;
+    color: white;
+    padding: 14px 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* CONTENIDO DE PRECIO */
+
+.mejor-precio-contenido {
+    background: #faf3f2;
+    padding: 20px 15px 18px;
+    text-align: center;
+}
+
+.mejor-precio-tienda {
+    font-size: 15px;
+    font-weight: 600;
+    color: #242424;
+    margin-bottom: 7px;
+}
+
+.mejor-precio-valor {
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 800;
+    color: #bc6465;
+    margin-bottom: 10px;
+}
+
+.mejor-precio-ahorro {
+    display: inline-block;
+    padding: 5px 14px;
+    background: #f4dfdd;
+    color: #bc6465;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.mejor-precio-regular {
+    font-size: 12px;
+    color: #555;
+    margin: 0;
+}
+
+/* =========================================
+   FORMULARIO DE COMPRA
+========================================= */
+
+.mejor-precio-compra {
+    padding: 16px;
+}
+
+.cantidad-contenedor {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.cantidad-contenedor label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* SELECTOR DE CANTIDAD */
+
+.cantidad-selector {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e5dddd;
+    border-radius: 7px;
+    overflow: hidden;
+    background: white;
+}
+
+.cantidad-selector button {
+    width: 34px;
+    height: 35px;
+    background: white;
+    border: none;
+    color: #555;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.cantidad-selector button:hover:not(:disabled) {
+    background: #f9eeee;
+    color: #bc6465;
+}
+
+.cantidad-selector button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.cantidad-selector input {
+    width: 40px;
+    height: 35px;
+    border: none;
+    outline: none;
+    background: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.cantidad-selector input::-webkit-inner-spin-button,
+.cantidad-selector input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* SUBTOTAL */
+
+.subtotal-contenedor {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.subtotal-contenedor strong {
+    color: #bc6465;
+    font-size: 17px;
+}
+
+/* BOTÓN CARRITO */
+
+.btn-agregar-carrito {
+    width: 100%;
+    padding: 12px;
+    background: #bc6465;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-agregar-carrito:hover:not(:disabled) {
+    background: #a95155;
+}
+
+.btn-agregar-carrito:disabled {
+    background: #cfc5c5;
+    cursor: not-allowed;
+}
+
+/* MENSAJES */
+
+.carrito-mensaje-exito {
+    color: #17824c;
+    font-size: 13px;
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+.carrito-mensaje-error {
+    color: #bf3535;
+    font-size: 13px;
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+/* =========================================
+   CATEGORÍA, CÓDIGO Y STOCK
+========================================= */
+
+.producto-datos-card {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    margin-top: 12px;
+    padding: 14px 6px;
+
+    background: white;
+    border: 1px solid #e8dddd;
+    border-radius: 10px;
+}
+
+.producto-dato {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    min-width: 0;
+    gap: 5px;
+    padding: 0 6px;
+}
+
+.producto-dato + .producto-dato {
+    border-left: 1px solid #eee4e4;
+}
+
+.producto-dato-icono {
+    font-size: 19px;
+    color: #9a7777;
+}
+
+.producto-dato-etiqueta {
+    font-size: 12px;
+    color: #666;
+}
+
+.producto-dato strong {
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.stock-disponible {
+    color: #20824c;
+}
+
+.stock-agotado {
+    color: #c34444;
+}
+
+.comparar-envio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-size: 12px;
+    color: #444;
+    text-align: center;
+}

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head('comparar.css', 'Comparar Precios')}">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div th:replace="~{layout :: header}"></div>
+
+    <main class="container comparar-main">
+
+        <section class="row g-4 comparar-producto">
+
+            <!-- COLUMNA 1: IMAGEN -->
+            <div class="col-lg-4">
+
+                <div class="comparar-imagen-wrapper">
+
+                    <img
+                        class="comparar-imagen"
+                        th:src="@{'/img/' + ${productoSeleccionado.imagen}}"
+                        th:alt="${productoSeleccionado.nombre}">
+
+                </div>
+
+            </div>
+
+            <!-- COLUMNA 2: INFORMACIÓN -->
+            <div class="col-lg-4">
+
+                <div class="comparar-informacion">
+
+                    <!-- NOMBRE -->
+                    <h1 class="comparar-titulo"
+                        th:text="${productoSeleccionado.nombre}">
+                        Nombre del producto
+                    </h1>
+
+                    <!-- DESCRIPCIÓN -->
+                    <p class="comparar-descripcion"
+                       th:text="${productoSeleccionado.descripcion}">
+                        Descripción del producto
+                    </p>
+
+                    <!-- ESPECIFICACIONES -->
+                    <h2 class="comparar-subtitulo">
+                        Especificaciones
+                    </h2>
+
+                    <ul class="comparar-especificaciones">
+
+                        <li th:if="${productoSeleccionado.material != null}">
+                            <span class="especificacion-icono">♧</span>
+                            <strong>Material:</strong>
+                            <span th:text="${productoSeleccionado.material}"></span>
+                        </li>
+
+                        <li th:if="${productoSeleccionado.tipoTela != null}">
+                            <span class="especificacion-icono">▤</span>
+                            <strong>Tipo de tela:</strong>
+                            <span th:text="${productoSeleccionado.tipoTela}"></span>
+                        </li>
+
+                        <li th:if="${productoSeleccionado.ajuste != null}">
+                            <span class="especificacion-icono">⌁</span>
+                            <strong>Ajuste:</strong>
+                            <span th:text="${productoSeleccionado.ajuste}"></span>
+                        </li>
+
+                        <li th:if="${productoSeleccionado.manga != null
+                                    and productoSeleccionado.manga != 'No aplica'}">
+                            <span class="especificacion-icono">◇</span>
+                            <strong>Manga:</strong>
+                            <span th:text="${productoSeleccionado.manga}"></span>
+                        </li>
+
+                        <li th:if="${productoSeleccionado.cuello != null
+                                    and productoSeleccionado.cuello != 'No aplica'}">
+                            <span class="especificacion-icono">◌</span>
+                            <strong>Cuello:</strong>
+                            <span th:text="${productoSeleccionado.cuello}"></span>
+                        </li>
+
+                        <li>
+                            <span class="especificacion-icono">♙</span>
+                            <strong>Género:</strong>
+                            <span th:text="${productoSeleccionado.genero}"></span>
+                        </li>
+
+                        <li th:if="${productoSeleccionado.ocasion != null}">
+                            <span class="especificacion-icono">▣</span>
+                            <strong>Ocasión:</strong>
+                            <span th:text="${productoSeleccionado.ocasion}"></span>
+                        </li>
+
+                    </ul>
+
+                    <!-- TALLAS -->
+                    <div class="comparar-tallas"
+                         th:if="${productoSeleccionado.tallas != null
+                                 and !productoSeleccionado.tallas.isEmpty()}">
+
+                        <h3 class="comparar-tallas-titulo">
+                            Tallas disponibles:
+                        </h3>
+
+                        <div class="comparar-tallas-opciones"
+                             role="group"
+                             aria-label="Seleccionar talla">
+
+                            <button
+                                th:each="talla : ${productoSeleccionado.tallas}"
+                                type="button"
+                                class="comparar-talla-btn"
+                                th:text="${talla}"
+                                th:attr="data-talla=${talla},aria-label=|Talla ${talla}|"
+                                aria-pressed="false">
+                                M
+                            </button>
+
+                        </div>
+
+                        <input
+                            type="hidden"
+                            id="talla-seleccionada"
+                            name="talla"
+                            value="">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ======================================
+                COLUMNA 3: MEJOR PRECIO ENCONTRADO
+            ======================================= -->
+
+            <div class="col-lg-4">
+
+                <!-- TARJETA DE MEJOR PRECIO -->
+                <div class="mejor-precio-card">
+
+                    <!-- CABECERA -->
+                    <div class="mejor-precio-header">
+                        <span>◆</span>
+                        MEJOR PRECIO ENCONTRADO
+                    </div>
+
+                    <!-- INFORMACIÓN DE PRECIOS -->
+                    <div class="mejor-precio-contenido">
+
+
+                    <!-- CANTIDAD Y CARRITO -->
+                    <div class="mejor-precio-compra">
+
+                        <form
+                            th:action="@{/comparar/carrito/agregar}"
+                            method="post"
+                            id="form-agregar-carrito">
+
+                            <input
+                                type="hidden"
+                                name="idProducto"
+                                th:value="${productoSeleccionado.idProducto}">
+
+                            <div class="cantidad-contenedor">
+
+                                <label for="cantidad-producto">
+                                    Cantidad:
+                                </label>
+
+                                <div class="cantidad-selector">
+
+                                    <button
+                                        type="button"
+                                        id="btn-restar"
+                                        aria-label="Disminuir cantidad"
+                                        th:disabled="${stockDisponible == 0}">
+                                        −
+                                    </button>
+
+                                    <input
+                                        type="number"
+                                        id="cantidad-producto"
+                                        name="cantidad"
+                                        value="1"
+                                        min="1"
+                                        th:max="${stockDisponible}"
+                                        th:disabled="${stockDisponible == 0}"
+                                        required
+                                        readonly>
+
+                                    <button
+                                        type="button"
+                                        id="btn-sumar"
+                                        aria-label="Aumentar cantidad"
+                                        th:disabled="${stockDisponible == 0}">
+                                        +
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <!-- SUBTOTAL DINÁMICO -->
+                            <div class="subtotal-contenedor"
+                                th:if="${stockDisponible > 0}">
+
+                                <span>Subtotal:</span>
+
+                                <strong>
+                                    S/
+                                    <span id="subtotal-producto"
+                                        th:text="${#numbers.formatDecimal(mejorPrecio.precioMinimo, 1, 2)}">
+                                        39.90
+                                    </span>
+                                </strong>
+
+                            </div>
+
+                            <!-- BOTÓN AGREGAR -->
+                            <button
+                                type="submit"
+                                class="btn-agregar-carrito"
+                                th:disabled="${stockDisponible == 0}">
+
+                                <span th:if="${stockDisponible > 0}">
+                                    Agregar al carrito
+                                </span>
+
+                                <span th:if="${stockDisponible == 0}">
+                                    Sin stock
+                                </span>
+
+                            </button>
+
+                        </form>
+
+                        <!-- MENSAJES DEL SERVIDOR -->
+                        <p class="carrito-mensaje-exito"
+                        th:if="${mensajeCarrito != null}"
+                        th:text="${mensajeCarrito}"
+                        role="status">
+                        </p>
+
+                        <p class="carrito-mensaje-error"
+                        th:if="${errorCarrito != null}"
+                        th:text="${errorCarrito}"
+                        role="alert">
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- ===================================
+                    DATOS ADICIONALES DEL PRODUCTO
+                ==================================== -->
+
+                <div class="producto-datos-card">
+
+                    <!-- CATEGORÍA -->
+                    <div class="producto-dato">
+
+                        <span class="producto-dato-icono">▤</span>
+
+                        <span class="producto-dato-etiqueta">
+                            Categoría
+                        </span>
+
+                        <strong
+                            th:text="${productoSeleccionado.categoria.nombre}">
+                            Polos
+                        </strong>
+
+                    </div>
+
+                    <!-- CÓDIGO -->
+                    <div class="producto-dato">
+
+                        <span class="producto-dato-icono">▦</span>
+
+                        <span class="producto-dato-etiqueta">
+                            Código
+                        </span>
+
+                        <strong th:text="${codigoProducto}">
+                            PBN-001
+                        </strong>
+
+                    </div>
+
+                    <!-- STOCK -->
+                    <div class="producto-dato">
+
+                        <span class="producto-dato-icono">▣</span>
+
+                        <span class="producto-dato-etiqueta">
+                            Stock
+                        </span>
+
+                        <strong
+                            th:classappend="${stockDisponible > 0} ? 'stock-disponible' : 'stock-agotado'"
+                            th:text="${stockDisponible > 0} ? 'Disponible' : 'Agotado'">
+                            Disponible
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <div th:replace="~{layout :: footer}"></div>
+
+    <!-- JAVASCRIPT DE COMPARACIÓN -->
+    <script th:src="@{/js/comparar.js}" defer></script>
+
+</body>
+</html>
