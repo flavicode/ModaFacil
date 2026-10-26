@@ -78,3 +78,18 @@ input::placeholder {
     color: var(--color-primary) !important; /* Mantiene el texto oscuro para que resalte */
     font-weight: 700; /* Pone el texto en negrita para destacar más */
 }
+
+/* --- ESTILOS PARA VENTANAS MODALES --- */
+.icono-modal-login {
+    color: var(--color-success);
+}
+
+.btn-moda-principal {
+    background-color: var(--color-success);
+    color: var(--color-white);
+}
+
+.btn-moda-principal:hover {
+    background-color: var(--color-success-dark); /* Un tono un poco más oscuro para cuando pases el mouse */
+    color: var(--color-white);
+}
