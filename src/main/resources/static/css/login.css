@@ -1,0 +1,78 @@
+/* ==========================================
+   ESTILOS ESPECÍFICOS DE LOGIN
+   ========================================== */
+   
+/* Contenedor principal centrado */
+.login-container {
+    max-width: 1100px;
+}
+
+/* --- TARJETA DE LOGIN CON REFLLEJO / SOMBRA OSCURA --- */
+.card-login {
+    border-radius: 2.5rem !important;
+    /* Sombra difuminada suave en tonos oscuros para dar profundidad */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* --- SECCIÓN DE LA IMAGEN (COLUMNA IZQUIERDA) --- */
+.login-banner-wrapper {
+    position: relative;
+    padding: 1rem;
+}
+
+/* Cuadro decorativo rosado pastel detrás de la foto */
+.login-banner-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80%;
+    height: 80%;
+    border-radius: 2.5rem;
+    background-color: var(--color-background, #f2e7e5);
+    transform: translate(-15px, -15px);
+    z-index: 0;
+}
+
+/* Imagen principal */
+.login-banner-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+    border-radius: 2.5rem;
+}
+
+/* --- CAMPOS Y ENTRADAS DE TEXTO --- */
+.input-group-custom .input-group-text,
+.input-group-custom .form-control {
+    border-color: #e2e8f0;
+}
+
+.input-group-custom .form-control:focus {
+    box-shadow: none;
+    border-color: var(--color-success, #c36363);
+}
+
+.input-group-custom:focus-within .input-group-text {
+    border-color: var(--color-success, #c36363);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* --- CHECKBOX Y NAVEGACIÓN --- */
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--color-success, #c36363) !important;
+    border-color: var(--color-success, #c36363) !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--color-success, #c36363) !important;
+    box-shadow: 0 0 0 0.25rem rgba(195, 99, 99, 0.2);
+}

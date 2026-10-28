@@ -2,19 +2,34 @@
 <html lang="es" xmlns:th="http://thymeleaf.org">
     <head th:replace="~{layout :: head('login.css', 'Iniciar sesión')}"></head>
 
-    <body class="bg-light-layout min-vh-100 d-flex flex-column">
+    <body class="bg-light min-vh-100 d-flex flex-column">
 
         <!-- HEADER -->
         <div th:replace="~{layout :: header}"></div>
 
         <!-- MAIN -->
         <main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
-            <!-- Formulario Iniciar Sesión -->
-            <div class="card card-login border-0 p-4 p-sm-5 rounded-5 shadow-sm bg-white">
-                <div class="text-center mb-4">
-                    <h1 class="h2 fw-bold text-dark mb-2">Bienvenido</h1>
-                    <p class="text-muted small">Ingresa tus credenciales para acceder a tu cuenta</p>
+            <div class="row align-items-center justify-content-center w-100 g-4 g-lg-5 login-container">
+                
+                <!-- Columna Izquierda: Imagen decorativa con fondo pastel -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="login-banner-wrapper">
+                        <!-- Cuadro decorativo de fondo -->
+                        <div class="login-banner-bg"></div>
+                        
+                        <!-- Imagen principal -->
+                        <img th:src="@{/img/login.jpg}" alt="ModaFácil Banner" 
+                             class="login-banner-img shadow-sm">
+                    </div>
                 </div>
+
+                <!-- Columna Derecha: Formulario de Iniciar Sesión -->
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="card card-login border-0 p-4 p-sm-5 rounded-5 shadow-sm bg-white">
+                        <div class="text-center mb-4">
+                            <h1 class="h2 fw-bold text-primary mb-2">Bienvenido</h1>
+                            <p class="text-muted small">Ingresa tus credenciales para acceder a tu cuenta</p>
+                        </div>
 
                 <!-- Alerta de Registro Exitoso -->
                 <div th:if="${param.registrado != null}" class="alert alert-success border-0 rounded-3 small fw-medium mb-4 d-flex align-items-center gap-2">
