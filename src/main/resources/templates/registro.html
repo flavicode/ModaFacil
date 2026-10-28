@@ -9,12 +9,27 @@
 
         <!-- MAIN -->
         <main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
-            <!-- Formulario Registro Completo (Se muestra siempre) -->
-            <div class="card card-login border-0 p-4 p-sm-5 rounded-5 shadow-sm bg-white">
-                <div class="text-center mb-4">
-                    <h1 class="h2 fw-bold text-dark mb-2">Crear Cuenta</h1>
-                    <p class="text-muted small">Regístrate en ModaFacil y empieza a conectar con los mejores proveedores.</p>
+            <div class="row align-items-center justify-content-center w-100 g-4 g-lg-5 register-container">
+                
+                <!-- Columna Izquierda: Imagen decorativa + fondo pastel inferior derecho -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="register-banner-wrapper">
+                        <!-- Cuadro decorativo -->
+                        <div class="register-banner-bg"></div>
+                        
+                        <!-- Imagen principal de registro -->
+                        <img th:src="@{/img/registro.jpg}" alt="ModaFácil Registro" 
+                             class="register-banner-img shadow-sm">
+                    </div>
                 </div>
+
+                <!-- Columna Derecha: Formulario de Registro -->
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="card card-register border-0 p-4 p-sm-5 bg-white">
+                        <div class="text-center mb-4">
+                            <h1 class="h2 fw-bold text-primary mb-2">Crea tu cuenta gratis</h1>
+                            <p class="text-muted small">Completa tus datos para registrarte y comenzar</p>
+                        </div>
 
                 <!-- Alertas de Error exclusivas de Registro -->
                 <div th:if="${errorRegistro != null}" class="alert alert-warning border-0 rounded-3 small fw-medium mb-4 d-flex align-items-center gap-2">

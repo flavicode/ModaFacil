@@ -93,3 +93,16 @@ input::placeholder {
     background-color: var(--color-success-dark); /* Un tono un poco más oscuro para cuando pases el mouse */
     color: var(--color-white);
 }
+
+/* Contenedor principal de la imagen */
+.hero-image-container {
+    position: relative;
+    margin-top: 40px; /* Espacio superior para que la tarjeta no choque arriba */
+}
+
+/* Posición de la tarjeta flotante */
+.badge-discount {
+    top: -25px;   /* Centra verticalmente la tarjeta sobre el borde superior de la foto */
+    left: -35px;  /* Desplaza la tarjeta hacia la izquierda, sobresaliendo de la foto */
+    z-index: 10;
+}

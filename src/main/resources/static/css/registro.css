@@ -1,3 +1,81 @@
-.btn-success{
+/* ===============================
+   ESTILOS ESPECÍFICOS DE REGISTRO
+   =============================== */
+
+/* Color del botón */
+.btn-success {
     background-color: var(--color-success) !important;
+}
+
+/* Contenedor principal centrado */
+.register-container {
+    max-width: 1100px;
+}
+
+/* Fondo tenue del layout */
+.bg-light-layout {
+    background-color: var(--color-light, #f8f8f8) !important;
+}
+
+/* --- TARJETA DE REGISTRO (COLUMNA DERECHA) --- */
+.card-register {
+    border-radius: 2.5rem !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.07) !important;
+}
+
+/* --- SECCIÓN DE LA IMAGEN HORIZONTAL (COLUMNA IZQUIERDA) --- */
+.register-banner-wrapper {
+    position: relative;
+    width: 100%;
+    /* Espacio para que el cuadro rosado sobresalga abajo y a la derecha */
+    padding-right: 25px;
+    padding-bottom: 25px;
+}
+
+/* Cuadro decorativo rosado pastel */
+.register-banner-bg {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 80%;
+    height: 80%;
+    border-radius: 2rem;
+    background-color: var(--color-background, #f2e7e5);
+    z-index: 0;
+}
+
+/* Imagen en formato horizontal */
+.register-banner-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 360px; /* Altura contenida para que quede formato horizontal */
+    object-fit: cover;
+    border-radius: 2rem;
+    display: block;
+}
+
+/* --- CAMPOS Y ENTRADAS DE TEXTO --- */
+.input-group-custom .input-group-text,
+.input-group-custom .form-control {
+    border-color: #e2e8f0;
+}
+
+.input-group-custom .form-control:focus {
+    box-shadow: none;
+    border-color: var(--color-success, #c36363);
+}
+
+.input-group-custom:focus-within .input-group-text {
+    border-color: var(--color-success, #c36363);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Indicador de requisitos de contraseña */
+.password-requirements {
+    font-size: 0.75rem;
+    color: #718096;
 }

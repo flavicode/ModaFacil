@@ -11,39 +11,49 @@
 
         <!-- MAIN -->
         <main>
-            <!-- Banner -->
-            <section class="py-5 bg-light">
-                <div class="container color-light">
-                    <div class="row align-items-center gy-5">
-                        <div class="col-lg-6">
-                            <span class="badge text-wrap text-start text-uppercase tracking-wider px-3 py-2 mb-3 bg-light text-secondary border border-light-subtle rounded-pill fw-bold lh-base d-inline-flex align-items-center">
+        <!-- Banner -->
+        <section class="py-5 bg-light">
+            <div class="container color-light">
+                <div class="row align-items-center gy-5">
+                    
+                    <!-- Columna Izquierda (Texto y Botón) -->
+                    <div class="col-lg-6">
+                        <span class="badge text-wrap text-start text-uppercase tracking-wider px-3 py-2 mb-3 bg-light text-secondary border border-light-subtle rounded-pill fw-bold lh-base d-inline-flex align-items-center">
                             <img th:src="@{/img/bandera.png}" alt="Bandera de Perú" class="flex-shrink-0 me-2" style="width: 18px; height: auto; object-fit: contain; vertical-align: middle;">
                             Para microemprendedores en el Perú
-                            </span>
-                            <h1 class="display-4 fw-bold text-dark mb-4 lh-sm">
-                                Encuentra las mejores prendas y proveedores en un solo lugar
-                            </h1>
-                            <p class="text-muted fs-5 mb-4 lh-base max-w-xl">
-                                Explora diferentes modelos de ropa, compara precios entre proveedores y encuentra la mejor opción para tu negocio.
-                            </p>
-                            <a href="/login?registrar=true" class="btn bg-success text-white btn-lg px-5 py-3 fw-bold shadow-sm rounded-3">
-                                Registrarme Gratis
-                            </a>
-                        </div>
-                        <div class="col-lg-6 position-relative text-center">
+                        </span>
+                        <h1 class="display-4 fw-bold text-dark mb-4 lh-sm">
+                            Encuentra las mejores prendas y proveedores en un solo lugar
+                        </h1>
+                        <p class="text-muted fs-5 mb-4 lh-base max-w-xl">
+                            Explora diferentes modelos de ropa, compara precios entre proveedores y encuentra la mejor opción para tu negocio.
+                        </p>
+                        <a href="/login?registrar=true" class="btn bg-success text-white btn-lg px-5 py-3 fw-bold shadow-sm rounded-3">
+                            Registrarme Gratis
+                        </a>
+                    </div>
+
+                    <!-- Columna Derecha (AQUÍ PEGAS EL CÓDIGO) -->
+                    <div class="col-lg-6 text-center">
+                        <div class="image-wrapper rounded-4 shadow-sm mx-auto hero-image-container position-relative">
+                            
+                            <!-- Tarjeta de descuento -->
                             <div class="position-absolute badge-discount p-4 bg-success text-white rounded-4 shadow-lg text-start z-3">
-                                <div class="display-5 fw-extrabold">-40%</div>
-                                <div class="small">En costos de<br>compra.</div>
+                                <div class="display-4 font-serif fw-normal lh-1 mb-2">-40%</div>
+                                <div class="small lh-sm">En costos de<br>compra.</div>
                             </div>
-                            <div class="image-wrapper rounded-4 shadow-sm mx-auto hero-image-container">
-                                <div class="w-100 h-100 rounded-4 overflow-hidden position-relative z-2">
-                                    <img th:src="@{/img/img_principal.jpg}" class="img-fluid w-100 h-100 object-fit-cover" alt="Trabajo en almacén">
-                                </div>
+
+                            <!-- Imagen principal -->
+                            <div class="w-100 h-100 rounded-4 overflow-hidden position-relative z-2">
+                                <img th:src="@{/img/img_principal.jpg}" class="img-fluid w-100 h-100 object-fit-cover" alt="Trabajo en almacén">
                             </div>
+
                         </div>
                     </div>
+
                 </div>
-            </section>
+            </div>
+        </section>
 
             <!-- Estadísticas -->
             <section class="py-5 border-top border-bottom bg-light">
