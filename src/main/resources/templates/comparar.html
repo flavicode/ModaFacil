@@ -152,7 +152,29 @@
                     <!-- INFORMACIÓN DE PRECIOS -->
                     <div class="mejor-precio-contenido">
 
+                        <!-- PROVEEDOR CON EL MEJOR PRECIO -->
+                        <p class="mejor-precio-proveedor"
+                        th:text="${mejorPrecio.importadorNombre}">
+                        </p>
 
+                        <!-- PRECIO MÁS ECONÓMICO -->
+                        <h2 class="mejor-precio-valor">
+                            S/ <span th:text="${#numbers.formatDecimal(mejorPrecio.precioMinimo, 1, 2)}"></span>
+                        </h2>
+
+                        <!-- AHORRO CALCULADO -->
+                        <div class="mejor-precio-ahorro">
+                            Ahorras S/ <span th:text="${#numbers.formatDecimal(mejorPrecio.ahorro, 1, 2)}"></span>
+                        </div>
+
+                        <!-- PRECIO MÁS ALTO -->
+                        <p class="mejor-precio-regular">
+                            Precio regular: S/ <span th:text="${#numbers.formatDecimal(mejorPrecio.precioMaximo, 1, 2)}"></span>
+                        </p>
+
+                    </div>
+
+                    
                     <!-- CANTIDAD Y CARRITO -->
                     <div class="mejor-precio-compra">
 
@@ -161,11 +183,13 @@
                             method="post"
                             id="form-agregar-carrito">
 
+                            <!-- ID DEL PRODUCTO -->
                             <input
                                 type="hidden"
                                 name="idProducto"
                                 th:value="${productoSeleccionado.idProducto}">
 
+                            <!-- CANTIDAD -->
                             <div class="cantidad-contenedor">
 
                                 <label for="cantidad-producto">
@@ -174,6 +198,7 @@
 
                                 <div class="cantidad-selector">
 
+                                    <!-- DISMINUIR -->
                                     <button
                                         type="button"
                                         id="btn-restar"
@@ -182,6 +207,7 @@
                                         −
                                     </button>
 
+                                    <!-- VALOR SELECCIONADO -->
                                     <input
                                         type="number"
                                         id="cantidad-producto"
@@ -193,6 +219,7 @@
                                         required
                                         readonly>
 
+                                    <!-- AUMENTAR -->
                                     <button
                                         type="button"
                                         id="btn-sumar"
@@ -205,23 +232,7 @@
 
                             </div>
 
-                            <!-- SUBTOTAL DINÁMICO -->
-                            <div class="subtotal-contenedor"
-                                th:if="${stockDisponible > 0}">
-
-                                <span>Subtotal:</span>
-
-                                <strong>
-                                    S/
-                                    <span id="subtotal-producto"
-                                        th:text="${#numbers.formatDecimal(mejorPrecio.precioMinimo, 1, 2)}">
-                                        39.90
-                                    </span>
-                                </strong>
-
-                            </div>
-
-                            <!-- BOTÓN AGREGAR -->
+                            <!-- AGREGAR AL CARRITO -->
                             <button
                                 type="submit"
                                 class="btn-agregar-carrito"
@@ -239,20 +250,30 @@
 
                         </form>
 
-                        <!-- MENSAJES DEL SERVIDOR -->
-                        <p class="carrito-mensaje-exito"
-                        th:if="${mensajeCarrito != null}"
-                        th:text="${mensajeCarrito}"
-                        role="status">
+                        <!-- DELIVERY -->
+                        <div class="mejor-precio-delivery">
+                            <i class="bi bi-truck"></i>
+                            <span>Delivery a todo Lima Metropolitana</span>
+                        </div>
+
+                        <!-- MENSAJE DE ÉXITO -->
+                        <p
+                            class="carrito-mensaje-exito"
+                            th:if="${mensajeCarrito != null}"
+                            th:text="${mensajeCarrito}"
+                            role="status">
                         </p>
 
-                        <p class="carrito-mensaje-error"
-                        th:if="${errorCarrito != null}"
-                        th:text="${errorCarrito}"
-                        role="alert">
+                        <!-- MENSAJE DE ERROR -->
+                        <p
+                            class="carrito-mensaje-error"
+                            th:if="${errorCarrito != null}"
+                            th:text="${errorCarrito}"
+                            role="alert">
                         </p>
 
                     </div>
+
 
                 </div>
 
@@ -313,6 +334,217 @@
                 </div>
 
             </div>
+
+            <!-- ==========================================
+                SECCIÓN: COMPARACIÓN DE PRECIOS EN TIENDAS
+            ========================================== -->
+
+            <section class="comparacion-tiendas-card">
+
+                <!-- ======================================
+                    ENCABEZADO DE COMPARACIÓN
+                ======================================= -->
+
+                <div class="comparacion-tiendas-header">
+
+                    <i class="bi bi-bag-check"></i>
+
+                    <h3>
+                        COMPARAR PRECIOS EN
+                        <span th:text="${cantidadTiendas}">3</span>
+                        TIENDAS
+                    </h3>
+
+                </div>
+
+                <!-- ======================================
+                    TABLA DE COMPARACIÓN
+                ======================================= -->
+
+                <div class="comparacion-tabla-contenedor">
+
+                    <table class="comparacion-tabla">
+
+                        <!-- CABECERA DE LA TABLA -->
+                        <thead>
+                            <tr>
+
+                                <th>TIENDA</th>
+                                <th>PRECIO</th>
+                                <th>TALLAS DISPONIBLES</th>
+                                <th>STOCK</th>
+                                <th>ACCIONES</th>
+
+                            </tr>
+                        </thead>
+
+                        <!-- CONTENIDO DINÁMICO -->
+                        <tbody>
+
+                            <tr th:each="tienda, estado : ${tiendasComparacion}"
+                                th:classappend="${estado.first} ? 'fila-mejor-precio' : ''">
+
+                                <!-- ==========================
+                                    COLUMNA 1: TIENDA
+                                =========================== -->
+                                <td>
+
+                                    <div class="comparacion-tienda-info">
+
+                                        <div class="comparacion-tienda-icono">
+                                            <i class="bi bi-shop"></i>
+                                        </div>
+
+                                        <div class="comparacion-tienda-detalle">
+
+                                            <!-- NOMBRE DE TIENDA -->
+                                            <strong
+                                                th:text="${tienda.nombre}">
+                                                Importador 1
+                                            </strong>
+
+                                            <!-- MEJOR PRECIO -->
+                                            <span
+                                                class="comparacion-mejor-etiqueta"
+                                                th:if="${estado.first}">
+                                                MEJOR PRECIO
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- ==========================
+                                    COLUMNA 2: PRECIO
+                                =========================== -->
+                                <td>
+
+                                    <div class="comparacion-precio-info">
+
+                                        <strong
+                                            class="comparacion-precio-valor"
+                                            th:text="|S/ ${#numbers.formatDecimal(tienda.precio, 1, 2)}|">
+                                            S/ 39.90
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- ==========================
+                                    COLUMNA 3: TALLAS
+                                =========================== -->
+                                <td>
+
+                                    <div class="comparacion-tallas-lista">
+
+                                        <span
+                                            class="comparacion-talla"
+                                            th:each="talla : ${tienda.tallas}"
+                                            th:text="${talla}">
+                                            M
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- =====================================
+                                    COLUMNA 4: STOCK
+                                ===================================== -->
+
+                                <td>
+
+                                    <span
+                                        class="comparacion-stock-estado"
+                                        th:classappend="${tienda.claseStock}"
+                                        th:text="${tienda.estadoStock}">
+
+                                        En stock
+
+                                    </span>
+
+                                </td>
+                                <!-- ======================================
+                                    COLUMNA 5: ACCIONES
+                                ======================================= -->
+
+                                <td>
+
+                                    <form
+                                        th:action="@{/comparar/carrito/agregar}"
+                                        method="post"
+                                        class="comparacion-form-carrito">
+
+                                        <!-- PRODUCTO SELECCIONADO -->
+                                        <input
+                                            type="hidden"
+                                            name="idProducto"
+                                            th:value="${productoSeleccionado.idProducto}">
+
+                                        <!-- IMPORTADOR SELECCIONADO -->
+                                        <input
+                                            type="hidden"
+                                            name="idImportador"
+                                            th:value="${tienda.idImportador}">
+
+                                        <!-- CANTIDAD INICIAL -->
+                                        <input
+                                            type="hidden"
+                                            name="cantidad"
+                                            value="1">
+
+                                        <!-- TOKEN CSRF, SI ESTÁ DISPONIBLE -->
+                                        <input
+                                            th:if="${_csrf != null}"
+                                            type="hidden"
+                                            th:name="${_csrf.parameterName}"
+                                            th:value="${_csrf.token}">
+
+                                        <!-- BOTÓN AGREGAR AL CARRITO -->
+                                        <button
+                                            type="submit"
+                                            class="comparacion-btn-carrito"
+                                            th:disabled="${tienda.stock <= 0}">
+
+                                            <span th:if="${tienda.stock > 0}">
+                                                Agregar al carrito
+                                            </span>
+
+                                            <span th:if="${tienda.stock <= 0}">
+                                                Agotado
+                                            </span>
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            <!-- SIN TIENDAS -->
+                            <tr th:if="${#lists.isEmpty(tiendasComparacion)}">
+
+                                <td colspan="5"
+                                    class="comparacion-sin-tiendas">
+
+                                    No se encontraron tiendas
+                                    para comparar este producto.
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
 
 
         </section>

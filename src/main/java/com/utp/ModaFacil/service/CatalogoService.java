@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +137,103 @@ public class CatalogoService {
         return resultado;
     }
 
+    // ==========================================
+    // OBTENER TIENDAS PARA COMPARAR PRECIOS
+    // ==========================================
+
+    public List<Map<String, Object>> obtenerComparacionPrecios(
+        Long idProducto) {
+
+    Map<Long, Map<String, Object>> tiendasUnicas =
+        new LinkedHashMap<>();
+
+    for (Map<String, Object> relacion : obtenerRelaciones()) {
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> producto =
+            (Map<String, Object>) relacion.get("producto");
+
+        // FILTRAR SOLO EL PRODUCTO SELECCIONADO
+        if (producto == null ||
+            !idProducto.equals(producto.get("idProducto"))) {
+            continue;
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> importador =
+            (Map<String, Object>) relacion.get("importador");
+
+        if (importador == null) {
+            continue;
+        }
+
+        Long idImportador =
+            ((Number) importador.get("idImportador")).longValue();
+
+        BigDecimal precio =
+            convertirPrecio(relacion.get("precio"));
+
+        int stock =
+            ((Number) relacion.get("stock")).intValue();
+
+        // EVITAR IMPORTADORES DUPLICADOS
+        // SI EXISTEN DOS RELACIONES, CONSERVAR EL MENOR PRECIO
+        Map<String, Object> tiendaExistente =
+            tiendasUnicas.get(idImportador);
+
+        if (tiendaExistente != null) {
+
+            BigDecimal precioExistente =
+                (BigDecimal) tiendaExistente.get("precio");
+
+            if (precio.compareTo(precioExistente) >= 0) {
+                continue;
+            }
+        }
+
+        // DETERMINAR ESTADO DEL STOCK
+        String estadoStock;
+        String claseStock;
+
+        if (stock > 10) {
+            estadoStock = "En stock";
+            claseStock = "stock-alto";
+
+        } else if (stock >= 2) {
+            estadoStock = "Pocas unidades";
+            claseStock = "stock-bajo";
+
+        } else if (stock == 1) {
+            estadoStock = "Solo queda una unidad";
+            claseStock = "stock-ultimo";
+
+        } else {
+            estadoStock = "Agotado";
+            claseStock = "stock-sin";
+        }
+
+        // CREAR INFORMACIÓN DEL IMPORTADOR
+        Map<String, Object> tienda = new HashMap<>();
+
+        tienda.put("idImportador", idImportador);
+        tienda.put("nombre", "Importador " + idImportador);
+        tienda.put("precio", precio);
+        tienda.put("tallas", producto.get("tallas"));
+        tienda.put("stock", stock);
+        tienda.put("estadoStock", estadoStock);
+        tienda.put("claseStock", claseStock);
+
+        // GUARDAR UNA SOLA VEZ POR IMPORTADOR
+        tiendasUnicas.put(idImportador, tienda);
+    }
+
+    // ORDENAR POR PRECIO DE MENOR A MAYOR
+    return tiendasUnicas.values().stream()
+        .sorted(Comparator.comparing(
+            tienda -> (BigDecimal) tienda.get("precio")
+        ))
+        .toList();
+    }
 
     // ==========================================
     // 2. CONVERTIR EL PRECIO A BIGDECIMAL
@@ -248,13 +346,85 @@ public class CatalogoService {
         Map<String, Object> importadorData = new HashMap<>();
         importadorData.put("idImportador", idImportador);
 
+        // ==========================================
+        // STOCK TEMPORAL POR IMPORTADOR
+        // ==========================================
+
+        int stock = switch (idImportador.intValue()) {
+            case 1 -> 20;
+            case 2 -> 8;
+            case 3 -> 1;
+            case 4 -> 0;
+            case 5 -> 15;
+            case 6 -> 5;
+            case 7 -> 12;
+            case 8 -> 3;
+            default -> 0;
+        };
+
         // RELACIÓN PRODUCTO - IMPORTADOR - PRECIO
         Map<String, Object> relacion = new HashMap<>();
+
         relacion.put("producto", productoData);
         relacion.put("importador", importadorData);
         relacion.put("precio", precio);
 
-        relaciones.add(relacion);
+        // NUEVO: STOCK DEL IMPORTADOR
+        relacion.put("stock", stock);
 
+        relaciones.add(relacion);
     }
+    // ==========================================
+    // BUSCAR PRODUCTO EN UN IMPORTADOR ESPECÍFICO
+    // ==========================================
+
+    public Map<String, Object> obtenerOfertaImportador(
+            Long idProducto,
+            Long idImportador) {
+
+        for (Map<String, Object> relacion : obtenerRelaciones()) {
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> producto =
+                (Map<String, Object>) relacion.get("producto");
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> importador =
+                (Map<String, Object>) relacion.get("importador");
+
+            if (producto == null || importador == null) {
+                continue;
+            }
+
+            Long productoId =
+                ((Number) producto.get("idProducto")).longValue();
+
+            Long importadorId =
+                ((Number) importador.get("idImportador")).longValue();
+
+            if (idProducto.equals(productoId)
+                    && idImportador.equals(importadorId)) {
+
+                Map<String, Object> oferta = new HashMap<>();
+
+                oferta.put("idProducto", productoId);
+                oferta.put("idImportador", importadorId);
+
+                oferta.put(
+                    "precio",
+                    convertirPrecio(relacion.get("precio"))
+                );
+
+                oferta.put(
+                    "stock",
+                    ((Number) relacion.get("stock")).intValue()
+                );
+
+                return oferta;
+            }
+        }
+
+        return null;
+    }
+
 }
