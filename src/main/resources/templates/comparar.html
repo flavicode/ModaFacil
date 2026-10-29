@@ -122,11 +122,14 @@
 
                         </div>
 
+                        
                         <input
                             type="hidden"
                             id="talla-seleccionada"
                             name="talla"
+                            form="form-agregar-carrito"
                             value="">
+
 
                     </div>
 
@@ -189,6 +192,13 @@
                                 name="idProducto"
                                 th:value="${productoSeleccionado.idProducto}">
 
+                            <!-- IMPORTADOR DEL MEJOR PRECIO -->
+                            <input
+                                type="hidden"
+                                name="idImportador"
+                                th:value="${tiendasComparacion[0].idImportador}">
+
+
                             <!-- CANTIDAD -->
                             <div class="cantidad-contenedor">
 
@@ -232,6 +242,12 @@
 
                             </div>
 
+                            <!-- TOKEN CSRF SI CORRESPONDE -->
+                            <input
+                                th:if="${_csrf != null}"
+                                type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}">
                             <!-- AGREGAR AL CARRITO -->
                             <button
                                 type="submit"
@@ -556,6 +572,7 @@
 
     <!-- JAVASCRIPT DE COMPARACIÓN -->
     <script th:src="@{/js/comparar.js}" defer></script>
+
 
 </body>
 </html>

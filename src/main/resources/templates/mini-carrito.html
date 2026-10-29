@@ -1,0 +1,135 @@
+<div th:fragment="miniCarrito">
+
+    <!-- FONDO OSCURO -->
+    <div id="carrito-overlay" class="carrito-overlay"></div>
+
+    <!-- PANEL LATERAL -->
+    <aside id="mini-carrito"
+           class="mini-carrito"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="titulo-carrito"
+           aria-hidden="true">
+
+        <div class="mini-carrito-header">
+            <h2 id="titulo-carrito">
+                Carrito de Compras
+                <span th:text="${carritoCantidad}">0</span>
+            </h2>
+
+            <button type="button"
+                    id="cerrar-carrito"
+                    aria-label="Cerrar carrito">
+                &times;
+            </button>
+        </div>
+
+        <!-- PRENDAS -->
+        <div class="mini-carrito-productos">
+
+            <p th:if="${#lists.isEmpty(carritoItems)}">
+                Tu carrito está vacío.
+            </p>
+
+            <div class="mini-carrito-item"
+                 th:each="item : ${carritoItems}">
+
+                <!-- IMAGEN -->
+                <img th:src="@{'/img/' + ${item.imagen}}"
+                     th:alt="${item.nombre}"
+                     class="mini-carrito-imagen">
+
+                <!-- DATOS -->
+                <div class="mini-carrito-detalle">
+
+                    <strong th:text="${item.nombre}">
+                        Nombre del producto
+                    </strong>
+
+                    <p>
+                        Talla:
+                        <span th:text="${item.talla}">M</span>
+                    </p>
+
+                    <p th:text="${item.importador}">
+                        Importador
+                    </p>
+
+                    <p>
+                        Precio unitario: S/
+                        <span th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 2)}">
+                            0.00
+                        </span>
+                    </p>
+
+                    <!-- CAMBIAR CANTIDAD -->
+                    <div class="mini-carrito-cantidad">
+
+                        <form th:action="@{/comparar/carrito/cantidad}"
+                              method="post">
+
+                            <input type="hidden" name="idProducto"
+                                   th:value="${item.idProducto}">
+                            <input type="hidden" name="idImportador"
+                                   th:value="${item.idImportador}">
+                            <input type="hidden" name="talla"
+                                   th:value="${item.talla}">
+                            <input type="hidden" name="cambio" value="-1">
+
+                            <button type="submit"
+                                    th:disabled="${item.cantidad <= 1}">
+                                −
+                            </button>
+                        </form>
+
+                        <span th:text="${item.cantidad}">1</span>
+
+                        <form th:action="@{/comparar/carrito/cantidad}"
+                              method="post">
+
+                            <input type="hidden" name="idProducto"
+                                   th:value="${item.idProducto}">
+                            <input type="hidden" name="idImportador"
+                                   th:value="${item.idImportador}">
+                            <input type="hidden" name="talla"
+                                   th:value="${item.talla}">
+                            <input type="hidden" name="cambio" value="1">
+
+                            <button type="submit">+</button>
+                        </form>
+
+                    </div>
+
+                    <p class="mini-carrito-item-subtotal">
+                        Total: S/
+                        <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">
+                            0.00
+                        </span>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMEN -->
+        <div class="mini-carrito-footer">
+
+            <div class="mini-carrito-subtotal">
+                <strong>Subtotal:</strong>
+                <strong>
+                    S/
+                    <span th:text="${#numbers.formatDecimal(carritoSubtotal, 1, 2)}">
+                        0.00
+                    </span>
+                </strong>
+            </div>
+
+            <div class="mini-carrito-acciones">
+                <a th:href="@{/carrito}" class="btn-seguir-comprando">
+                    Ver carrito completo
+                </a>
+            </div>
+
+        </div>
+    </aside>
+</div>

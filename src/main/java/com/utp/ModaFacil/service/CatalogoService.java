@@ -13,12 +13,16 @@ import org.springframework.stereotype.Service;
 
 import com.utp.ModaFacil.model.Categoria;
 import com.utp.ModaFacil.model.Producto;
-
-
+import com.utp.ModaFacil.strategy.EstrategiaComparacion;
 
 @Service
 public class CatalogoService {
+private final List<EstrategiaComparacion> estrategias;
 
+public CatalogoService(
+        List<EstrategiaComparacion> estrategias) {
+    this.estrategias = estrategias;
+}
     public List<Map<String, Object>> obtenerRelaciones() {
 
         Categoria polos = new Categoria(1L, "Polos", "#C65F64");
@@ -143,6 +147,11 @@ public class CatalogoService {
 
     public List<Map<String, Object>> obtenerComparacionPrecios(
         Long idProducto) {
+    return obtenerComparacionPrecios(idProducto, "precio");
+    }
+
+    public List<Map<String, Object>> obtenerComparacionPrecios(
+        Long idProducto, String criterio) {
 
     Map<Long, Map<String, Object>> tiendasUnicas =
         new LinkedHashMap<>();
@@ -226,14 +235,30 @@ public class CatalogoService {
         // GUARDAR UNA SOLA VEZ POR IMPORTADOR
         tiendasUnicas.put(idImportador, tienda);
     }
+    
+    // SELECCIONAR LA ESTRATEGIA DE COMPARACIÓN
+    String criterioElegido =
+        criterio == null ? "" : criterio.toLowerCase().trim();
 
-    // ORDENAR POR PRECIO DE MENOR A MAYOR
-    return tiendasUnicas.values().stream()
-        .sorted(Comparator.comparing(
-            tienda -> (BigDecimal) tienda.get("precio")
-        ))
-        .toList();
-    }
+    EstrategiaComparacion estrategia = estrategias.stream()
+        .filter(e -> e.obtenerCriterio().equals(criterioElegido))
+        .findFirst()
+        .orElseGet(() -> estrategias.stream()
+            .filter(e -> e.obtenerCriterio().equals("precio"))
+            .findFirst()
+            .orElseThrow(() ->
+                new IllegalStateException(
+                    "No existe una estrategia para ordenar por precio"
+                )
+            )
+        );
+
+    // ORDENAR LAS TIENDAS CON LA ESTRATEGIA ELEGIDA
+    return estrategia.ordenar(
+        new ArrayList<>(tiendasUnicas.values())
+    );
+}
+
 
     // ==========================================
     // 2. CONVERTIR EL PRECIO A BIGDECIMAL

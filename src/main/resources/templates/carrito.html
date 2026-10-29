@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('carrito-completo.css', 'Carrito de Compras')}"></head>
+
+<body>
+
+    <!-- HEADER -->
+    <div th:replace="~{layout :: header}"></div>
+
+    <header class="carrito-header">
+        <h1>Carrito de Compras</h1>
+    </header>
+
+    <main class="carrito-main">
+
+        <div class="carrito-pasos">
+            <span class="paso activo">1. Carrito</span>
+            <span class="paso">2. Pago</span>
+            <span class="paso">3. Estado</span>
+        </div>
+
+        <p class="carrito-descripcion">
+            Revisa los detalles antes de continuar al pago.
+        </p>
+
+        <div class="carrito-contenedor">
+
+            <!-- SI EL CARRITO ESTÁ VACÍO -->
+            <div th:if="${#lists.isEmpty(items)}" class="carrito-tarjeta text-center py-4">
+                <p class="mb-3">Tu carrito está vacío.</p>
+                <a th:href="@{/productos}" class="btn btn-outline-secondary">Ver productos</a>
+            </div>
+
+            <!-- LISTA DE ITEMS -->
+            <th:block th:each="item : ${items}">
+                
+            <!-- PRENDA SELECCIONADA -->
+            <section class="carrito-tarjeta">
+
+                <h2 class="seccion-titulo">PRENDA SELECCIONADA</h2>
+
+                <div class="prenda-contenido">
+
+                    <!-- IMAGEN DEL PRODUCTO -->
+                    <img th:src="@{/img/p_camisero_1.jpg}"
+                        alt="Imagen del producto"
+                        class="prenda-imagen">
+
+                    <!-- INFORMACIÓN DEL PRODUCTO -->
+                    <div class="prenda-informacion">
+
+                        <h3 th:text="${item.nombre}">
+                            Nombre del producto
+                        </h3>
+
+                        <p>
+                            Talla:
+                            <span th:text="${item.talla}">M</span>
+                        </p>
+
+                        <p>
+                            Precio unitario: S/
+                            <span th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 2)}">
+                                0.00
+                            </span>
+                        </p>
+
+                    </div>
+
+                    <!-- CONTROL DE CANTIDAD -->
+                    <div class="prenda-cantidad">
+
+                        <button type="button"
+                                th:attr="data-id=${item.idProducto}"
+                                onclick="cambiarCantidad(this,-1)">
+                            −
+                        </button>
+
+                        <span th:text="${item.cantidad}">1</span>
+
+                        <button type="button"
+                                th:attr="data-id=${item.idProducto}"
+                                onclick="cambiarCantidad(this,1)">
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            
+                <!-- PROVEEDOR -->
+                <section class="carrito-tarjeta">
+                    <h2 class="seccion-titulo">PROVEEDOR</h2>
+                    <div class="proveedor-contenido">
+                        <strong th:text="${item.importador != null ? item.importador : 'Proveedor'}">Proveedor</strong>
+                        <span class="etiqueta-mejor-precio">Mejor precio</span>
+                    </div>
+                    <p class="delivery-texto">🚚 Delivery a toda Lima Metropolitana</p>
+                </section>
+            </th:block>
+            
+
+            <!-- DESGLOSE DE COSTOS -->
+            <section class="carrito-tarjeta" th:unless="${#lists.isEmpty(items)}">
+                <h2 class="seccion-titulo">DESGLOSE DE COSTOS</h2>
+
+                <div th:each="item : ${items}" class="desglose-fila">
+                    <span th:text="|${item.nombre} (x${item.cantidad})|"></span>
+                    <span th:text="|S/ ${#numbers.formatDecimal(item.subtotal, 1, 2)}|"></span>
+                </div>
+
+                <div class="desglose-fila">
+                    <span>Envío</span>
+                    <span>Incluido</span>
+                </div>
+
+                <hr>
+
+                <div class="desglose-total">
+                    <strong>Monto Total a Pagar</strong>
+                    <strong th:text="|S/ ${#numbers.formatDecimal(subtotal, 1, 2)}|"></strong>
+                </div>
+            </section>
+
+            <a th:unless="${#lists.isEmpty(items)}" th:href="@{/pago}" class="boton-confirmar">
+                Confirmar y Proceder al Pago
+            </a>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER GENERAL -->
+    <div th:replace="~{layout :: footer}"></div>
+
+</body>
+</html>
