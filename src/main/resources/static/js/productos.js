@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function obtenerImagen(ruta) {
+        console.log(ruta);
         if (!ruta) return "";
 
         if (/^https?:\/\//i.test(ruta)) {

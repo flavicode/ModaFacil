@@ -119,15 +119,9 @@
         <script th:inline="javascript">
             const categoriasGlobales = /*[[${categorias}]]*/ [];
 
-            const relacionesServidor = /*[[${listaRelaciones}]]*/ [];
+            window.relacionesServidor = /*[[${relacionesServidor}]]*/ [];
         </script>
 
-        
-        <!-- DATOS ENVIADOS DESDE SPRING BOOT -->
-        <script th:inline="javascript">
-            window.relacionesServidor =
-                /*[[${relacionesServidor}]]*/ [];
-        </script>
 
         <!-- 1. PROCESAMIENTO DE DATOS -->
         <script th:src="@{/js/productos-data.js}" defer></script>

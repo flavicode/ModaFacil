@@ -42,7 +42,7 @@
                 <div class="prenda-contenido">
 
                     <!-- IMAGEN DEL PRODUCTO -->
-                    <img th:src="@{/img/p_camisero_1.jpg}"
+                    <img th:src="@{/img/{img}(img=${item.imagen})}"
                         alt="Imagen del producto"
                         class="prenda-imagen">
 

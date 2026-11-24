@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.utp.ModaFacil.model.Usuario;
-import com.utp.ModaFacil.repository.UsuarioRepository;
+import com.utp.ModaFacil.dao.UsuarioDAO;
 import com.utp.ModaFacil.util.HexCrypter;
 
 import jakarta.servlet.http.HttpSession;
@@ -16,10 +16,10 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class RegistroController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioDAO usuarioDAO;
 
-    public RegistroController(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public RegistroController(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
     }
 
     @GetMapping("/registro")
@@ -50,7 +50,7 @@ public class RegistroController {
             return "redirect:/login?registrar=true";
         }
 
-        if (usuarioRepository.buscarPorCorreo(correo) != null) {
+        if (usuarioDAO.buscarPorCorreo(correo) != null) {
             redirectAttributes.addFlashAttribute(
                 "errorRegistro",
                 "El correo ya se encuentra registrado. Intenta con otro."
@@ -61,10 +61,10 @@ public class RegistroController {
         String passwordCifrada = HexCrypter.encrypt(password);
         String fechaActual = java.time.LocalDate.now().toString();
 
-        Long nuevoId = usuarioRepository.obtenerSiguienteId();
+        // el id lo genera MySQL (AUTO_INCREMENT)
 
         Usuario nuevoUsuario = new Usuario(
-            nuevoId,
+            null,
             nombre,
             correo,
             passwordCifrada,
@@ -72,7 +72,7 @@ public class RegistroController {
             fechaActual
         );
 
-        usuarioRepository.guardar(nuevoUsuario);
+        usuarioDAO.guardar(nuevoUsuario);
 
         return "redirect:/login?registrado=true";
     }
@@ -81,6 +81,6 @@ public class RegistroController {
     @GetMapping("/registro/verificar-correo")
     @ResponseBody
     public boolean verificarCorreo(@RequestParam String correo) {
-        return usuarioRepository.buscarPorCorreo(correo.trim()) != null;
+        return usuarioDAO.buscarPorCorreo(correo.trim()) != null;
     }
 }

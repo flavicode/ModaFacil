@@ -3,21 +3,21 @@ package com.utp.ModaFacil.service;
 import org.springframework.stereotype.Service;
 
 import com.utp.ModaFacil.model.Usuario;
-import com.utp.ModaFacil.repository.UsuarioRepository;
+import com.utp.ModaFacil.dao.UsuarioDAO;
 import com.utp.ModaFacil.util.HexCrypter;
 
 @Service
 public class LoginService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioDAO usuarioDAO;
 
-    public LoginService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public LoginService(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
     }
 
     public Usuario autenticar(String correo, String password) {
 
-        Usuario usuario = usuarioRepository.buscarPorCorreo(correo);
+        Usuario usuario = usuarioDAO.buscarPorCorreo(correo);
 
         if (usuario == null) {
             return null;
