@@ -26,7 +26,7 @@ public class CatalogoService {
         this.ofertaDAO = ofertaDAO;
     }
 
-    // Las relaciones producto - importador - precio - stock ahora vienen de MySQL
+    // Las relaciones producto - proveedor - precio - stock ahora vienen de MySQL
     public List<Map<String, Object>> obtenerRelaciones() {
         return ofertaDAO.obtenerRelaciones();
     }
@@ -80,19 +80,19 @@ public class CatalogoService {
             precioMaximo.subtract(precioMinimo);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> importador =
-            (Map<String, Object>) mejorRelacion.get("importador");
+        Map<String, Object> proveedor =
+            (Map<String, Object>) mejorRelacion.get("proveedor");
 
-        Long idImportador =
-            ((Number) importador.get("idImportador")).longValue();
+        Long idProveedor =
+            ((Number) proveedor.get("idProveedor")).longValue();
 
         Map<String, Object> resultado = new HashMap<>();
 
         resultado.put("precioMinimo", precioMinimo);
         resultado.put("precioMaximo", precioMaximo);
         resultado.put("ahorro", ahorro);
-        resultado.put("idImportador", idImportador);
-        resultado.put("importadorNombre", "Importador " + idImportador);
+        resultado.put("idProveedor", idProveedor);
+        resultado.put("proveedorNombre", "Proveedor " + idProveedor);
 
         return resultado;
     }
@@ -125,15 +125,15 @@ public class CatalogoService {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> importador =
-            (Map<String, Object>) relacion.get("importador");
+        Map<String, Object> proveedor =
+            (Map<String, Object>) relacion.get("proveedor");
 
-        if (importador == null) {
+        if (proveedor == null) {
             continue;
         }
 
-        Long idImportador =
-            ((Number) importador.get("idImportador")).longValue();
+        Long idProveedor =
+            ((Number) proveedor.get("idProveedor")).longValue();
 
         BigDecimal precio =
             convertirPrecio(relacion.get("precio"));
@@ -144,7 +144,7 @@ public class CatalogoService {
         // EVITAR proveedores DUPLICADOS
         // SI EXISTEN DOS RELACIONES, CONSERVAR EL MENOR PRECIO
         Map<String, Object> tiendaExistente =
-            tiendasUnicas.get(idImportador);
+            tiendasUnicas.get(idProveedor);
 
         if (tiendaExistente != null) {
 
@@ -177,19 +177,19 @@ public class CatalogoService {
             claseStock = "stock-sin";
         }
 
-        // CREAR INFORMACIÓN DEL IMPORTADOR
+        // CREAR INFORMACIÓN DEL PROVEEDOR
         Map<String, Object> tienda = new HashMap<>();
 
-        tienda.put("idImportador", idImportador);
-        tienda.put("nombre", "Importador " + idImportador);
+        tienda.put("idProveedor", idProveedor);
+        tienda.put("nombre", "Proveedor " + idProveedor);
         tienda.put("precio", precio);
         tienda.put("tallas", producto.get("tallas"));
         tienda.put("stock", stock);
         tienda.put("estadoStock", estadoStock);
         tienda.put("claseStock", claseStock);
 
-        // GUARDAR UNA SOLA VEZ POR IMPORTADOR
-        tiendasUnicas.put(idImportador, tienda);
+        // GUARDAR UNA SOLA VEZ POR PROVEEDOR
+        tiendasUnicas.put(idProveedor, tienda);
     }
     
     // SELECCIONAR LA ESTRATEGIA DE COMPARACIÓN
@@ -229,13 +229,13 @@ public class CatalogoService {
 
 
     // ==========================================
-    // BUSCAR PRODUCTO EN UN IMPORTADOR ESPECÍFICO
+    // BUSCAR PRODUCTO EN UN PROVEEDOR ESPECÍFICO
     // ==========================================
 
-    public Map<String, Object> obtenerOfertaImportador(
+    public Map<String, Object> obtenerOfertaProveedor(
             Long idProducto,
-            Long idImportador) {
-        return ofertaDAO.obtenerOferta(idProducto, idImportador);
+            Long idProveedor) {
+        return ofertaDAO.obtenerOferta(idProducto, idProveedor);
     }
 
 }

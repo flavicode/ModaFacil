@@ -51,8 +51,8 @@
                         <span th:text="${item.talla}">M</span>
                     </p>
 
-                    <p th:text="${item.importador}">
-                        Importador
+                    <p th:text="${item.proveedor}">
+                        Proveedor
                     </p>
 
                     <p>
@@ -70,8 +70,8 @@
 
                             <input type="hidden" name="idProducto"
                                    th:value="${item.idProducto}">
-                            <input type="hidden" name="idImportador"
-                                   th:value="${item.idImportador}">
+                            <input type="hidden" name="idProveedor"
+                                   th:value="${item.idProveedor}">
                             <input type="hidden" name="talla"
                                    th:value="${item.talla}">
                             <input type="hidden" name="cambio" value="-1">
@@ -89,8 +89,8 @@
 
                             <input type="hidden" name="idProducto"
                                    th:value="${item.idProducto}">
-                            <input type="hidden" name="idImportador"
-                                   th:value="${item.idImportador}">
+                            <input type="hidden" name="idProveedor"
+                                   th:value="${item.idProveedor}">
                             <input type="hidden" name="talla"
                                    th:value="${item.talla}">
                             <input type="hidden" name="cambio" value="1">
@@ -125,7 +125,7 @@
             </div>
 
             <div class="mini-carrito-acciones">
-                <a th:href="@{/carrito}" class="btn-seguir-comprando">
+                <a th:href="@{/carrito}" class="btn bg-success text-white">
                     Ver carrito completo
                 </a>
             </div>

@@ -2,7 +2,10 @@
     display: flex;
     flex: 1 0 auto;
     min-height: calc(100vh - 68px);
+    width: 100%;
+    max-width: 100%;
 }
+
 .admin-sidebar {
     width: 250px;
     flex-shrink: 0;
@@ -42,7 +45,8 @@
     box-shadow: 0 2px 6px rgba(195, 99, 99, 0.3);
 }
 .admin-main {
-    flex-grow: 1;
+    flex: 1 1 auto;
+    min-width: 0; /* Evita que la tabla ancha empuje el contenedor fuera de la pantalla */
     background-color: var(--color-light);
     overflow-x: hidden;
 }
@@ -348,4 +352,62 @@
     background-color: #f9ebeb;
     border-radius: 12px;
     padding: 12px 18px;
+}
+
+/* =========================================
+   RESPONSIVE INVENTARIO Y PANEL ADMIN
+   ========================================= */
+@media (max-width: 1199.98px) {
+    .kpi-card {
+        padding: 16px 18px;
+        gap: 14px;
+    }
+
+    .kpi-icon-box {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .inventory-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .table-inventario thead th,
+    .table-inventario tbody td {
+        padding: 11px 12px;
+        font-size: 0.85rem;
+    }
+
+    .product-thumb {
+        width: 40px;
+        height: 40px;
+    }
+
+    .btn-actualizar-stock {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Ajustes del modal en celular */
+    .modal-stock-content {
+        padding: 4px;
+    }
+
+    .modal-stock-actual-box {
+        width: 100%;
+    }
+
+    .stock-stepper button {
+        width: 30px;
+        height: 30px;
+    }
+
+    .stock-stepper input {
+        width: 40px;
+        height: 30px;
+    }
 }

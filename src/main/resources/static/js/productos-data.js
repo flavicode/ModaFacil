@@ -39,8 +39,8 @@
             producto.precios.push(precio);
         }
 
-        if (rel.importador?.idImportador != null) {
-            producto.proveedores.add(rel.importador.idImportador);
+        if (rel.proveedor?.idProveedor != null) {
+            producto.proveedores.add(rel.proveedor.idProveedor);
         }
     });
 

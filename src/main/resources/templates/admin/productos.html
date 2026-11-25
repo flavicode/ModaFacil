@@ -117,8 +117,6 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Producto</th>
-                                    <th>Precio</th>
-                                    <th>Stock</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -154,26 +152,10 @@
                                         </div>
                                     </td>
 
-                                    <!-- Precio -->
-                                    <td th:text="${producto.precio() != null
-                                        ? 'S/ ' + producto.precio()
-                                        : 'No disponible'}">
-                                    </td>
-
-                                    <!-- Stock -->
-                                    <td>
-                                        <span class="stock-producto"
-                                            th:classappend="${producto.stock() == 0}
-                                                ? 'stock-agotado' : ''"
-                                            th:text="${producto.stock()}">
-                                        </span>
-                                    </td>
-
                                     <!-- Estado -->
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
 
-                                            <!-- Etiqueta de estado -->
                                             <span class="estado-producto"
                                                 th:classappend="${producto.activo()}
                                                     ? 'estado-activo' : 'estado-inactivo'"
@@ -181,7 +163,6 @@
                                                     ? 'Activo' : 'Inactivo'">
                                             </span>
 
-                                            <!-- Interruptor -->
                                             <div class="form-check form-switch mb-0">
 
                                                 <input type="checkbox"
@@ -205,6 +186,7 @@
                                             <button type="button"
                                                     class="btn btn-accion btn-detalle"
                                                     th:data-id="${producto.idProducto()}"
+                                                    th:data-url="@{/admin/productos/{id}/detalle(id=${producto.idProducto()})}"
                                                     title="Ver detalle"
                                                     aria-label="Ver detalle">
 
@@ -231,7 +213,7 @@
                                 <!-- Sin resultados -->
                                 <tr th:if="${#lists.isEmpty(productos)}">
 
-                                    <td colspan="6"
+                                    <td colspan="4"
                                         class="text-center text-muted py-5">
 
                                         No se encontraron productos.
@@ -253,6 +235,226 @@
 
                 </div>
             </main>
+        </div>
+
+        <!-- MODAL DETALLE DEL PRODUCTO-->
+        <div class="modal fade"
+            id="modalDetalleProducto"
+            tabindex="-1"
+            aria-labelledby="tituloModalDetalle"
+            aria-hidden="true"
+            th:data-img-base="@{/img/}">
+
+            <div class="modal-dialog modal-lg modal-dialog-centered
+                        modal-dialog-scrollable">
+
+                <div class="modal-content detalle-modal">
+
+                    <!-- CABECERA DEL MODAL -->
+                    <div class="modal-header detalle-header">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="detalle-icono-header">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+
+                            <h5 class="modal-title fw-bold"
+                                id="tituloModalDetalle">
+                                Detalle del producto
+                            </h5>
+
+                        </div>
+
+                        <!-- Botón X -->
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Cerrar">
+                        </button>
+
+                    </div>
+
+                    <!-- CUERPO DEL MODAL -->
+                    <div class="modal-body p-4">
+
+                        <!-- Mensaje de carga o error -->
+                        <div id="detalleMensaje"
+                            class="text-center py-4"
+                            role="status">
+                        </div>
+
+                        <div id="detalleContenido" class="d-none">
+
+                            <!-- INFORMACIÓN PRINCIPAL -->
+                            <div class="row g-4 mb-4 align-items-center">
+
+                                <!-- Imagen -->
+                                <div class="col-12 col-md-4">
+
+                                    <div class="detalle-imagen-contenedor">
+
+                                        <img id="detalleImagen"
+                                            class="detalle-imagen"
+                                            alt="Imagen del producto">
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Información -->
+                                <div class="col-12 col-md-8">
+
+                                    <h4 id="detalleNombre"
+                                        class="fw-bold mb-2">
+                                    </h4>
+
+                                    <span id="detalleCodigo"
+                                        class="detalle-codigo">
+                                    </span>
+
+                                    <div class="detalle-informacion mt-3">
+
+                                        <!-- Categoría -->
+                                        <div class="detalle-dato">
+
+                                            <i class="bi bi-layers"></i>
+
+                                            <div>
+                                                <small>Categoría:</small>
+                                                <strong id="detalleCategoria">
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        <hr>
+
+                                        <!-- Estado -->
+                                        <div class="detalle-dato">
+
+                                            <i class="bi bi-check-circle"></i>
+
+                                            <div>
+                                                <small>Estado:</small>
+
+                                                <span id="detalleEstado"
+                                                    class="estado-producto">
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- DESCRIPCIÓN -->
+                            <section class="detalle-seccion mb-3">
+
+                                <h5 class="detalle-titulo-seccion">
+
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    Descripción
+
+                                </h5>
+
+                                <p id="detalleDescripcion"
+                                class="mb-0">
+                                </p>
+
+                            </section>
+
+                            <!-- ESPECIFICACIONES -->
+                            <section class="detalle-seccion">
+
+                                <h5 class="detalle-titulo-seccion">
+
+                                    <i class="bi bi-gear"></i>
+                                    Especificaciones
+
+                                </h5>
+
+                                <div class="row g-4">
+
+                                    <!-- Características -->
+                                    <div class="col-12 col-md-6">
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-flower1"></i>
+                                            <strong>Material:</strong>
+                                            <span id="detalleMaterial"></span>
+                                        </div>
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-grid"></i>
+                                            <strong>Tipo de tela:</strong>
+                                            <span id="detalleTipoTela"></span>
+                                        </div>
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-arrows-expand"></i>
+                                            <strong>Ajuste:</strong>
+                                            <span id="detalleAjuste"></span>
+                                        </div>
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-diamond"></i>
+                                            <strong>Manga:</strong>
+                                            <span id="detalleManga"></span>
+                                        </div>
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-circle"></i>
+                                            <strong>Cuello:</strong>
+                                            <span id="detalleCuello"></span>
+                                        </div>
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-person"></i>
+                                            <strong>Género:</strong>
+                                            <span id="detalleGenero"></span>
+                                        </div>
+
+                                        <div class="detalle-especificacion">
+                                            <i class="bi bi-calendar-event"></i>
+                                            <strong>Ocasión:</strong>
+                                            <span id="detalleOcasion"></span>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Tallas -->
+                                    <div class="col-12 col-md-6
+                                                detalle-columna-tallas">
+
+                                        <h6 class="fw-bold mb-3">
+
+                                            <i class="bi bi-tag me-2"></i>
+                                            Tallas registradas
+
+                                        </h6>
+
+                                        <div id="detalleTallas"
+                                            class="d-flex flex-wrap gap-2">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
         <div th:replace="~{layout-admin :: scriptsAdmin}"></div>

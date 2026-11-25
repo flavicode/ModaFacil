@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 /**
- * Ofertas = producto + importador + precio + stock.
- * obtenerRelaciones() devuelve el MISMO formato de Map que hoy arma
- * CatalogoService, así que los controllers y los .js no cambian.
+ * Ofertas = producto + proveedor + precio.
+ * El stock ahora se calcula y descuenta desde producto_tallas, manteniendo
+ * el mismo formato de Map para no romper controllers ni .js.
  */
 @Repository
 public class OfertaDAO {
@@ -23,20 +23,26 @@ public class OfertaDAO {
     public OfertaDAO(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
     public List<Map<String, Object>> obtenerRelaciones() {
-        // tallas de todos los productos en una sola consulta
+        // 1. Cargamos tallas y sumamos el stock total por producto en una sola consulta
         Map<Long, List<String>> tallas = new HashMap<>();
-        jdbc.query("SELECT id_producto, talla FROM producto_tallas ORDER BY id_producto, talla", rs -> {
-            tallas.computeIfAbsent(rs.getLong("id_producto"), k -> new ArrayList<>())
+        Map<Long, Integer> stockPorProducto = new HashMap<>();
+
+        jdbc.query("SELECT id_producto, talla, stock FROM producto_tallas ORDER BY id_producto, talla", rs -> {
+            Long idProd = rs.getLong("id_producto");
+            tallas.computeIfAbsent(idProd, k -> new ArrayList<>())
                   .add(rs.getString("talla"));
+            stockPorProducto.merge(idProd, rs.getInt("stock"), Integer::sum);
         });
 
+        // 2. Consultamos ofertas sin o.stock (ya que no existe en la tabla ofertas)
         return jdbc.query(
-            "SELECT p.*, c.nombre AS categoria, o.id_importador, o.precio, o.stock " +
+            "SELECT p.*, c.nombre AS categoria, o.id_proveedor, o.precio " +
             "FROM ofertas o " +
-            "JOIN productos p   ON p.id_producto  = o.id_producto " +
-            "JOIN categorias c  ON c.id_categoria = p.id_categoria " +
-            "JOIN proveedores i ON i.id_importador = o.id_importador AND i.activo " +
-            "ORDER BY p.id_producto, o.id_importador",
+            "JOIN productos p   ON p.id_producto   = o.id_producto " +
+            "JOIN categorias c  ON c.id_categoria  = p.id_categoria " +
+            "JOIN proveedores i ON i.id_proveedor = o.id_proveedor AND i.activo = TRUE " +
+            "WHERE p.activo = TRUE " +
+            "ORDER BY p.id_producto, o.id_proveedor",
             (rs, n) -> {
                 Long idProducto = rs.getLong("id_producto");
 
@@ -57,40 +63,51 @@ public class OfertaDAO {
 
                 Map<String, Object> relacion = new HashMap<>();
                 relacion.put("producto", producto);
-                relacion.put("importador", Map.of("idImportador", rs.getLong("id_importador")));
+                relacion.put("proveedor", Map.of("idProveedor", rs.getLong("id_proveedor")));
                 relacion.put("precio", rs.getBigDecimal("precio"));
-                relacion.put("stock", rs.getInt("stock"));
+                relacion.put("stock", stockPorProducto.getOrDefault(idProducto, 0));
                 return relacion;
             });
     }
 
-    /** Equivale a CatalogoService.obtenerOfertaImportador(...). */
-    public Map<String, Object> obtenerOferta(Long idProducto, Long idImportador) {
+    /** Equivale a CatalogoService.obtenerOfertaProveedor(...). */
+    public Map<String, Object> obtenerOferta(Long idProducto, Long idProveedor) {
         try {
             return jdbc.queryForObject(
-                "SELECT precio, stock FROM ofertas WHERE id_producto = ? AND id_importador = ?",
+                "SELECT o.precio, COALESCE((SELECT SUM(pt.stock) FROM producto_tallas pt WHERE pt.id_producto = o.id_producto), 0) AS stock " +
+                "FROM ofertas o " +
+                "WHERE o.id_producto = ? AND o.id_proveedor = ?",
                 (rs, n) -> {
                     Map<String, Object> oferta = new HashMap<>();
                     oferta.put("idProducto", idProducto);
-                    oferta.put("idImportador", idImportador);
+                    oferta.put("idProveedor", idProveedor);
                     oferta.put("precio", rs.getBigDecimal("precio"));
                     oferta.put("stock", rs.getInt("stock"));
                     return oferta;
-                }, idProducto, idImportador);
+                }, idProducto, idProveedor);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
-    /** Descuenta stock solo si alcanza; devuelve false si no había suficiente. */
-    public boolean descontarStock(Long idProducto, Long idImportador, int cantidad) {
+    /** Descuenta stock de una talla específica en producto_tallas; devuelve false si no alcanza. */
+    public boolean descontarStockPorTalla(Long idProducto, String talla, int cantidad) {
         return jdbc.update(
-            "UPDATE ofertas SET stock = stock - ? WHERE id_producto = ? AND id_importador = ? AND stock >= ?",
-            cantidad, idProducto, idImportador, cantidad) == 1;
+            "UPDATE producto_tallas SET stock = stock - ? WHERE id_producto = ? AND talla = ? AND stock >= ?",
+            cantidad, idProducto, talla, cantidad) == 1;
     }
 
-    public BigDecimal obtenerPrecio(Long idProducto, Long idImportador) {
-        Map<String, Object> o = obtenerOferta(idProducto, idImportador);
+    /** Mantiene compatibilidad si algún servicio antiguo llama descontarStock sin talla. */
+    public boolean descontarStock(Long idProducto, Long idProveedor, int cantidad) {
+        return jdbc.update(
+            "UPDATE producto_tallas SET stock = stock - ? " +
+            "WHERE id_producto = ? AND stock >= ? " +
+            "ORDER BY stock DESC LIMIT 1",
+            cantidad, idProducto, cantidad) == 1;
+    }
+
+    public BigDecimal obtenerPrecio(Long idProducto, Long idProveedor) {
+        Map<String, Object> o = obtenerOferta(idProducto, idProveedor);
         return o == null ? null : (BigDecimal) o.get("precio");
     }
 }

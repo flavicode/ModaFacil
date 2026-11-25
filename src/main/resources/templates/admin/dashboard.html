@@ -10,18 +10,253 @@
         <div class="admin-wrapper">
             <aside th:replace="~{layout-admin :: sidebarAdmin}"></aside>
 
-            <main class="admin-main p-4 p-lg-5">
-                <!-- Breadcrumb y Título -->
-                <nav aria-label="breadcrumb" class="small text-muted mb-1">
-                    <i class="bi bi-house"></i> / Dashboard
-                </nav>
+            <main class="admin-main p-4 p-lg-5 bg-white">
+                <!-- Encabezado de sección -->
+                <div class="d-flex align-items-center gap-2 small fw-semibold text-uppercase mb-1" style="letter-spacing: 0.05em; color: #7a6666;">
+                    <span class="rounded-1 d-inline-block" style="width: 10px; height: 10px; background-color: var(--color-success);"></span>
+                    <span>Inicio</span>
+                </div>
                 <h2 class="fw-bold text-primary mb-1">Dashboard</h2>
-                <p class="text-muted mb-4">Resumen general de Moda Fácil.</p>
+                <p class="text-muted mb-4">Resumen general de ventas, compras y productos de Moda Fácil.</p>
 
-                <!-- Aquí va el contenido de la página -->
+                <!-- FILA 1: 3 TARJETAS DE MÉTRICAS (KPIs) -->
+                <div class="row g-4 mb-4">
+                    
+                    <!-- Tarjeta 1: Ingresos por ventas -->
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 p-4 h-100" style="background-color: var(--color-light);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 text-white"
+                                    style="width: 54px; height: 54px; background-color: var(--color-success);">
+                                    <i class="bi bi-coin fs-3"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-medium mb-1">Ingresos por ventas</p>
+                                    <h3 class="fw-bold text-primary mb-1" 
+                                        th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotales ?: 12450.00, 1, 'COMMA', 2, 'POINT')}">
+                                        S/ 12,450.00
+                                    </h3>
+                                    <div class="d-flex align-items-center gap-2 small">
+                                        <span class="badge rounded-pill fw-semibold px-2 py-1" style="background-color: #e2f5ea; color: #1e7e48;">
+                                            <i class="bi bi-chevron-up"></i> <span th:text="${variacionIngresos ?: '+12.5%'}">+12.5%</span>
+                                        </span>
+                                        <span class="text-muted" style="font-size: 0.78rem;">vs. mes anterior</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2: Compras realizadas -->
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 p-4 h-100" style="background-color: var(--color-light);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 text-white"
+                                    style="width: 54px; height: 54px; background-color: var(--color-success);">
+                                    <i class="bi bi-bag fs-3"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-medium mb-1">Compras realizadas</p>
+                                    <h3 class="fw-bold text-primary mb-1" th:text="${comprasRealizadas ?: 145}">145</h3>
+                                    <div class="d-flex align-items-center gap-2 small">
+                                        <span class="badge rounded-pill fw-semibold px-2 py-1" style="background-color: #e2f5ea; color: #1e7e48;">
+                                            <i class="bi bi-chevron-up"></i> <span th:text="${variacionCompras ?: '+8.2%'}">+8.2%</span>
+                                        </span>
+                                        <span class="text-muted" style="font-size: 0.78rem;">vs. mes anterior</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 3: Productos registrados -->
+                    <div class="col-md-4">
+                        <div class="card border-0 rounded-4 p-4 h-100" style="background-color: var(--color-light);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0 text-white"
+                                    style="width: 54px; height: 54px; background-color: var(--color-success);">
+                                    <i class="bi bi-box-seam fs-3"></i>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-medium mb-1">Productos registrados</p>
+                                    <h3 class="fw-bold text-primary mb-1" th:text="${productosRegistrados ?: 256}">256</h3>
+                                    <div class="d-flex align-items-center gap-2 small">
+                                        <span class="badge rounded-pill fw-semibold px-2 py-1" style="background-color: #e2f5ea; color: #1e7e48;">
+                                            <i class="bi bi-chevron-up"></i> <span th:text="${variacionProductos ?: '+4.1%'}">+4.1%</span>
+                                        </span>
+                                        <span class="text-muted" style="font-size: 0.78rem;">vs. mes anterior</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- FILA 2: GRÁFICO DE VENTAS MENSUALES + ÚLTIMAS COMPRAS -->
+                <div class="row g-4">
+                    
+                    <!-- Columna Izquierda (7/12): Ventas mensuales -->
+                    <div class="col-lg-7">
+                        <div class="card border-0 rounded-4 p-4 h-100" style="background-color: var(--color-light);">
+                            <div class="d-flex align-items-start gap-2 mb-4">
+                                <i class="bi bi-bar-chart-line fs-4 mt-1" style="color: var(--color-success);"></i>
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-0">Ventas mensuales</h5>
+                                    <p class="text-muted small mb-0">Ingresos por ventas en los últimos 6 meses</p>
+                                </div>
+                            </div>
+                            
+                            <div class="position-relative" style="height: 270px; width: 100%;">
+                                <canvas id="graficoVentasMensuales"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Columna Derecha (5/12): Últimas compras -->
+                    <div class="col-lg-5">
+                        <div class="card border-0 rounded-4 p-4 h-100" style="background-color: var(--color-light);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-cart3 fs-4" style="color: var(--color-success);"></i>
+                                    <h5 class="fw-bold text-primary mb-0">Últimas compras</h5>
+                                </div>
+                                <a th:href="@{/admin/ventas}" class="small fw-semibold text-decoration-underline" style="color: var(--color-success);">
+                                    Ver todas &gt;
+                                </a>
+                            </div>
+
+                            <!-- Lista dinámica desde BD -->
+                            <div th:if="${ultimasCompras != null and !#lists.isEmpty(ultimasCompras)}" class="d-flex flex-column">
+                                <div th:each="venta, iter : ${ultimasCompras}" 
+                                    class="d-flex justify-content-between align-items-center py-3"
+                                    th:classappend="${!iter.last ? 'border-bottom' : ''}">
+                                    <div>
+                                        <div class="fw-bold text-primary" th:text="${venta.codigo}">#000145</div>
+                                        <div class="text-muted small" th:text="${venta.fecha}">24 nov 2026</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="fw-bold text-primary" th:text="'S/ ' + ${#numbers.formatDecimal(venta.total, 1, 'COMMA', 2, 'POINT')}">S/ 159.90</span>
+                                        <span th:if="${venta.estado == 'PAGADO'}" class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #e2f5ea; color: #1e7e48;">Pagado</span>
+                                        <span th:if="${venta.estado == 'PENDIENTE'}" class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #fef3c7; color: #b45309;">Pendiente</span>
+                                        <span th:if="${venta.estado == 'CANCELADO'}" class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #fee2e2; color: #b91c1c;">Cancelado</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Datos visuales de respaldo mientras conectas la tabla 'ventas' -->
+                            <div th:if="${ultimasCompras == null or #lists.isEmpty(ultimasCompras)}" class="d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                    <div>
+                                        <div class="fw-bold text-primary">#000145</div>
+                                        <div class="text-muted small">24 nov 2026</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="fw-bold text-primary">S/ 159.90</span>
+                                        <span class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #e2f5ea; color: #1e7e48;">Pagado</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                    <div>
+                                        <div class="fw-bold text-primary">#000144</div>
+                                        <div class="text-muted small">24 nov 2026</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="fw-bold text-primary">S/ 89.90</span>
+                                        <span class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #e2f5ea; color: #1e7e48;">Pagado</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                                    <div>
+                                        <div class="fw-bold text-primary">#000143</div>
+                                        <div class="text-muted small">23 nov 2026</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="fw-bold text-primary">S/ 120.00</span>
+                                        <span class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #e2f5ea; color: #1e7e48;">Pagado</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-3">
+                                    <div>
+                                        <div class="fw-bold text-primary">#000142</div>
+                                        <div class="text-muted small">22 nov 2026</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="fw-bold text-primary">S/ 259.90</span>
+                                        <span class="badge rounded-3 px-2 py-1 fw-semibold" style="background-color: #fef3c7; color: #b45309;">Pendiente</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
 
         <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+        <script src="https://jsdelivr.net"></script>
+        <script th:inline="javascript">
+            document.addEventListener("DOMContentLoaded", function () {
+                const ctx = document.getElementById('graficoVentasMensuales');
+                if (!ctx) return;
+
+                const etiquetas = /*[[${mesesGrafico}]]*/ ['Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov'];
+                const montos = /*[[${montosGrafico}]]*/;
+
+                const coloresBarras = montos.map((_, index) => 
+                    index === montos.length - 1 ? '#b05252' : '#e09f9f'
+                );
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{
+                            label: 'Ingresos',
+                            data: montos,
+                            backgroundColor: coloresBarras,
+                            hoverBackgroundColor: '#9e4545',
+                            borderRadius: { topLeft: 8, topRight: 8 },
+                            borderSkipped: false,
+                            barPercentage: 0.65
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#b05252',
+                                titleFont: { family: 'Outfit', size: 12 },
+                                bodyFont: { family: 'Outfit', size: 14, weight: 'bold' },
+                                padding: 10,
+                                cornerRadius: 8,
+                                displayColors: false,
+                                callbacks: {
+                                    title: () => '',
+                                    label: (context) => 'S/ ' + context.parsed.y.toLocaleString('es-PE', { minimumFractionDigits: 2 })
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                border: { color: '#e5dede' },
+                                ticks: { color: '#6c5a5a', font: { family: 'Outfit', size: 12 } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                border: { display: false },
+                                grid: { color: '#ece6e6' },
+                                ticks: {
+                                    color: '#6c5a5a',
+                                    font: { family: 'Outfit', size: 11 },
+                                    callback: (value) => 'S/ ' + value.toLocaleString('es-PE')
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

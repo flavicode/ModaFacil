@@ -1,21 +1,21 @@
 package com.utp.ModaFacil.controller;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.http.ResponseEntity;
 
-import java.util.Map;
-
+import com.utp.ModaFacil.dao.InventarioDAO;
+import com.utp.ModaFacil.model.ProductoDetalleAdmin;
 import com.utp.ModaFacil.model.Usuario;
 import com.utp.ModaFacil.service.ProductoAdminService;
 
@@ -25,9 +25,11 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/admin")
 public class AdminController {
     private final ProductoAdminService productoAdminService;
+    private final InventarioDAO inventarioDAO;
 
-    public AdminController(ProductoAdminService productoAdminService) {
+    public AdminController(ProductoAdminService productoAdminService, InventarioDAO inventarioDAO) {
         this.productoAdminService = productoAdminService;
+        this.inventarioDAO = inventarioDAO;
     }
 
     @GetMapping({"", "/", "/dashboard"})
@@ -77,14 +79,31 @@ public class AdminController {
                 Map.of("ok", true,"activo", activo,"mensaje", "Estado actualizado correctamente"));
         }
 
+        @GetMapping("/productos/{id}/detalle")
+        @ResponseBody
+        public ResponseEntity<ProductoDetalleAdmin> obtenerDetalleProducto(
+                @PathVariable("id") Long idProducto,
+                HttpSession session) {
+
+            if (!esAdmin(session)) {
+                return ResponseEntity.status(403).build();
+            }
+
+            return productoAdminService.obtenerDetalle(idProducto)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() ->
+                        ResponseEntity.notFound().build()
+                    );
+        }
+
     @GetMapping("/inventario")
     public String inventario(HttpSession session, Model model) {
         if (!esAdmin(session)) {
             return "redirect:/login";
         }
 
-    // TODO: Reemplazar con datos reales desde tu ProductoService / InventarioRepository
-        List<ProductoInventario> productosInventario = obtenerDatosDemoInventario();
+        List<ProductoInventario> productosInventario = inventarioDAO.listarInventario();
+        List<String> categorias = inventarioDAO.listarCategorias();
 
         int totalUnidades = productosInventario.stream()
                 .mapToInt(ProductoInventario::getStockTotal)
@@ -120,8 +139,7 @@ public class AdminController {
             return "redirect:/login";
         }
 
-        // TODO: Guardar en base de datos usando tu servicio:
-        // inventarioService.actualizarStockPorTallas(productoId, tallas, cantidades);
+        inventarioDAO.actualizarStockPorTallas(productoId, tallas, cantidades);
         redirectAttributes.addFlashAttribute("mensajeExito", "Stock actualizado correctamente.");
         return "redirect:/admin/inventario";
     }
@@ -129,52 +147,6 @@ public class AdminController {
     private boolean esAdmin(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("logged");
         return usuario != null && "ADMIN".equalsIgnoreCase(String.valueOf(usuario.getRol()));
-    }
-
-    // Datos de prueba idénticos al mockup (puedes borrar este método al conectar tu BD)
-    private List<ProductoInventario> obtenerDatosDemoInventario() {
-        List<ProductoInventario> lista = new ArrayList<>();
-
-        lista.add(new ProductoInventario(1L, "P00125", "Blusa Elegante", "Blusas", "/img/productos/blusa.png", 25,
-                List.of(
-                    new TallaStock("S", 8),
-                    new TallaStock("M", 12),
-                    new TallaStock("L", 5),
-                    new TallaStock("XL", 0)
-                )));
-
-        lista.add(new ProductoInventario(2L, "P00124", "Jean Clásico", "Jeans", "/img/productos/jean.png", 18,
-                List.of(
-                    new TallaStock("28", 6),
-                    new TallaStock("30", 8),
-                    new TallaStock("32", 4),
-                    new TallaStock("34", 0)
-                )));
-
-        lista.add(new ProductoInventario(3L, "P00123", "Casaca Urbana", "Casacas", "/img/productos/casaca.png", 12,
-                List.of(
-                    new TallaStock("S", 4),
-                    new TallaStock("M", 5),
-                    new TallaStock("L", 3),
-                    new TallaStock("XL", 0)
-                )));
-
-        lista.add(new ProductoInventario(4L, "P00122", "Vestido Floral", "Vestidos", "/img/productos/vestido.png", 0,
-                List.of(
-                    new TallaStock("S", 0),
-                    new TallaStock("M", 0),
-                    new TallaStock("L", 0)
-                )));
-
-        lista.add(new ProductoInventario(5L, "P00121", "Polo Básico", "Polos", "/img/productos/polo.png", 40,
-                List.of(
-                    new TallaStock("S", 10),
-                    new TallaStock("M", 15),
-                    new TallaStock("L", 10),
-                    new TallaStock("XL", 5)
-                )));
-
-        return lista;
     }
 
     public static class ProductoInventario {

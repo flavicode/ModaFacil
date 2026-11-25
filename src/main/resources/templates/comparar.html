@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <h4 class="card-title mb-3">No se ha seleccionado ningún producto</h4>
                     <p class="card-text text-muted mb-4">
-                        Aún no has elegido un artículo para comparar. Explora nuestro catálogo y selecciona uno para ver las mejores ofertas de los importadores.
+                        Aún no has elegido un artículo para comparar. Explora nuestro catálogo y selecciona uno para ver las mejores ofertas de los proveedores.
                     </p>
                     <a th:href="@{/productos}" class="btn bg-success text-white px-4">
                         Ir a Productos
@@ -170,7 +170,7 @@
 
                         <!-- PROVEEDOR CON EL MEJOR PRECIO -->
                         <p class="mejor-precio-proveedor"
-                        th:text="${mejorPrecio.importadorNombre}">
+                        th:text="${mejorPrecio.proveedorNombre}">
                         </p>
 
                         <!-- PRECIO MÁS ECONÓMICO -->
@@ -205,11 +205,11 @@
                                 name="idProducto"
                                 th:value="${productoSeleccionado.idProducto}">
 
-                            <!-- IMPORTADOR DEL MEJOR PRECIO -->
+                            <!-- PROVEEDOR DEL MEJOR PRECIO -->
                             <input
                                 type="hidden"
-                                name="idImportador"
-                                th:value="${tiendasComparacion[0].idImportador}">
+                                name="idProveedor"
+                                th:value="${tiendasComparacion[0].idProveedor}">
 
 
                             <!-- CANTIDAD -->
@@ -429,7 +429,7 @@
                                             <!-- NOMBRE DE TIENDA -->
                                             <strong
                                                 th:text="${tienda.nombre}">
-                                                Importador 1
+                                                Proveedor 1
                                             </strong>
 
                                             <!-- MEJOR PRECIO -->
@@ -513,11 +513,11 @@
                                             name="idProducto"
                                             th:value="${productoSeleccionado.idProducto}">
 
-                                        <!-- IMPORTADOR SELECCIONADO -->
+                                        <!-- PROVEEDOR SELECCIONADO -->
                                         <input
                                             type="hidden"
-                                            name="idImportador"
-                                            th:value="${tienda.idImportador}">
+                                            name="idProveedor"
+                                            th:value="${tienda.idProveedor}">
 
                                         <!-- CANTIDAD INICIAL -->
                                         <input
@@ -525,6 +525,12 @@
                                             name="cantidad"
                                             value="1">
 
+                                        <input
+                                            type="hidden"
+                                            name="talla"
+                                            class="input-talla-tabla"
+                                            th:value="${!#lists.isEmpty(tienda.tallas) ? tienda.tallas[0] : ''}">
+                                            
                                         <!-- TOKEN CSRF, SI ESTÁ DISPONIBLE -->
                                         <input
                                             th:if="${_csrf != null}"

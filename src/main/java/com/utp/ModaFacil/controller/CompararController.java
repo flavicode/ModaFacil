@@ -70,17 +70,17 @@ public class CompararController {
         model.addAttribute("tiendasComparacion", tiendasComparacion);
         model.addAttribute("cantidadTiendas", tiendasComparacion.size());
 
-        // OBTENER ID DEL IMPORTADOR MÁS ECONÓMICO
-        Long idMejorImportador = ((Number) mejorPrecio.get("idImportador")).longValue();
+        // OBTENER ID DEL PROVEEDOR MÁS ECONÓMICO
+        Long idMejorProveedor = ((Number) mejorPrecio.get("idProveedor")).longValue();
 
-        // OBTENER OFERTA DEL IMPORTADOR
-        Map<String, Object> ofertaMejorPrecio = catalogoService.obtenerOfertaImportador(id, idMejorImportador);
+        // OBTENER OFERTA DEL PROVEEDOR
+        Map<String, Object> ofertaMejorPrecio = catalogoService.obtenerOfertaProveedor(id, idMejorProveedor);
 
-        // OBTENER STOCK DEL IMPORTADOR
+        // OBTENER STOCK DEL PROVEEDOR
         int stockTotal = ofertaMejorPrecio == null ? 0 : ((Number) ofertaMejorPrecio.get("stock")).intValue();
 
         // CONTAR CANTIDADES QUE YA ESTÁN EN EL CARRITO
-        int cantidadEnCarrito = obtenerCantidadEnCarrito( session, id, idMejorImportador);
+        int cantidadEnCarrito = obtenerCantidadEnCarrito( session, id, idMejorProveedor);
 
         // CALCULAR STOCK DISPONIBLE
         int stockDisponible = Math.max(0, stockTotal - cantidadEnCarrito);
@@ -132,20 +132,20 @@ public class CompararController {
     }
 
 
-    // CONTAR UNIDADES POR PRODUCTO E IMPORTADOR
+    // CONTAR UNIDADES POR PRODUCTO E PROVEEDOR
 
     
     private int obtenerCantidadEnCarrito(
             HttpSession session,
             Long idProducto,
-            Long idImportador) {
+            Long idProveedor) {
 
         return obtenerCarrito(session).stream()
 
-                // FILTRAR POR PRODUCTO E IMPORTADOR
+                // FILTRAR POR PRODUCTO E PROVEEDOR
                 .filter(item ->
                         idProducto.equals(item.getIdProducto())
-                        && idImportador.equals(item.getIdImportador())
+                        && idProveedor.equals(item.getIdProveedor())
                 )
 
                 // SUMAR CANTIDADES DE TODAS LAS TALLAS

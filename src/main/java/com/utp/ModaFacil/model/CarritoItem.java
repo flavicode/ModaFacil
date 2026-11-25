@@ -5,29 +5,29 @@ import java.math.BigDecimal;
 public class CarritoItem {
 
     private Long idProducto;
-    private Long idImportador;
+    private Long idProveedor;
     private String nombre;
     private String imagen;
     private String talla;
-    private String importador;
+    private String proveedor;
     private BigDecimal precioUnitario;
     private int cantidad;
 
     public CarritoItem(Long idProducto,
-                       Long idImportador,
+                       Long idProveedor,
                        String nombre,
                        String imagen,
                        String talla,
-                       String importador,
+                       String proveedor,
                        BigDecimal precioUnitario,
                        int cantidad) {
 
         this.idProducto = idProducto;
-        this.idImportador = idImportador;
+        this.idProveedor = idProveedor;
         this.nombre = nombre;
         this.imagen = imagen;
         this.talla = talla;
-        this.importador = importador;
+        this.proveedor = proveedor;
         this.precioUnitario = precioUnitario;
         this.cantidad = cantidad;
     }
@@ -40,8 +40,8 @@ public class CarritoItem {
         return idProducto;
     }
 
-    public Long getIdImportador() {
-        return idImportador;
+    public Long getIdProveedor() {
+        return idProveedor;
     }
 
     public String getNombre() {
@@ -56,8 +56,8 @@ public class CarritoItem {
         return talla;
     }
 
-    public String getImportador() {
-        return importador;
+    public String getProveedor() {
+        return proveedor;
     }
 
     public BigDecimal getPrecioUnitario() {

@@ -1,19 +1,21 @@
 package com.utp.ModaFacil.controller;
 
-import com.utp.ModaFacil.model.CarritoItem;
-import com.utp.ModaFacil.service.CatalogoService;
-
-import jakarta.servlet.http.HttpSession;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.utp.ModaFacil.model.CarritoItem;
+import com.utp.ModaFacil.service.CatalogoService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/comparar/carrito")
@@ -45,19 +47,19 @@ public class CarritoController {
     }
 
     // ==========================================
-    // CONTAR UNIDADES POR PRODUCTO E IMPORTADOR
+    // CONTAR UNIDADES POR PRODUCTO E PROVEEDOR
     // INCLUYE TODAS LAS TALLAS
     // ==========================================
 
     private int cantidadReservada(
             List<CarritoItem> carrito,
             Long idProducto,
-            Long idImportador) {
+            Long idProveedor) {
 
         return carrito.stream()
                 .filter(item ->
                         Objects.equals(item.getIdProducto(), idProducto)
-                        && Objects.equals(item.getIdImportador(), idImportador))
+                        && Objects.equals(item.getIdProveedor(), idProveedor))
                 .mapToInt(CarritoItem::getCantidad)
                 .sum();
     }
@@ -69,7 +71,7 @@ public class CarritoController {
     @PostMapping("/agregar")
     public String agregar(
             @RequestParam Long idProducto,
-            @RequestParam Long idImportador,
+            @RequestParam Long idProveedor,
             @RequestParam String talla,
             @RequestParam(defaultValue = "1") int cantidad,
             HttpSession session,
@@ -82,16 +84,16 @@ public class CarritoController {
 
         System.out.println("===== AGREGAR AL CARRITO =====");
         System.out.println("Producto: " + idProducto);
-        System.out.println("Importador: " + idImportador);
+        System.out.println("Proveedor: " + idProveedor);
         System.out.println("Talla: " + talla);
         System.out.println("Cantidad: " + cantidad);
 
         String destino = "redirect:/comparar?id=" + idProducto;
 
-        // OBTENER OFERTA REAL DEL IMPORTADOR
+        // OBTENER OFERTA REAL DEL PROVEEDOR
         Map<String, Object> oferta =
-                catalogoService.obtenerOfertaImportador(
-                        idProducto, idImportador);
+                catalogoService.obtenerOfertaProveedor(
+                        idProducto, idProveedor);
 
         if (oferta == null) {
             redirect.addFlashAttribute(
@@ -153,7 +155,7 @@ public class CarritoController {
 
         // VALIDAR STOCK CONSIDERANDO TODAS LAS TALLAS
         int reservado = cantidadReservada(
-                carrito, idProducto, idImportador);
+                carrito, idProducto, idProveedor);
 
         if (cantidad < 1 ||
                 reservado + (long) cantidad > stock) {
@@ -165,11 +167,11 @@ public class CarritoController {
             return destino;
         }
 
-        // BUSCAR MISMO PRODUCTO, IMPORTADOR Y TALLA
+        // BUSCAR MISMO PRODUCTO, PROVEEDOR Y TALLA
         CarritoItem existente = carrito.stream()
                 .filter(item ->
                         Objects.equals(item.getIdProducto(), idProducto)
-                        && Objects.equals(item.getIdImportador(), idImportador)
+                        && Objects.equals(item.getIdProveedor(), idProveedor)
                         && Objects.equals(item.getTalla(), talla))
                 .findFirst()
                 .orElse(null);
@@ -184,11 +186,11 @@ public class CarritoController {
 
             CarritoItem nuevo = new CarritoItem(
                     idProducto,
-                    idImportador,
+                    idProveedor,
                     (String) producto.get("nombre"),
                     (String) producto.get("imagen"),
                     talla,
-                    "Importador " + idImportador,
+                    "Proveedor " + idProveedor,
                     precio,
                     cantidad
             );
@@ -211,7 +213,7 @@ public class CarritoController {
     @PostMapping("/cantidad")
     public String cambiarCantidad(
             @RequestParam Long idProducto,
-            @RequestParam Long idImportador,
+            @RequestParam Long idProveedor,
             @RequestParam String talla,
             @RequestParam int cambio,
             HttpSession session) {
@@ -232,7 +234,7 @@ public class CarritoController {
         CarritoItem item = carrito.stream()
                 .filter(actual ->
                         Objects.equals(actual.getIdProducto(), idProducto)
-                        && Objects.equals(actual.getIdImportador(), idImportador)
+                        && Objects.equals(actual.getIdProveedor(), idProveedor)
                         && Objects.equals(actual.getTalla(), talla))
                 .findFirst()
                 .orElse(null);
@@ -242,8 +244,8 @@ public class CarritoController {
         }
 
         Map<String, Object> oferta =
-                catalogoService.obtenerOfertaImportador(
-                        idProducto, idImportador);
+                catalogoService.obtenerOfertaProveedor(
+                        idProducto, idProveedor);
 
         if (oferta == null) {
             return destino;
@@ -255,9 +257,9 @@ public class CarritoController {
         int nuevaCantidad = item.getCantidad() + cambio;
 
         int reservado = cantidadReservada(
-                carrito, idProducto, idImportador);
+                carrito, idProducto, idProveedor);
 
-        // VALIDAR EL STOCK TOTAL DEL IMPORTADOR
+        // VALIDAR EL STOCK TOTAL DEL PROVEEDOR
         if (nuevaCantidad >= 1 &&
                 reservado + cambio <= stock) {
 

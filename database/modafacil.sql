@@ -17,7 +17,7 @@ CREATE TABLE usuarios (
 );
 
 CREATE TABLE proveedores (
-    id_importador BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_proveedor  BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre        VARCHAR(100) NOT NULL,
     activo        BOOLEAN NOT NULL DEFAULT TRUE
 );
@@ -44,36 +44,64 @@ CREATE TABLE productos (
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
 
-CREATE TABLE producto_tallas (
-    id_producto BIGINT NOT NULL,
-    talla       VARCHAR(5) NOT NULL,
-    PRIMARY KEY (id_producto, talla),
-    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE
-);
 
--- Relación producto - importador: cada importador vende el producto a su precio y con su stock
+-- Relación producto - proveedor: cada proveedor vende el producto a su precio y con su stock
 CREATE TABLE ofertas (
     id_producto   BIGINT NOT NULL,
-    id_importador BIGINT NOT NULL,
+    id_proveedor BIGINT NOT NULL,
     precio        DECIMAL(8,2) NOT NULL CHECK (precio > 0),
-    stock         INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
-    PRIMARY KEY (id_producto, id_importador),
+    PRIMARY KEY (id_producto, id_proveedor),
     FOREIGN KEY (id_producto)   REFERENCES productos(id_producto),
-    FOREIGN KEY (id_importador) REFERENCES proveedores(id_importador)
+    FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
 );
 
--- Carrito guardado por usuario (hoy vive en la sesión HTTP). Un item = producto + importador + talla
+CREATE TABLE producto_tallas (
+    id_producto BIGINT NOT NULL,
+    id_proveedor BIGINT NOT NULL,
+    talla       VARCHAR(5) NOT NULL,
+    stock         INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    PRIMARY KEY (id_producto, id_proveedor, talla),
+    FOREIGN KEY (id_producto, id_proveedor) REFERENCES ofertas(id_producto, id_proveedor) ON DELETE CASCADE
+);
+
+-- Carrito guardado por usuario (hoy vive en la sesión HTTP). Un item = producto + proveedor + talla
 CREATE TABLE carrito_items (
     id_usuario    BIGINT NOT NULL,
     id_producto   BIGINT NOT NULL,
-    id_importador BIGINT NOT NULL,
+    id_proveedor BIGINT NOT NULL,
     talla         VARCHAR(5) NOT NULL,
     cantidad      INT NOT NULL CHECK (cantidad > 0),
-    PRIMARY KEY (id_usuario, id_producto, id_importador, talla),
+    PRIMARY KEY (id_usuario, id_producto, id_proveedor, talla),
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_producto, id_importador) REFERENCES ofertas(id_producto, id_importador),
-    FOREIGN KEY (id_producto, talla) REFERENCES producto_tallas(id_producto, talla)
+    FOREIGN KEY (id_producto, id_proveedor, talla) REFERENCES producto_tallas(id_producto, id_proveedor, talla)
 );
+
+-- Cabecera de la venta / orden de compra
+CREATE TABLE ventas (
+    id_venta          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario        BIGINT NOT NULL,
+    fecha_venta       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    total             DECIMAL(10,2) NOT NULL CHECK (total >= 0),
+    estado            ENUM('PENDIENTE', 'PAGADO', 'CANCELADO') NOT NULL DEFAULT 'PAGADO',
+    metodo_pago       VARCHAR(40) NOT NULL DEFAULT 'IZIPAY',
+    transaccion_id    VARCHAR(100) NULL, -- Código de operación simulado de Izipay
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+-- Detalle de los productos comprados en cada venta
+CREATE TABLE detalle_ventas (
+    id_detalle        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_venta          BIGINT NOT NULL,
+    id_producto       BIGINT NOT NULL,
+    id_proveedor      BIGINT NOT NULL,
+    talla             VARCHAR(5) NOT NULL,
+    cantidad          INT NOT NULL CHECK (cantidad > 0),
+    precio_unitario   DECIMAL(8,2) NOT NULL CHECK (precio_unitario > 0),
+    FOREIGN KEY (id_venta) REFERENCES ventas(id_venta) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto, id_proveedor, talla) 
+        REFERENCES producto_tallas(id_producto, id_proveedor, talla)
+);
+
 
 -- =============== DATOS (los mismos que CatalogoService / UsuarioRepository) ===============
 INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol) VALUES
@@ -85,8 +113,8 @@ INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol)
 INSERT INTO categorias (nombre, color) VALUES ('Polos','#C65F64'),('Pantalones','#C65F64'),('Vestidos','#C65F64');
 
 INSERT INTO proveedores (nombre) VALUES
- ('Importador 1'),('Importador 2'),('Importador 3'),('Importador 4'),
- ('Importador 5'),('Importador 6'),('Importador 7'),('Importador 8');
+ ('Proveedor 1'),('Proveedor 2'),('Proveedor 3'),('Proveedor 4'),
+ ('Proveedor 5'),('Proveedor 6'),('Proveedor 7'),('Proveedor 8');
 
 INSERT INTO productos (id_categoria, nombre, imagen, genero, descripcion, material, tipo_tela, ajuste, manga, cuello, ocasion) VALUES
  (1,'Polo Básico Negro para Hombre','p_camisero_1.jpg','Hombre',
@@ -99,14 +127,32 @@ INSERT INTO productos (id_categoria, nombre, imagen, genero, descripcion, materi
   'Vestido casual de verano, ligero y cómodo, ideal para días cálidos y ocasiones informales.',
   'Algodón y poliéster','Tela ligera','Regular','Corta','Redondo','Casual / Verano');
 
-INSERT INTO producto_tallas (id_producto, talla) VALUES
- (1,'S'),(1,'M'),(1,'L'),(1,'XL'),(1,'XXL'),
- (2,'28'),(2,'30'),(2,'32'),(2,'34'),(2,'36'),
- (3,'XS'),(3,'S'),(3,'M'),(3,'L'),(3,'XL');
+INSERT INTO ofertas (id_producto, id_proveedor, precio) VALUES
+ (1, 1, 39.90), (1, 2, 45.00), (1, 3, 42.00),
+ (2, 1, 25.00), (2, 2, 28.00), (2, 3, 32.00), (2, 4, 27.00),
+ (2, 5, 30.00), (2, 6, 29.00), (2, 7, 35.00), (2, 8, 31.00),
+ (3, 1, 42.00), (3, 2, 48.00), (3, 3, 50.00), (3, 4, 46.00), (3, 5, 55.00), (3, 6, 49.00);
 
--- stock según importador: 1→20, 2→8, 3→1, 4→0, 5→15, 6→5, 7→12, 8→3
-INSERT INTO ofertas (id_producto, id_importador, precio, stock) VALUES
- (1,1,39.90,20),(1,2,45.00, 8),(1,3,42.00, 1),
- (2,1,25.00,20),(2,2,28.00, 8),(2,3,32.00, 1),(2,4,27.00, 0),
- (2,5,30.00,15),(2,6,29.00, 5),(2,7,35.00,12),(2,8,31.00, 3),
- (3,1,42.00,20),(3,2,48.00, 8),(3,3,50.00, 1),(3,4,46.00, 0),(3,5,55.00,15),(3,6,49.00, 5);
+INSERT INTO producto_tallas (id_producto, id_proveedor, talla, stock) VALUES
+ -- Producto 1: Polo Básico (Proveedores 1, 2 y 3)
+ (1, 1, 'S',  8), (1, 1, 'M', 12), (1, 1, 'L',  5), (1, 1, 'XL', 0), (1, 1, 'XXL', 3),
+ (1, 2, 'S',  4), (1, 2, 'M',  6), (1, 2, 'L',  2), (1, 2, 'XL', 5), (1, 2, 'XXL', 0),
+ (1, 3, 'S', 10), (1, 3, 'M',  0), (1, 3, 'L',  8), (1, 3, 'XL', 4), (1, 3, 'XXL', 1),
+
+ -- Producto 2: Pantalón Slim Fit (Proveedores 1 al 8)
+ (2, 1, '28', 6), (2, 1, '30',  8), (2, 1, '32', 4), (2, 1, '34', 0), (2, 1, '36', 2),
+ (2, 2, '28', 3), (2, 2, '30',  5), (2, 2, '32', 7), (2, 2, '34', 2), (2, 2, '36', 0),
+ (2, 3, '28', 0), (2, 3, '30',  4), (2, 3, '32', 6), (2, 3, '34', 3), (2, 3, '36', 1),
+ (2, 4, '28', 5), (2, 4, '30', 10), (2, 4, '32', 2), (2, 4, '34', 0), (2, 4, '36', 4),
+ (2, 5, '28', 2), (2, 5, '30',  3), (2, 5, '32', 5), (2, 5, '34', 4), (2, 5, '36', 2),
+ (2, 6, '28', 4), (2, 6, '30',  6), (2, 6, '32', 0), (2, 6, '34', 5), (2, 6, '36', 3),
+ (2, 7, '28', 1), (2, 7, '30',  2), (2, 7, '32', 3), (2, 7, '34', 1), (2, 7, '36', 0),
+ (2, 8, '28', 7), (2, 8, '30',  9), (2, 8, '32', 5), (2, 8, '34', 2), (2, 8, '36', 1),
+
+ -- Producto 3: Vestido Casual Verano (Proveedores 1 al 6 - Agotado en todos para probar estado "Agotado")
+ (3, 1, 'XS', 0), (3, 1, 'S', 0), (3, 1, 'M', 0), (3, 1, 'L', 0), (3, 1, 'XL', 0),
+ (3, 2, 'XS', 0), (3, 2, 'S', 0), (3, 2, 'M', 0), (3, 2, 'L', 0), (3, 2, 'XL', 0),
+ (3, 3, 'XS', 0), (3, 3, 'S', 0), (3, 3, 'M', 0), (3, 3, 'L', 0), (3, 3, 'XL', 0),
+ (3, 4, 'XS', 0), (3, 4, 'S', 0), (3, 4, 'M', 0), (3, 4, 'L', 0), (3, 4, 'XL', 0),
+ (3, 5, 'XS', 0), (3, 5, 'S', 0), (3, 5, 'M', 0), (3, 5, 'L', 0), (3, 5, 'XL', 0),
+ (3, 6, 'XS', 0), (3, 6, 'S', 0), (3, 6, 'M', 0), (3, 6, 'L', 0), (3, 6, 'XL', 0);
