@@ -80,7 +80,7 @@ INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol)
  ('Diego León',     'diegoleon6431@gmail.com', '34343639363536373566333033323335',         '987654321', '2026-08-22', 'USUARIO'),
  ('Thirsa Alvarez', 'thirsa18utp@gmail.com',   '353436383639373237333631356633313338',   '999888777', '2026-09-14', 'USUARIO'),
  ('Dana Quiñones',  'dana@gmail.com',          '34343631366536313635356633323336',       '987654567', '2026-10-01', 'USUARIO');
-
+/* A ,Dieg_025, Thirsa_18, Danae_26, SAdmin$3 */
 INSERT INTO categorias (nombre, color) VALUES ('Polos','#C65F64'),('Pantalones','#C65F64'),('Vestidos','#C65F64');
 
 INSERT INTO proveedores (nombre) VALUES

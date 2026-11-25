@@ -22,9 +22,20 @@ public class AdminController {
         return "admin/dashboard";
     }
 
+    @GetMapping("/productos")
+    public String productos(HttpSession session, Model model) {
+        if (!esAdmin(session)) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("paginaActual", "productos");
+        return "admin/productos";
+    }
+    
     // Método auxiliar para validar sesión y rol ADMIN
     private boolean esAdmin(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("logged");
         return usuario != null && "ADMIN".equalsIgnoreCase(String.valueOf(usuario.getRol()));
     }
+
 }
