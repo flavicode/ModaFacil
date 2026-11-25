@@ -141,7 +141,7 @@ public class CatalogoService {
         int stock =
             ((Number) relacion.get("stock")).intValue();
 
-        // EVITAR IMPORTADORES DUPLICADOS
+        // EVITAR proveedores DUPLICADOS
         // SI EXISTEN DOS RELACIONES, CONSERVAR EL MENOR PRECIO
         Map<String, Object> tiendaExistente =
             tiendasUnicas.get(idImportador);

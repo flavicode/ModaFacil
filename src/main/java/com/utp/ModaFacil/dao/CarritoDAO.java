@@ -21,7 +21,7 @@ public class CarritoDAO {
             "       p.nombre, p.imagen, i.nombre AS importador, o.precio " +
             "FROM carrito_items ci " +
             "JOIN productos p    ON p.id_producto = ci.id_producto " +
-            "JOIN importadores i ON i.id_importador = ci.id_importador " +
+            "JOIN proveedores i ON i.id_importador = ci.id_importador " +
             "JOIN ofertas o      ON o.id_producto = ci.id_producto AND o.id_importador = ci.id_importador " +
             "WHERE ci.id_usuario = ? ORDER BY ci.id_producto, ci.id_importador, ci.talla",
             (rs, n) -> new CarritoItem(

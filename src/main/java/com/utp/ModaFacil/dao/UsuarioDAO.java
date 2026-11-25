@@ -26,7 +26,8 @@ public class UsuarioDAO {
             rs.getString("correo"),
             rs.getString("contrasena"),
             rs.getString("telefono"),
-            rs.getDate("fecha_registro").toString());
+            rs.getDate("fecha_registro").toString(),
+            rs.getString("rol"));
 
     public Usuario buscarPorCorreo(String correo) {
         try {
@@ -51,7 +52,7 @@ public class UsuarioDAO {
         GeneratedKeyHolder keys = new GeneratedKeyHolder();
         jdbc.update(con -> {
             PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro) VALUES (?,?,?,?,?)",
+                "INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol) VALUES (?,?,?,?,?,?)",
                 Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, u.getNombre());
             ps.setString(2, u.getCorreo());
@@ -59,6 +60,7 @@ public class UsuarioDAO {
             ps.setString(4, u.getTelefono());
             ps.setDate(5, java.sql.Date.valueOf(
                 u.getFechaRegistro() != null ? LocalDate.parse(u.getFechaRegistro()) : LocalDate.now()));
+            ps.setString(6, u.getRol());
             return ps;
         }, keys);
         if (keys.getKey() != null) u.setIdUsuario(keys.getKey().longValue());

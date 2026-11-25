@@ -7,16 +7,19 @@ public class Usuario {
     private String contraseña;
     private String telefono;
     private String fechaRegistro;
+    private String rol;
 
     public Usuario() {}
 
-    public Usuario(Long idUsuario, String nombre, String correo, String contraseña, String telefono, String fechaRegistro) {
+    public Usuario(Long idUsuario, String nombre, String correo, String contraseña, String telefono, String fechaRegistro, String rol
+    ) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.correo = correo;
         this.contraseña = contraseña;
         this.telefono = telefono;
         this.fechaRegistro = fechaRegistro;
+        this.rol = rol;
     }
 
     public Long getIdUsuario() { return idUsuario; }
@@ -31,4 +34,6 @@ public class Usuario {
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public String getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(String fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+    public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
 }

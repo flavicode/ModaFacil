@@ -22,8 +22,9 @@ public class LoginController {
 
     @GetMapping("/login")
     public String login(HttpSession session) {
-        if (session.getAttribute("logged") != null) {
-            return "redirect:/";
+        Usuario usuario = (Usuario) session.getAttribute("logged");
+        if (usuario != null) {
+            return esAdmin(usuario) ? "redirect:/admin/dashboard" : "redirect:/";
         }
         return "login";
     }
@@ -38,13 +39,20 @@ public class LoginController {
         Usuario usuario = loginService.autenticar(correo, password);
 
         if (usuario == null) {
-            model.addAttribute("errorLogin",
-                    "Correo o contraseña incorrectos.");
+            model.addAttribute("errorLogin", "Correo o contraseña incorrectos.");
             return "login";
         }
 
         session.setAttribute("logged", usuario);
 
+        if (esAdmin(usuario)) {
+            return "redirect:/admin/dashboard";
+        }
+
         return "redirect:/";
+    }
+
+    private boolean esAdmin(Usuario usuario) {
+        return "ADMIN".equalsIgnoreCase(String.valueOf(usuario.getRol()));
     }
 }

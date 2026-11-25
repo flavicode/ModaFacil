@@ -35,7 +35,7 @@ public class OfertaDAO {
             "FROM ofertas o " +
             "JOIN productos p   ON p.id_producto  = o.id_producto " +
             "JOIN categorias c  ON c.id_categoria = p.id_categoria " +
-            "JOIN importadores i ON i.id_importador = o.id_importador AND i.activo " +
+            "JOIN proveedores i ON i.id_importador = o.id_importador AND i.activo " +
             "ORDER BY p.id_producto, o.id_importador",
             (rs, n) -> {
                 Long idProducto = rs.getLong("id_producto");

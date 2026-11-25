@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.utp.ModaFacil.model.Usuario;
 import com.utp.ModaFacil.dao.UsuarioDAO;
+import com.utp.ModaFacil.model.Usuario;
 import com.utp.ModaFacil.util.HexCrypter;
 
 import jakarta.servlet.http.HttpSession;
@@ -69,7 +69,8 @@ public class RegistroController {
             correo,
             passwordCifrada,
             null,
-            fechaActual
+            fechaActual,
+            "USUARIO"
         );
 
         usuarioDAO.guardar(nuevoUsuario);

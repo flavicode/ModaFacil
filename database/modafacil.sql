@@ -12,7 +12,14 @@ CREATE TABLE usuarios (
     correo          VARCHAR(120) NOT NULL UNIQUE,
     contrasena      VARCHAR(255) NOT NULL,           -- HexCrypter.encrypt(...)
     telefono        VARCHAR(15)  NULL,
-    fecha_registro  DATE NOT NULL DEFAULT (CURRENT_DATE)
+    fecha_registro  DATE NOT NULL DEFAULT (CURRENT_DATE),
+    rol             ENUM('ADMIN','USUARIO') NOT NULL DEFAULT 'USUARIO'
+);
+
+CREATE TABLE proveedores (
+    id_importador BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nombre        VARCHAR(100) NOT NULL,
+    activo        BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE categorias (
@@ -20,13 +27,6 @@ CREATE TABLE categorias (
     nombre       VARCHAR(50) NOT NULL UNIQUE,
     color        VARCHAR(7)  NOT NULL DEFAULT '#C65F64'
 );
-
-CREATE TABLE importadores (
-    id_importador BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nombre        VARCHAR(100) NOT NULL,
-    activo        BOOLEAN NOT NULL DEFAULT TRUE
-);
-
 CREATE TABLE productos (
     id_producto  BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_categoria BIGINT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE ofertas (
     stock         INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
     PRIMARY KEY (id_producto, id_importador),
     FOREIGN KEY (id_producto)   REFERENCES productos(id_producto),
-    FOREIGN KEY (id_importador) REFERENCES importadores(id_importador)
+    FOREIGN KEY (id_importador) REFERENCES proveedores(id_importador)
 );
 
 -- Carrito guardado por usuario (hoy vive en la sesión HTTP). Un item = producto + importador + talla
@@ -75,14 +75,15 @@ CREATE TABLE carrito_items (
 );
 
 -- =============== DATOS (los mismos que CatalogoService / UsuarioRepository) ===============
-INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro) VALUES
- ('Diego León',     'diegoleon6431@gmail.com', '34343639363536373566333033323335',         '987654321', '2026-08-22'),
- ('Thirsa Alvarez', 'thirsa18utp@gmail.com',   '353436383639373237333631356633313338',   '999888777', '2026-09-14'),
- ('Dana Quiñones',  'dana@gmail.com',          '34343631366536313635356633323336',       '987654567', '2026-10-01');
+INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol) VALUES
+ ('Admin',          'admin@gmail.com', '35333431363436643639366532343333', null, '2026-08-22', 'ADMIN'),
+ ('Diego León',     'diegoleon6431@gmail.com', '34343639363536373566333033323335',         '987654321', '2026-08-22', 'USUARIO'),
+ ('Thirsa Alvarez', 'thirsa18utp@gmail.com',   '353436383639373237333631356633313338',   '999888777', '2026-09-14', 'USUARIO'),
+ ('Dana Quiñones',  'dana@gmail.com',          '34343631366536313635356633323336',       '987654567', '2026-10-01', 'USUARIO');
 
 INSERT INTO categorias (nombre, color) VALUES ('Polos','#C65F64'),('Pantalones','#C65F64'),('Vestidos','#C65F64');
 
-INSERT INTO importadores (nombre) VALUES
+INSERT INTO proveedores (nombre) VALUES
  ('Importador 1'),('Importador 2'),('Importador 3'),('Importador 4'),
  ('Importador 5'),('Importador 6'),('Importador 7'),('Importador 8');
 

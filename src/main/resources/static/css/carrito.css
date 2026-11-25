@@ -202,3 +202,13 @@
     text-align: center !important;
     display: inline-block !important;
 }
+
+.btnseguircomprando {
+    background-color: #bd6164 !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
