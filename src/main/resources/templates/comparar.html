@@ -11,7 +11,20 @@
 
     <main class="container comparar-main">
 
-        <section class="row g-4 comparar-producto">
+        <section th:if="${sinProducto}" class="container my-5 py-5 text-center">
+            <div class="card shadow-sm mx-auto p-4" style="max-width: 500px;">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">No se ha seleccionado ningún producto</h4>
+                    <p class="card-text text-muted mb-4">
+                        Aún no has elegido un artículo para comparar. Explora nuestro catálogo y selecciona uno para ver las mejores ofertas de los importadores.
+                    </p>
+                    <a th:href="@{/productos}" class="btn bg-success text-white px-4">
+                        Ir a Productos
+                    </a>
+                </div>
+            </div>
+        </section>
+        <section th:if="${!sinProducto}" class="row g-4 comparar-producto">
 
             <!-- COLUMNA 1: IMAGEN -->
             <div class="col-lg-4">

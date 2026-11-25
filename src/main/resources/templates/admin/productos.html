@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://thymeleaf.org">
-    <head th:replace="~{layout-admin :: headAdmin('Dashboard')}"></head>
+    <head th:replace="~{layout-admin :: headAdmin('Productos')}"></head>
     <body>
 
         <!-- Header superior -->
@@ -18,10 +18,244 @@
                 <h2 class="fw-bold text-primary mb-1">Productos</h2>
                 <p class="text-muted mb-4">Gestiona el catálogo de productos de ModaFacil</p>
 
-                <!-- Aquí va el contenido de la página -->
+                <!-- FILTROS DE PRODUCTOS -->
+                <form id="formFiltros"
+                    class="filtros-productos"
+                    th:action="@{/admin/productos}"
+                    method="get">
+
+                    <div class="row g-3 align-items-center">
+
+                        <!-- Buscador -->
+                        <div class="col-12 col-md-5">
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+
+                                <input type="text"
+                                    id="buscarProducto"
+                                    name="busqueda"
+                                    class="form-control"
+                                    th:value="${busqueda}"
+                                    placeholder="Buscar producto (nombre, código...)"
+                                    aria-label="Buscar producto">
+
+                            </div>
+                        </div>
+
+                        <!-- Filtro de estado -->
+                        <div class="col-12 col-md-3">
+                            <div class="input-group">
+
+                                <label class="input-group-text"
+                                    for="filtroEstado">
+                                    Estado:
+                                </label>
+
+                                <select id="filtroEstado"
+                                        name="estado"
+                                        class="form-select">
+
+                                    <option value="todos"
+                                            th:selected="${estado == 'todos'}">
+                                        Todos
+                                    </option>
+
+                                    <option value="activo"
+                                            th:selected="${estado == 'activo'}">
+                                        Activo
+                                    </option>
+
+                                    <option value="inactivo"
+                                            th:selected="${estado == 'inactivo'}">
+                                        Inactivo
+                                    </option>
+
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <!-- Botón recargar -->
+                        <div class="col-auto ms-md-auto">
+
+                            <a th:href="@{/admin/productos}"
+                            class="btn btn-recargar"
+                            title="Recargar productos"
+                            aria-label="Recargar productos">
+
+                                <i class="bi bi-arrow-clockwise"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <noscript>
+                        <button type="submit" class="btn btn-primary mt-3">
+                            Buscar
+                        </button>
+                    </noscript>
+
+                </form>
+
+                <p id="mensajeFiltros"
+                class="text-muted small"
+                role="status"></p>
+
+                <!-- RESULTADOS DE PRODUCTOS -->
+                <div id="resultadosProductos">
+
+                    <div class="table-responsive tabla-productos">
+
+                        <table class="table align-middle mb-0">
+
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr th:each="producto, iter : ${productos}">
+
+                                    <!-- Número de fila -->
+                                    <td th:text="${iter.count}"></td>
+
+                                    <!-- Producto -->
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+
+                                            <img th:if="${producto.imagen() != null}"
+                                                th:src="@{/img/{archivo}(archivo=${producto.imagen()})}"
+                                                class="imagen-producto"
+                                                alt="Producto">
+
+                                            <div>
+
+                                                <strong th:text="${producto.nombre()}">
+                                                </strong>
+
+                                                <div class="text-muted small"
+                                                    th:text="${producto.codigo() + ' · ' + producto.categoria()}">
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <!-- Precio -->
+                                    <td th:text="${producto.precio() != null
+                                        ? 'S/ ' + producto.precio()
+                                        : 'No disponible'}">
+                                    </td>
+
+                                    <!-- Stock -->
+                                    <td>
+                                        <span class="stock-producto"
+                                            th:classappend="${producto.stock() == 0}
+                                                ? 'stock-agotado' : ''"
+                                            th:text="${producto.stock()}">
+                                        </span>
+                                    </td>
+
+                                    <!-- Estado -->
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+
+                                            <!-- Etiqueta de estado -->
+                                            <span class="estado-producto"
+                                                th:classappend="${producto.activo()}
+                                                    ? 'estado-activo' : 'estado-inactivo'"
+                                                th:text="${producto.activo()}
+                                                    ? 'Activo' : 'Inactivo'">
+                                            </span>
+
+                                            <!-- Interruptor -->
+                                            <div class="form-check form-switch mb-0">
+
+                                                <input type="checkbox"
+                                                    class="form-check-input switch-estado"
+                                                    role="switch"
+                                                    th:checked="${producto.activo()}"
+                                                    th:data-id="${producto.idProducto()}"
+                                                    th:data-url="@{/admin/productos/{id}/estado(id=${producto.idProducto()})}"
+                                                    th:aria-label="|Cambiar estado de ${producto.nombre()}|">
+
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                    <!-- Acciones -->
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <!-- Ver detalle -->
+                                            <button type="button"
+                                                    class="btn btn-accion btn-detalle"
+                                                    th:data-id="${producto.idProducto()}"
+                                                    title="Ver detalle"
+                                                    aria-label="Ver detalle">
+
+                                                <i class="bi bi-eye"></i>
+
+                                            </button>
+
+                                            <!-- Editar producto -->
+                                            <button type="button"
+                                                    class="btn btn-accion btn-editar"
+                                                    th:data-id="${producto.idProducto()}"
+                                                    title="Editar producto"
+                                                    aria-label="Editar producto">
+
+                                                <i class="bi bi-pencil"></i>
+
+                                            </button>
+
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <!-- Sin resultados -->
+                                <tr th:if="${#lists.isEmpty(productos)}">
+
+                                    <td colspan="6"
+                                        class="text-center text-muted py-5">
+
+                                        No se encontraron productos.
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- Contador de productos -->
+                    <p class="text-muted mt-3"
+                    th:text="|Mostrando ${#lists.size(productos)} de ${totalProductos} productos|">
+                    </p>
+
+                </div>
             </main>
         </div>
 
         <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+        <script th:src="@{/js/admin-productos.js}"></script>
     </body>
 </html>

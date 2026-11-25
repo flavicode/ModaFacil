@@ -7,17 +7,28 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 import com.utp.ModaFacil.model.Usuario;
+import com.utp.ModaFacil.service.ProductoAdminService;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+    private final ProductoAdminService productoAdminService;
+
+    public AdminController(ProductoAdminService productoAdminService) {
+        this.productoAdminService = productoAdminService;
+    }
 
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(HttpSession session, Model model) {
@@ -29,13 +40,42 @@ public class AdminController {
     }
 
     @GetMapping("/productos")
-    public String productos(HttpSession session, Model model) {
+    public String productos(
+            @RequestParam(name = "busqueda", defaultValue = "")
+            String busqueda,
+
+            @RequestParam(name = "estado", defaultValue = "todos")
+            String estado,
+
+            HttpSession session,
+            Model model) {
+
         if (!esAdmin(session)) {
             return "redirect:/login";
         }
         model.addAttribute("paginaActual", "productos");
+        model.addAttribute("productos",productoAdminService.buscarProductos(busqueda, estado));
+        model.addAttribute("totalProductos",productoAdminService.contarProductos());
+        model.addAttribute("busqueda", busqueda);
+        model.addAttribute("estado", estado);
         return "admin/productos";
     }
+    @PostMapping("/productos/{id}/estado")
+        @ResponseBody
+        public ResponseEntity<Map<String, Object>> actualizarEstadoProducto(
+                @PathVariable("id") Long idProducto,
+                @RequestParam("activo") boolean activo,
+                HttpSession session) {
+            if (!esAdmin(session)) {
+                return ResponseEntity.status(403).body(Map.of("ok", false,"mensaje", "No tienes permisos de administrador"));
+            }
+            boolean actualizado =productoAdminService.actualizarEstado(idProducto, activo);
+            if (!actualizado) {
+                return ResponseEntity.status(404).body(Map.of("ok", false,"mensaje", "No se pudo actualizar el producto"));
+            }
+            return ResponseEntity.ok(
+                Map.of("ok", true,"activo", activo,"mensaje", "Estado actualizado correctamente"));
+        }
 
     @GetMapping("/inventario")
     public String inventario(HttpSession session, Model model) {

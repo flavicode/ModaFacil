@@ -40,6 +40,7 @@ CREATE TABLE productos (
     manga        VARCHAR(40)  NULL,
     cuello       VARCHAR(60)  NULL,
     ocasion      VARCHAR(60)  NULL,
+    activo       BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
 

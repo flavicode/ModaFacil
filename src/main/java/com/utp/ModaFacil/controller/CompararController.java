@@ -37,72 +37,53 @@ public class CompararController {
         model.addAttribute("paginaActual", "comparar");
 
         if (id == null) {
-            return "redirect:/productos";
+            Long ultimoId = (Long) session.getAttribute("ultimoProducto");
+            if (ultimoId != null) {
+                return "redirect:comparar?id=" + ultimoId;
+            }
+            model.addAttribute("sinProducto", true);
+            return "comparar";
         }
 
         Map<String, Object> producto = buscarProducto(id);
 
         if (producto == null) {
-            return "redirect:/productos";
+            model.addAttribute("sinProducto", true);
+            session.removeAttribute("ultimoProducto");
+            return "comparar";
         }
 
         Map<String, Object> mejorPrecio =
             catalogoService.obtenerMejorPrecio(id);
 
         if (mejorPrecio == null) {
-            return "redirect:/productos";
+            model.addAttribute("sinProducto", true);
+            session.removeAttribute("ultimoProducto");
+            return "comparar";
         }
-        // ==========================================
-        // OBTENER COMPARACIÓN DE PRECIOS
-        // ==========================================
 
+        session.setAttribute("ultimoProducto", id);
+        model.addAttribute("sinProducto", false);
         // OBTENER TODAS LAS TIENDAS DEL PRODUCTO
-        List<Map<String, Object>> tiendasComparacion =
-            catalogoService.obtenerComparacionPrecios(id, criterio);
+        List<Map<String, Object>> tiendasComparacion = catalogoService.obtenerComparacionPrecios(id, criterio);
 
-        // ENVIAR LISTA DE TIENDAS AL HTML
-        model.addAttribute(
-            "tiendasComparacion",
-            tiendasComparacion
-        );
-
-        // ENVIAR CANTIDAD TOTAL DE TIENDAS
-        model.addAttribute(
-            "cantidadTiendas",
-            tiendasComparacion.size()
-        );
-
-        // ==========================================
-        // STOCK DEL IMPORTADOR CON MEJOR PRECIO
-        // ==========================================
+        model.addAttribute("tiendasComparacion", tiendasComparacion);
+        model.addAttribute("cantidadTiendas", tiendasComparacion.size());
 
         // OBTENER ID DEL IMPORTADOR MÁS ECONÓMICO
-        Long idMejorImportador =
-            ((Number) mejorPrecio.get("idImportador")).longValue();
+        Long idMejorImportador = ((Number) mejorPrecio.get("idImportador")).longValue();
 
         // OBTENER OFERTA DEL IMPORTADOR
-        Map<String, Object> ofertaMejorPrecio =
-            catalogoService.obtenerOfertaImportador(
-                id,
-                idMejorImportador
-            );
+        Map<String, Object> ofertaMejorPrecio = catalogoService.obtenerOfertaImportador(id, idMejorImportador);
 
         // OBTENER STOCK DEL IMPORTADOR
-        int stockTotal = ofertaMejorPrecio == null
-            ? 0
-            : ((Number) ofertaMejorPrecio.get("stock")).intValue();
+        int stockTotal = ofertaMejorPrecio == null ? 0 : ((Number) ofertaMejorPrecio.get("stock")).intValue();
 
         // CONTAR CANTIDADES QUE YA ESTÁN EN EL CARRITO
-        int cantidadEnCarrito =
-            obtenerCantidadEnCarrito(
-                session,
-                id,
-                idMejorImportador
-            );
+        int cantidadEnCarrito = obtenerCantidadEnCarrito( session, id, idMejorImportador);
 
         // CALCULAR STOCK DISPONIBLE
-        int stockDisponible =
-            Math.max(0, stockTotal - cantidadEnCarrito);
+        int stockDisponible = Math.max(0, stockTotal - cantidadEnCarrito);
 
         model.addAttribute("productoSeleccionado", producto);
         model.addAttribute("mejorPrecio", mejorPrecio);

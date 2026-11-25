@@ -22,7 +22,7 @@
         
         <!-- HEADER -->
         <header th:fragment="header" class="bg-background">
-            <nav class="navbar navbar-expand-lg navbar-light border-bottom sticky-top py-3">
+            <nav class="navbar navbar-expand-lg navbar-light border-bottom sticky-top py-2">
                 <div class="container d-flex align-items-center">
                     <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0 py-0" href="/">
                         <img th:src="@{/img/logo.png}" alt="Logo ModaFácil" class="flex-shrink-0 rounded-3" style="width: 38px; height: 38px; object-fit: cover;">
@@ -63,12 +63,12 @@
 
                         <!-- Si SÍ hay sesión iniciada -->
                        <div th:if="${session.logged != null}"class="ms-lg-auto mt-3 mt-lg-0 border-start ps-lg-3 d-flex align-items-center justify-content-center justify-content-lg-end gap-3">
-                        <!-- BOTÓN DEL CARRITO DE COMPRAS -->
-                        <button type="button" id="btn-abrir-carrito" class="btn-carrito-header" aria-label="Abrir carrito de compras" aria-controls="mini-carrito" aria-haspopup="dialog">
-                            <i class="bi bi-cart3 fs-4"></i>
-                            <!-- CONTADOR DE PRODUCTOS -->
-                            <span class="carrito-contador" th:if="${carritoCantidad != null and carritoCantidad > 0}" th:text="${carritoCantidad}">0</span>
-                        </button>
+                            <!-- BOTÓN DEL CARRITO DE COMPRAS -->
+                            <button type="button" id="btn-abrir-carrito" class="btn-carrito-header" aria-label="Abrir carrito de compras" aria-controls="mini-carrito" aria-haspopup="dialog">
+                                <i class="bi bi-cart3 fs-4"></i>
+                                <!-- CONTADOR DE PRODUCTOS -->
+                                <span class="carrito-contador" th:if="${carritoCantidad != null and carritoCantidad > 0}" th:text="${carritoCantidad}">0</span>
+                            </button>
 
                             <div class="dropdown d-none d-lg-block">
                                 <div class="d-none d-lg-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-success-subtle-hover cursor-pointer user-select-none user-dropdown-toggle" 

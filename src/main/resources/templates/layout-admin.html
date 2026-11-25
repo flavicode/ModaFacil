@@ -15,46 +15,56 @@
         <link rel="stylesheet" th:href="@{/css/style-global.css(v=2)}"/>
         <link rel="stylesheet" th:href="@{/css/admin.css(v=2)}"/>
         <link rel="icon" type="image/png" th:href="@{/img/logo.png}"/>
+        <link rel="stylesheet" th:href="@{/css/admin-productos.css}">
     </head>
     <body>
 
-        <!-- HEADER -->
-        <header th:fragment="headerAdmin" class="navbar navbar-light bg-background border-bottom sticky-top px-3 px-lg-4 py-2" style="height: 68px; z-index: 1030;">
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn border-0 p-1 d-lg-none text-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarAdmin" aria-controls="sidebarAdmin">
-                    <i class="bi bi-list fs-2"></i>
-                </button>
-                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0" href="/admin/dashboard">
-                    <img th:src="@{/img/logo.png}" alt="Logo ModaFácil" class="rounded-3" style="width: 36px; height: 36px; object-fit: cover;">
-                    <span>Moda<span class="text-success">Fácil</span></span>
-                </a>
-            </div>
+        <!-- HEADER ADMIN -->
+        <header th:fragment="headerAdmin" class="bg-background">
+            <nav class="navbar navbar-expand-lg navbar-light border-bottom sticky-top py-2">
+                <div class="container d-flex align-items-center">
+                    
+                    <!-- 1. Logo idéntico al header normal (a la izquierda) -->
+                    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0 py-0" href="/admin/dashboard">
+                        <img th:src="@{/img/logo.png}" alt="Logo ModaFácil" class="flex-shrink-0 rounded-3" style="width: 38px; height: 38px; object-fit: cover;">
+                        <span class="d-none d-sm-inline">Moda<span class="text-success">Fácil</span></span>
+                    </a>
 
-            <!-- Perfil Administrador a la derecha -->
-            <div class="ms-auto d-flex align-items-center gap-3">
-                <div class="dropdown">
-                    <div class="d-flex align-items-center gap-2 px-2 py-1 rounded-3 cursor-pointer user-select-none" 
-                        id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle fs-3 text-secondary"></i>
-                        <span class="fw-medium small text-dark d-none d-sm-inline" th:text="${session.logged?.nombre ?: 'Administrador'}">Administrador</span>
-                        <i class="bi bi-chevron-down small text-muted"></i>
+                    <!-- 2. Botón hamburguesa idéntico al normal (a la derecha en móvil, abre el sidebarAdmin) -->
+                    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarAdmin" aria-controls="sidebarAdmin">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <!-- 3. Perfil Administrador a la derecha (solo visible en escritorio, igual que el normal) -->
+                    <div class="ms-auto d-none d-lg-block">
+                        <div class="dropdown">
+                            <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-success-subtle-hover cursor-pointer user-select-none user-dropdown-toggle" 
+                                id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="fw-bold small text-dark lh-1" th:text="${session.logged?.nombre ?: 'Administrador'}">Administrador</span>
+                                <i class="bi bi-person-circle fs-3 text-primary flex-shrink-0"></i>
+                            </div>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="adminDropdown">
+                                <li>
+                                    <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" href="/">
+                                        <i class="bi bi-shop text-muted"></i> Ir a la tienda
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-danger text-decoration-none" href="/logout">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="adminDropdown">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2 small py-2" href="/">
-                                <i class="bi bi-shop text-muted"></i> Ir a la tienda
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider my-1"></li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2 small py-2 text-danger" href="/logout">
-                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
+
                 </div>
-            </div>
+            </nav>
         </header>
+
+
 
         <aside th:fragment="sidebarAdmin" class="offcanvas-lg offcanvas-start bg-background border-end admin-sidebar" tabindex="-1" id="sidebarAdmin" aria-labelledby="sidebarAdminLabel">
             <div class="offcanvas-header border-bottom d-lg-none">
@@ -91,11 +101,15 @@
                     </nav>
                 </div>
 
-                <!-- Cerrar sesión al fondo del aside -->
-                <div class="pt-3 border-top">
+                <!-- Opciones de cuenta (SOLO visibles en móvil/tablet, ocultas en escritorio) -->
+                <div class="pt-3 border-top d-flex flex-column gap-1 d-lg-none">
+                    <a class="admin-nav-link" href="/">
+                        <i class="bi bi-shop"></i>
+                        <span>Ir a la tienda</span>
+                    </a>
                     <a class="admin-nav-link text-danger" href="/logout">
-                        <i class="bi bi-box-arrow-left"></i>
-                        <span>Cerrar Sesión</span>
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Cerrar sesión</span>
                     </a>
                 </div>
             </div>

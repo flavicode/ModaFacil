@@ -67,8 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 4. CREAR UNA TARJETA
+function crearTarjeta(producto) {
 
-    function crearTarjeta(producto) {
+        const urlComparar = "/comparar?id=" + encodeURIComponent(producto.id);
 
         const columna = document.createElement("div");
         columna.className = "col";
@@ -78,6 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const imagenWrapper = document.createElement("div");
         imagenWrapper.className = "producto-imagen-wrapper";
+        imagenWrapper.style.cursor = "pointer";
+        imagenWrapper.addEventListener("click", () => {
+            window.location.href = urlComparar;
+        });
 
         const imagen = document.createElement("img");
         imagen.className = "producto-imagen";
@@ -104,24 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             imagenWrapper.appendChild(placeholder);
         }
-
-        const favorito = document.createElement("button");
-        favorito.type = "button";
-        favorito.className = "producto-favorito";
-        favorito.setAttribute("aria-label", "Marcar favorito");
-        favorito.innerHTML = '<i class="bi bi-heart"></i>';
-
-        favorito.addEventListener("click", () => {
-            favorito.classList.toggle("activo");
-
-            const iconoFavorito = favorito.querySelector("i");
-            iconoFavorito.className =
-                favorito.classList.contains("activo")
-                    ? "bi bi-heart-fill"
-                    : "bi bi-heart";
-        });
-
-        imagenWrapper.appendChild(favorito);
 
         const body = document.createElement("div");
         body.className = "card-body producto-body d-flex flex-column";
@@ -151,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const comparar = document.createElement("a");
         comparar.className = "btn btn-comparar";
         comparar.textContent = "Comparar Precios";
-        comparar.href = "/comparar?id=" + encodeURIComponent(producto.id);
+        comparar.href = urlComparar;
 
         pie.append(proveedores, comparar);
         body.append(nombre, precio, pie);
@@ -160,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return columna;
     }
+
 
     // 5. FILTRAR Y RENDERIZAR
 

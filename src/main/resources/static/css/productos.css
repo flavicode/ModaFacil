@@ -168,29 +168,6 @@
 }
 
 
-/*BOTÓN DE FAVORITOS*/
-
-.producto-favorito {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #ffffff;
-    border: 1px solid #eeeeee;
-    border-radius: 7px;
-    color: #333333;
-    cursor: pointer;
-    z-index: 2;
-}
-
-.producto-favorito:hover,
-.producto-favorito.activo {
-    color: #c65f65;
-}
 
 
 /*INFORMACIÓN DEL PRODUCTO*/
