@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout-admin :: headAdmin('Inventario')}"></head>
+    <body>
+
+        <!-- Header superior -->
+        <header th:replace="~{layout-admin :: headerAdmin}"></header>
+
+        <!-- Contenedor Aside + Main -->
+        <div class="admin-wrapper">
+            <aside th:replace="~{layout-admin :: sidebarAdmin}"></aside>
+
+            <main class="admin-main p-4 p-lg-5">
+                <!-- Breadcrumb y Título -->
+                <nav aria-label="breadcrumb" class="small text-muted mb-1">
+                    <i class="bi bi-house text-success"></i> / Inventario
+                </nav>
+                <h2 class="fw-bold text-primary mb-1">Inventario</h2>
+                <p class="text-muted mb-4">Control de stock por producto y talla.</p>
+
+                <!-- Alerta de confirmación tras guardar -->
+                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${mensajeExito}">Stock actualizado.</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+
+                <!-- 1. TARJETAS KPI -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="kpi-card">
+                            <div class="kpi-icon-box kpi-icon-primary">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div>
+                                <div class="small fw-semibold text-muted">Total de unidades</div>
+                                <div class="h3 fw-bold text-primary mb-0"
+                                     th:text="${#numbers.formatInteger(totalUnidades, 1, 'COMMA')}">1,280</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="kpi-card">
+                            <div class="kpi-icon-box kpi-icon-green">
+                                <!-- Ícono de polo/prenda -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="small fw-semibold text-muted">Productos con stock</div>
+                                <div class="h3 fw-bold text-primary mb-0" th:text="${productosConStock}">244</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="kpi-card">
+                            <div class="kpi-icon-box kpi-icon-primary">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <div class="small fw-semibold text-muted">Productos agotados</div>
+                                <div class="h3 fw-bold text-primary mb-0" th:text="${productosAgotados}">12</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. BARRA DE BÚSQUEDA Y FILTROS -->
+                <div class="row g-2 mb-4 align-items-center">
+                    <div class="col-lg-5 col-md-12">
+                        <div class="input-group filter-box px-3 align-items-center">
+                            <i class="bi bi-search text-muted me-2"></i>
+                            <input type="text" id="filtroBusqueda" class="form-control border-0 shadow-none p-0 bg-transparent"
+                                   placeholder="Buscar producto (nombre o código)...">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-5">
+                        <select id="filtroEstado" class="form-select filter-box shadow-none text-primary fw-medium">
+                            <option value="todos" selected>Estado: Todos</option>
+                            <option value="en-stock">Estado: En stock</option>
+                            <option value="agotado">Estado: Agotado</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3 col-md-5">
+                        <select id="filtroCategoria" class="form-select filter-box shadow-none text-primary fw-medium">
+                            <option value="todas" selected>Categoría: Todas</option>
+                            <option value="Blusas">Categoría: Blusas</option>
+                            <option value="Jeans">Categoría: Jeans</option>
+                            <option value="Casacas">Categoría: Casacas</option>
+                            <option value="Vestidos">Categoría: Vestidos</option>
+                            <option value="Polos">Categoría: Polos</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-1 col-md-2 text-end">
+                        <button type="button" id="btnResetFiltros" class="btn-refresh-filter" title="Restablecer filtros">
+                            <i class="bi bi-arrow-clockwise fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. TABLA DE INVENTARIO -->
+                <div class="inventory-card mb-4">
+                    <div class="table-responsive">
+                        <table class="table table-inventario align-middle" id="tablaInventario">
+                            <thead>
+                                <tr>
+                                    <th style="width: 55px;">#</th>
+                                    <th>Producto</th>
+                                    <th>Tallas y stock</th>
+                                    <th class="text-center">Stock total</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="prod, iter : ${productos}"
+                                    class="fila-producto"
+                                    th:data-nombre="${prod.nombre.toLowerCase()}"
+                                    th:data-codigo="${prod.codigo.toLowerCase()}"
+                                    th:data-categoria="${prod.categoria}"
+                                    th:data-estado="${prod.stockTotal > 0 ? 'en-stock' : 'agotado'}">
+
+                                    <td class="fw-bold text-muted" th:text="${iter.count}">1</td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img th:src="${prod.imagen}"
+                                                 onerror="this.src='https://placehold.co/92x92/f4f4f4/c0a0a0?text=Prenda'"
+                                                 alt="Prenda" class="product-thumb">
+                                            <div>
+                                                <div class="fw-bold text-primary" th:text="${prod.nombre}">Blusa Elegante</div>
+                                                <div class="small text-muted" th:text="${prod.codigo}">P00125</div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span th:each="t : ${prod.tallas}"
+                                                  class="talla-pill"
+                                                  th:classappend="${t.stock == 0} ? 'agotado'"
+                                                  th:text="${t.talla + ': ' + t.stock}">S: 8</span>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center fw-bold fs-6" th:text="${prod.stockTotal}">25</td>
+
+                                    <td class="text-center">
+                                        <span th:if="${prod.stockTotal > 0}" class="badge-estado badge-en-stock">En stock</span>
+                                        <span th:if="${prod.stockTotal == 0}" class="badge-estado badge-agotado">Agotado</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <!-- Datos ocultos de tallas para cargar el modal sin problemas de escape -->
+                                        <div class="d-none datos-tallas-producto">
+                                            <span th:each="t : ${prod.tallas}"
+                                                  th:data-talla="${t.talla}"
+                                                  th:data-stock="${t.stock}"></span>
+                                        </div>
+
+                                        <button type="button"
+                                                class="btn-actualizar-stock"
+                                                th:data-id="${prod.id}"
+                                                th:data-nombre="${prod.nombre}"
+                                                th:data-codigo="${prod.codigo}"
+                                                th:data-categoria="${prod.categoria}"
+                                                th:data-imagen="${prod.imagen}"
+                                                th:data-total="${prod.stockTotal}"
+                                                onclick="abrirModalStock(this)">
+                                            <i class="bi bi-pencil"></i> Actualizar stock
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4. PIE DE TABLA Y BOTÓN MOSTRAR MÁS -->
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-muted small mb-3 mb-md-0" id="contadorResultados">
+                        Mostrando <span th:text="${#lists.size(productos)}">5</span> de <span th:text="${totalRegistros}">256</span> productos
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <button type="button" id="btnMostrarMas" class="btn btn-moda-principal px-4 py-2 rounded-3 fw-semibold shadow-sm">
+                            <i class="bi bi-chevron-down me-1"></i> Mostrar más productos
+                        </button>
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- =========================================
+             MODAL ACTUALIZAR STOCK
+             ========================================= -->
+        <div class="modal fade" id="modalActualizarStock" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content modal-stock-content shadow">
+                    <form th:action="@{/admin/inventario/actualizar}" method="post">
+                        <input type="hidden" name="productoId" id="modalProductoId">
+
+                        <!-- Cabecera del Modal -->
+                        <div class="modal-header border-0 pb-2 pt-3 px-4 align-items-start">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="modal-header-icon">
+                                    <i class="bi bi-layers"></i>
+                                </div>
+                                <div>
+                                    <h4 class="modal-title fw-bold text-primary mb-0">Actualizar Stock</h4>
+                                    <p class="text-muted small mb-0">Modifica la cantidad disponible por talla.</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <!-- Cuerpo del Modal -->
+                        <div class="modal-body px-4 py-3">
+                            <!-- Tarjeta de Resumen del Producto -->
+                            <div class="modal-product-box d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img id="modalProductoImg" src="" alt="Producto"
+                                         style="width: 64px; height: 64px; object-fit: cover; border-radius: 12px; background: #f4f4f4;">
+                                    <div>
+                                        <h5 class="fw-bold text-primary mb-1" id="modalProductoNombre">Blusa Elegante</h5>
+                                        <div class="small text-muted">Código: <span id="modalProductoCodigo" class="fw-medium">P00125</span></div>
+                                        <div class="small text-muted">Categoría: <span id="modalProductoCategoria" class="fw-medium">Blusas</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-stock-actual-box">
+                                    <i class="bi bi-box-seam fs-4 text-success"></i>
+                                    <div>
+                                        <div class="small text-muted">Stock total actual</div>
+                                        <div class="fw-bold text-primary fs-6" id="modalStockActualTexto">25 unidades</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tabla Editable de Tallas -->
+                            <div class="table-responsive">
+                                <table class="table table-modal-tallas text-center align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 25%;">Talla</th>
+                                            <th style="width: 35%;">Stock actual</th>
+                                            <th style="width: 40%;">Nuevo stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalTablaTallasBody">
+                                        <!-- Se llena dinámicamente con JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Barra de Nuevo Stock Total -->
+                            <div class="nuevo-total-bar d-flex align-items-center justify-content-between mt-3">
+                                <div class="d-flex align-items-center gap-2 fw-bold text-primary">
+                                    <i class="bi bi-box-seam fs-5 text-success"></i>
+                                    <span>Nuevo stock total</span>
+                                </div>
+                                <div class="fw-bold fs-5 text-success" id="modalNuevoTotalTexto">25 unidades</div>
+                            </div>
+                        </div>
+
+                        <!-- Pie del Modal -->
+                        <div class="modal-footer border-0 px-4 pb-3 pt-2 gap-2">
+                            <button type="button" class="btn btn-light border px-4 py-2 rounded-3 fw-medium text-primary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-moda-principal px-4 py-2 rounded-3 fw-semibold">
+                                <i class="bi bi-check2 me-1"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+
+        <!-- Script para Modal, Stepper y Filtros -->
+        <script>
+            let modalStockInstance = null;
+
+            function abrirModalStock(btn) {
+                const id = btn.getAttribute('data-id');
+                const nombre = btn.getAttribute('data-nombre');
+                const codigo = btn.getAttribute('data-codigo');
+                const categoria = btn.getAttribute('data-categoria');
+                const imagen = btn.getAttribute('data-imagen');
+                const totalActual = btn.getAttribute('data-total');
+
+                // Cargar datos generales en el modal
+                document.getElementById('modalProductoId').value = id;
+                document.getElementById('modalProductoNombre').textContent = nombre;
+                document.getElementById('modalProductoCodigo').textContent = codigo;
+                document.getElementById('modalProductoCategoria').textContent = categoria;
+                document.getElementById('modalStockActualTexto').textContent = totalActual + ' unidades';
+
+                const imgEl = document.getElementById('modalProductoImg');
+                imgEl.src = imagen;
+                imgEl.onerror = function() {
+                    this.src = 'https://placehold.co/128x128/f4f4f4/c0a0a0?text=Prenda';
+                };
+
+                // Leer tallas del producto seleccionado
+                const spansTallas = btn.parentElement.querySelectorAll('.datos-tallas-producto span');
+                const tbody = document.getElementById('modalTablaTallasBody');
+                tbody.innerHTML = '';
+
+                spansTallas.forEach(span => {
+                    const talla = span.getAttribute('data-talla');
+                    const stock = parseInt(span.getAttribute('data-stock'), 10) || 0;
+
+                    const tr = document.createElement('tr');
+                    if (stock === 0) {
+                        tr.classList.add('fila-sin-stock');
+                    }
+
+                    tr.innerHTML = `
+                        <td class="fw-bold text-primary">
+                            ${talla}
+                            <input type="hidden" name="tallas" value="${talla}">
+                        </td>
+                        <td class="fw-bold text-primary">${stock}</td>
+                        <td>
+                            <div class="stock-stepper">
+                                <button type="button" onclick="cambiarCantidad(this, -1)">−</button>
+                                <input type="number" name="cantidades" class="input-nuevo-stock"
+                                       value="${stock}" min="0" oninput="recalcularTotalModal()">
+                                <button type="button" onclick="cambiarCantidad(this, 1)">+</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                recalcularTotalModal();
+
+                if (!modalStockInstance) {
+                    modalStockInstance = new bootstrap.Modal(document.getElementById('modalActualizarStock'));
+                }
+                modalStockInstance.show();
+            }
+
+            function cambiarCantidad(boton, delta) {
+                const input = boton.parentElement.querySelector('.input-nuevo-stock');
+                let valorActual = parseInt(input.value, 10) || 0;
+                let nuevoValor = Math.max(0, valorActual + delta);
+                input.value = nuevoValor;
+                recalcularTotalModal();
+            }
+
+            function recalcularTotalModal() {
+                const inputs = document.querySelectorAll('#modalTablaTallasBody .input-nuevo-stock');
+                let suma = 0;
+
+                inputs.forEach(input => {
+                    let val = parseInt(input.value, 10);
+                    if (isNaN(val) || val < 0) {
+                        val = 0;
+                        input.value = 0;
+                    }
+                    suma += val;
+
+                    // Resaltar la fila en rosado suave si el stock es 0 (como en la imagen)
+                    const fila = input.closest('tr');
+                    if (val === 0) {
+                        fila.classList.add('fila-sin-stock');
+                    } else {
+                        fila.classList.remove('fila-sin-stock');
+                    }
+                });
+
+                document.getElementById('modalNuevoTotalTexto').textContent = suma + ' unidades';
+            }
+
+            // Filtros en tiempo real
+            document.addEventListener('DOMContentLoaded', () => {
+                const inputBusqueda = document.getElementById('filtroBusqueda');
+                const selectEstado = document.getElementById('filtroEstado');
+                const selectCategoria = document.getElementById('filtroCategoria');
+                const btnReset = document.getElementById('btnResetFiltros');
+                const filas = document.querySelectorAll('.fila-producto');
+
+                function aplicarFiltros() {
+                    const texto = inputBusqueda.value.trim().toLowerCase();
+                    const estado = selectEstado.value;
+                    const categoria = selectCategoria.value;
+                    let visibles = 0;
+
+                    filas.forEach(fila => {
+                        const nombre = fila.getAttribute('data-nombre');
+                        const codigo = fila.getAttribute('data-codigo');
+                        const cat = fila.getAttribute('data-categoria');
+                        const est = fila.getAttribute('data-estado');
+
+                        const coincideTexto = nombre.includes(texto) || codigo.includes(texto);
+                        const coincideEstado = (estado === 'todos') || (est === estado);
+                        const coincideCat = (categoria === 'todas') || (cat === categoria);
+
+                        if (coincideTexto && coincideEstado && coincideCat) {
+                            fila.style.display = '';
+                            visibles++;
+                        } else {
+                            fila.style.display = 'none';
+                        }
+                    });
+
+                    document.getElementById('contadorResultados').textContent =
+                        `Mostrando ${visibles} de ${filas.length} productos`;
+                }
+
+                inputBusqueda.addEventListener('input', aplicarFiltros);
+                selectEstado.addEventListener('change', aplicarFiltros);
+                selectCategoria.addEventListener('change', aplicarFiltros);
+
+                btnReset.addEventListener('click', () => {
+                    inputBusqueda.value = '';
+                    selectEstado.value = 'todos';
+                    selectCategoria.value = 'todas';
+                    aplicarFiltros();
+                });
+            });
+        </script>
+    </body>
+</html>

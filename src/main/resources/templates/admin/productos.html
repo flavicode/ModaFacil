@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org">
+    <head th:replace="~{layout-admin :: headAdmin('Dashboard')}"></head>
+    <body>
+
+        <!-- Header superior -->
+        <header th:replace="~{layout-admin :: headerAdmin}"></header>
+
+        <!-- Contenedor Aside + Main -->
+        <div class="admin-wrapper">
+            <aside th:replace="~{layout-admin :: sidebarAdmin}"></aside>
+
+            <main class="admin-main p-4 p-lg-5">
+                <!-- Breadcrumb y Título -->
+                <nav aria-label="breadcrumb" class="small text-muted mb-1">
+                    <i class="bi bi-house"></i> / Dashboard
+                </nav>
+                <h2 class="fw-bold text-primary mb-1">Productos</h2>
+                <p class="text-muted mb-4">Gestiona el catálogo de productos de ModaFacil</p>
+
+                <!-- Aquí va el contenido de la página -->
+            </main>
+        </div>
+
+        <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+    </body>
+</html>

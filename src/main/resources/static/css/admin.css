@@ -46,3 +46,306 @@
     background-color: var(--color-light);
     overflow-x: hidden;
 }
+
+/* =========================================
+   ESTILOS DE INVENTARIO
+   ========================================= */
+
+/* Tarjetas KPI */
+.kpi-card {
+    background-color: var(--color-white);
+    border-radius: 16px;
+    padding: 20px 24px;
+    border: 1px solid #f0e8e8;
+    box-shadow: 0 2px 10px rgba(44, 18, 18, 0.03);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.kpi-icon-box {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--color-white);
+    flex-shrink: 0;
+}
+
+.kpi-icon-primary {
+    background-color: var(--color-success);
+}
+
+.kpi-icon-green {
+    background-color: #7ea87e;
+}
+
+/* Barra de filtros */
+.filter-box {
+    background-color: var(--color-white);
+    border: 1px solid #ece3e3;
+    border-radius: 12px;
+    height: 44px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-box:focus-within {
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 3px rgba(195, 99, 99, 0.12);
+}
+
+.btn-refresh-filter {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background-color: var(--color-white);
+    border: 1px solid #ece3e3;
+    color: var(--color-success);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-refresh-filter:hover {
+    background-color: var(--color-success-light);
+    border-color: var(--color-success-light);
+}
+
+/* Contenedor y Tabla de Inventario */
+.inventory-card {
+    background-color: var(--color-white);
+    border-radius: 18px;
+    padding: 22px;
+    border: 1px solid #f0e8e8;
+    box-shadow: 0 2px 12px rgba(44, 18, 18, 0.03);
+}
+
+.table-inventario {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-inventario thead th {
+    background-color: #f9f1f1;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.88rem;
+    border: none;
+    padding: 13px 16px;
+}
+
+.table-inventario thead th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.table-inventario thead th:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.table-inventario tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f3eded;
+    color: var(--color-primary);
+}
+
+.table-inventario tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.product-thumb {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    object-fit: cover;
+    background-color: #f4f4f4;
+    border: 1px solid #eee6e6;
+    flex-shrink: 0;
+}
+
+/* Pills de tallas */
+.talla-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: #f3f1f1;
+    color: var(--color-primary);
+}
+
+.talla-pill.agotado {
+    background-color: #fbe9e9;
+    color: var(--color-success);
+}
+
+/* Badges de Estado */
+.badge-estado {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-en-stock {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+}
+
+.badge-agotado {
+    background-color: #fbe9e9;
+    color: var(--color-success);
+}
+
+/* Botón Actualizar Stock en fila */
+.btn-actualizar-stock {
+    background-color: var(--color-white);
+    border: 1px solid #e4d8d8;
+    color: var(--color-primary);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.83rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-actualizar-stock i {
+    color: var(--color-success);
+}
+
+.btn-actualizar-stock:hover {
+    background-color: #fdf6f6;
+    border-color: var(--color-success);
+}
+
+/* =========================================
+   MODAL ACTUALIZAR STOCK
+   ========================================= */
+.modal-stock-content {
+    border: none;
+    border-radius: 20px;
+    padding: 8px;
+}
+
+.modal-header-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background-color: #f9ebeb;
+    color: var(--color-success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.modal-product-box {
+    border: 1px solid #eee3e3;
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.modal-stock-actual-box {
+    background-color: #f9f1f1;
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.table-modal-tallas thead th {
+    background-color: #f9f1f1;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.88rem;
+    border: none;
+    padding: 10px 14px;
+}
+
+.table-modal-tallas thead th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.table-modal-tallas thead th:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.table-modal-tallas tbody td {
+    padding: 10px 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f4eeee;
+}
+
+.table-modal-tallas tbody tr.fila-sin-stock {
+    background-color: #fdf2f2;
+}
+
+/* Control Stepper (- 8 +) */
+.stock-stepper {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #e5d8d8;
+    border-radius: 10px;
+    background-color: var(--color-white);
+    overflow: hidden;
+}
+
+.stock-stepper button {
+    border: none;
+    background: transparent;
+    width: 34px;
+    height: 34px;
+    color: var(--color-primary);
+    font-weight: 600;
+    transition: background-color 0.15s ease;
+}
+
+.stock-stepper button:hover {
+    background-color: #f9ebeb;
+    color: var(--color-success);
+}
+
+.stock-stepper input {
+    width: 46px;
+    height: 34px;
+    border: none;
+    border-left: 1px solid #f0e6e6;
+    border-right: 1px solid #f0e6e6;
+    text-align: center;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 0.92rem;
+}
+
+.stock-stepper input:focus {
+    outline: none;
+}
+
+/* Quitar flechas por defecto del input number */
+.stock-stepper input::-webkit-outer-spin-button,
+.stock-stepper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.nuevo-total-bar {
+    background-color: #f9ebeb;
+    border-radius: 12px;
+    padding: 12px 18px;
+}
