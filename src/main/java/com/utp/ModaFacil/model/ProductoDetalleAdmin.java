@@ -7,6 +7,7 @@ public record ProductoDetalleAdmin(
     String codigo,
     String nombre,
     String imagen,
+    Long idCategoria,
     String categoria,
     boolean activo,
     String descripcion,

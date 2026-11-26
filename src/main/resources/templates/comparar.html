@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{layout :: head('comparar.css', 'Comparar Precios')}">
+<head th:replace="~{layout :: head('Comparar Precios','comparar.css')}">
 </head>
 
 <body>
@@ -462,23 +462,33 @@
 
                                 </td>
 
-                                <!-- ==========================
-                                    COLUMNA 3: TALLAS
-                                =========================== -->
+                                <!-- COLUMNA 3: TALLAS -->
                                 <td>
-
                                     <div class="comparacion-tallas-lista">
+                                        <th:block th:each="talla : ${tienda.tallas}"
+                                                th:with="disponible=${#lists.contains(tienda.tallasDisponibles, talla)},
+                                                        primeraDisponible=${!#lists.isEmpty(tienda.tallasDisponibles) and tienda.tallasDisponibles.toString().equals(talla.toString())}">
 
-                                        <span
-                                            class="comparacion-talla"
-                                            th:each="talla : ${tienda.tallas}"
-                                            th:text="${talla}">
-                                            M
-                                        </span>
+                                            <input type="radio"
+                                                class="btn-check comparacion-talla-radio"
+                                                th:name="|talla-tienda-${tienda.idProveedor}|"
+                                                th:id="|radio-talla-${tienda.idProveedor}-${talla}|"
+                                                th:value="${talla}"
+                                                th:disabled="${!disponible}"
+                                                th:checked="${primeraDisponible}"
+                                                autocomplete="off">
+
+                                            <label class="comparacion-talla"
+                                                th:for="|radio-talla-${tienda.idProveedor}-${talla}|"
+                                                th:classappend="${disponible} ? 'talla-con-stock' : 'talla-sin-stock'"
+                                                th:text="${talla}">
+                                                M
+                                            </label>
+                                        </th:block>
 
                                     </div>
-
                                 </td>
+
 
                                 <!-- =====================================
                                     COLUMNA 4: STOCK
@@ -501,62 +511,36 @@
                                 ======================================= -->
 
                                 <td>
-
-                                    <form
-                                        th:action="@{/comparar/carrito/agregar}"
+                                    <form th:action="@{/comparar/carrito/agregar}"
                                         method="post"
                                         class="comparacion-form-carrito">
 
-                                        <!-- PRODUCTO SELECCIONADO -->
-                                        <input
-                                            type="hidden"
-                                            name="idProducto"
-                                            th:value="${productoSeleccionado.idProducto}">
-
-                                        <!-- PROVEEDOR SELECCIONADO -->
-                                        <input
-                                            type="hidden"
-                                            name="idProveedor"
-                                            th:value="${tienda.idProveedor}">
-
-                                        <!-- CANTIDAD INICIAL -->
-                                        <input
-                                            type="hidden"
-                                            name="cantidad"
-                                            value="1">
-
-                                        <input
-                                            type="hidden"
+                                        <input type="hidden" name="idProducto" th:value="${productoSeleccionado.idProducto}">
+                                        <input type="hidden" name="idProveedor" th:value="${tienda.idProveedor}">
+                                        <input type="hidden" name="cantidad" value="1">
+                                        <input type="hidden"
                                             name="talla"
                                             class="input-talla-tabla"
-                                            th:value="${!#lists.isEmpty(tienda.tallas) ? tienda.tallas[0] : ''}">
-                                            
-                                        <!-- TOKEN CSRF, SI ESTÁ DISPONIBLE -->
-                                        <input
-                                            th:if="${_csrf != null}"
+                                            th:value="${!#lists.isEmpty(tienda.tallasDisponibles) ? tienda.tallasDisponibles[0] : ''}">
+
+                                        <input th:if="${_csrf != null}"
                                             type="hidden"
                                             th:name="${_csrf.parameterName}"
                                             th:value="${_csrf.token}">
 
-                                        <!-- BOTÓN AGREGAR AL CARRITO -->
-                                        <button
-                                            type="submit"
-                                            class="comparacion-btn-carrito"
-                                            th:disabled="${tienda.stock <= 0}">
-
-                                            <span th:if="${tienda.stock > 0}">
+                                        <button type="submit"
+                                                class="comparacion-btn-carrito"
+                                                th:disabled="${tienda.stock <= 0 or #lists.isEmpty(tienda.tallasDisponibles)}">
+                                            <span th:if="${tienda.stock > 0 and !#lists.isEmpty(tienda.tallasDisponibles)}">
                                                 Agregar al carrito
                                             </span>
-
-                                            <span th:if="${tienda.stock <= 0}">
+                                            <span th:if="${tienda.stock <= 0 or #lists.isEmpty(tienda.tallasDisponibles)}">
                                                 Agotado
                                             </span>
-
                                         </button>
-
                                     </form>
-
                                 </td>
+
 
                             </tr>
 

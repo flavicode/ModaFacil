@@ -12,23 +12,39 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.utp.ModaFacil.dao.OfertaDAO;
+import com.utp.ModaFacil.dao.ProductoDAO;
 import com.utp.ModaFacil.strategy.EstrategiaComparacion;
+import com.utp.ModaFacil.dao.ProductoDAO;
+import com.utp.ModaFacil.model.Categoria;
 
 @Service
 public class CatalogoService {
     private final List<EstrategiaComparacion> estrategias;
     private final OfertaDAO ofertaDAO;
+    private final ProductoDAO productoDAO;
 
     public CatalogoService(
             List<EstrategiaComparacion> estrategias,
-            OfertaDAO ofertaDAO) {
+            OfertaDAO ofertaDAO,
+            ProductoDAO productoDAO) {
         this.estrategias = estrategias;
         this.ofertaDAO = ofertaDAO;
+        this.productoDAO = productoDAO;
     }
 
-    // Las relaciones producto - proveedor - precio - stock ahora vienen de MySQL
+    // OBTENER RELACIONES PRODUCTO - PROVEEDOR
     public List<Map<String, Object>> obtenerRelaciones() {
         return ofertaDAO.obtenerRelaciones();
+    }
+
+    // OBTENER TODAS LAS CATEGORÍAS
+    public List<Categoria> obtenerCategorias() {
+        return productoDAO.listarCategorias();
+    }
+
+    // OBTENER CATEGORÍAS POR GÉNERO
+    public Map<String, List<Categoria>> obtenerCategoriasPorGenero() {
+        return productoDAO.obtenerCategoriasPorGenero();
     }
 
 
@@ -103,117 +119,121 @@ public class CatalogoService {
 
     public List<Map<String, Object>> obtenerComparacionPrecios(
         Long idProducto) {
-    return obtenerComparacionPrecios(idProducto, "precio");
+        return obtenerComparacionPrecios(idProducto, "precio");
     }
 
     public List<Map<String, Object>> obtenerComparacionPrecios(
         Long idProducto, String criterio) {
 
-    Map<Long, Map<String, Object>> tiendasUnicas =
-        new LinkedHashMap<>();
+        Map<Long, Map<String, Object>> tiendasUnicas =
+            new LinkedHashMap<>();
 
-    for (Map<String, Object> relacion : obtenerRelaciones()) {
+        for (Map<String, Object> relacion : obtenerRelaciones()) {
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> producto =
-            (Map<String, Object>) relacion.get("producto");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> producto =
+                (Map<String, Object>) relacion.get("producto");
 
-        // FILTRAR SOLO EL PRODUCTO SELECCIONADO
-        if (producto == null ||
-            !idProducto.equals(producto.get("idProducto"))) {
-            continue;
-        }
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> proveedor =
-            (Map<String, Object>) relacion.get("proveedor");
-
-        if (proveedor == null) {
-            continue;
-        }
-
-        Long idProveedor =
-            ((Number) proveedor.get("idProveedor")).longValue();
-
-        BigDecimal precio =
-            convertirPrecio(relacion.get("precio"));
-
-        int stock =
-            ((Number) relacion.get("stock")).intValue();
-
-        // EVITAR proveedores DUPLICADOS
-        // SI EXISTEN DOS RELACIONES, CONSERVAR EL MENOR PRECIO
-        Map<String, Object> tiendaExistente =
-            tiendasUnicas.get(idProveedor);
-
-        if (tiendaExistente != null) {
-
-            BigDecimal precioExistente =
-                (BigDecimal) tiendaExistente.get("precio");
-
-            if (precio.compareTo(precioExistente) >= 0) {
+            // FILTRAR SOLO EL PRODUCTO SELECCIONADO
+            if (producto == null ||
+                !idProducto.equals(producto.get("idProducto"))) {
                 continue;
             }
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> proveedor =
+                (Map<String, Object>) relacion.get("proveedor");
+
+            if (proveedor == null) {
+                continue;
+            }
+
+
+            Long idProveedor =
+                ((Number) proveedor.get("idProveedor")).longValue();
+
+            String nombreProveedor = proveedor.get("nombre") != null ? proveedor.get("nombre").toString() : "Proveedor " + idProveedor;
+
+            BigDecimal precio =
+                convertirPrecio(relacion.get("precio"));
+
+            int stock =
+                ((Number) relacion.get("stock")).intValue();
+
+            // EVITAR proveedores DUPLICADOS
+            // SI EXISTEN DOS RELACIONES, CONSERVAR EL MENOR PRECIO
+            Map<String, Object> tiendaExistente =
+                tiendasUnicas.get(idProveedor);
+
+            if (tiendaExistente != null) {
+
+                BigDecimal precioExistente =
+                    (BigDecimal) tiendaExistente.get("precio");
+
+                if (precio.compareTo(precioExistente) >= 0) {
+                    continue;
+                }
+            }
+
+            // DETERMINAR ESTADO DEL STOCK
+            String estadoStock;
+            String claseStock;
+
+            if (stock > 10) {
+                estadoStock = "En stock";
+                claseStock = "stock-alto";
+
+            } else if (stock >= 2) {
+                estadoStock = "Pocas unidades";
+                claseStock = "stock-bajo";
+
+            } else if (stock == 1) {
+                estadoStock = "Solo queda una unidad";
+                claseStock = "stock-ultimo";
+
+            } else {
+                estadoStock = "Agotado";
+                claseStock = "stock-sin";
+            }
+
+            // CREAR INFORMACIÓN DEL PROVEEDOR
+
+            Map<String, Object> tienda = new HashMap<>();
+            tienda.put("idProveedor", idProveedor);
+            tienda.put("nombre", nombreProveedor);
+            tienda.put("precio", precio);
+            tienda.put("tallas", producto.get("tallas"));
+            tienda.put("tallasDisponibles", relacion.getOrDefault("tallasOferta", List.of()));
+            tienda.put("stock", stock);
+            tienda.put("estadoStock", estadoStock);
+            tienda.put("claseStock", claseStock);
+
+            // GUARDAR UNA SOLA VEZ POR PROVEEDOR
+            tiendasUnicas.put(idProveedor, tienda);
         }
+        
+        // SELECCIONAR LA ESTRATEGIA DE COMPARACIÓN
+        String criterioElegido =
+            criterio == null ? "" : criterio.toLowerCase().trim();
 
-        // DETERMINAR ESTADO DEL STOCK
-        String estadoStock;
-        String claseStock;
-
-        if (stock > 10) {
-            estadoStock = "En stock";
-            claseStock = "stock-alto";
-
-        } else if (stock >= 2) {
-            estadoStock = "Pocas unidades";
-            claseStock = "stock-bajo";
-
-        } else if (stock == 1) {
-            estadoStock = "Solo queda una unidad";
-            claseStock = "stock-ultimo";
-
-        } else {
-            estadoStock = "Agotado";
-            claseStock = "stock-sin";
-        }
-
-        // CREAR INFORMACIÓN DEL PROVEEDOR
-        Map<String, Object> tienda = new HashMap<>();
-
-        tienda.put("idProveedor", idProveedor);
-        tienda.put("nombre", "Proveedor " + idProveedor);
-        tienda.put("precio", precio);
-        tienda.put("tallas", producto.get("tallas"));
-        tienda.put("stock", stock);
-        tienda.put("estadoStock", estadoStock);
-        tienda.put("claseStock", claseStock);
-
-        // GUARDAR UNA SOLA VEZ POR PROVEEDOR
-        tiendasUnicas.put(idProveedor, tienda);
-    }
-    
-    // SELECCIONAR LA ESTRATEGIA DE COMPARACIÓN
-    String criterioElegido =
-        criterio == null ? "" : criterio.toLowerCase().trim();
-
-    EstrategiaComparacion estrategia = estrategias.stream()
-        .filter(e -> e.obtenerCriterio().equals(criterioElegido))
-        .findFirst()
-        .orElseGet(() -> estrategias.stream()
-            .filter(e -> e.obtenerCriterio().equals("precio"))
+        EstrategiaComparacion estrategia = estrategias.stream()
+            .filter(e -> e.obtenerCriterio().equals(criterioElegido))
             .findFirst()
-            .orElseThrow(() ->
-                new IllegalStateException(
-                    "No existe una estrategia para ordenar por precio"
+            .orElseGet(() -> estrategias.stream()
+                .filter(e -> e.obtenerCriterio().equals("precio"))
+                .findFirst()
+                .orElseThrow(() ->
+                    new IllegalStateException(
+                        "No existe una estrategia para ordenar por precio"
+                    )
                 )
-            )
-        );
+            );
 
-    // ORDENAR LAS TIENDAS CON LA ESTRATEGIA ELEGIDA
-    return estrategia.ordenar(
-        new ArrayList<>(tiendasUnicas.values())
-    );
-}
+        // ORDENAR LAS TIENDAS CON LA ESTRATEGIA ELEGIDA
+        return estrategia.ordenar(
+            new ArrayList<>(tiendasUnicas.values())
+        );
+    }
 
 
     // ==========================================
@@ -237,5 +257,10 @@ public class CatalogoService {
             Long idProveedor) {
         return ofertaDAO.obtenerOferta(idProducto, idProveedor);
     }
+
+    public int obtenerStockPorTalla(Long idProducto, Long idProveedor, String talla) {
+        return ofertaDAO.obtenerStockPorTalla(idProducto, idProveedor, talla);
+    }
+
 
 }

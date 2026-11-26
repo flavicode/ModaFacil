@@ -19,6 +19,9 @@ CREATE TABLE usuarios (
 CREATE TABLE proveedores (
     id_proveedor  BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre        VARCHAR(100) NOT NULL,
+    ruc           VARCHAR(11)  NULL UNIQUE,
+    contacto      VARCHAR(100) NULL,
+    telefono      VARCHAR(20)  NULL,
     activo        BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -27,6 +30,16 @@ CREATE TABLE categorias (
     nombre       VARCHAR(50) NOT NULL UNIQUE,
     color        VARCHAR(7)  NOT NULL DEFAULT '#C65F64'
 );
+
+CREATE TABLE categoria_genero (
+    id_categoria BIGINT NOT NULL,
+    genero ENUM('Hombre', 'Mujer') NOT NULL,
+    PRIMARY KEY (id_categoria, genero),
+    FOREIGN KEY (id_categoria)
+        REFERENCES categorias(id_categoria)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE productos (
     id_producto  BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_categoria BIGINT NOT NULL,
@@ -112,9 +125,57 @@ INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol)
 /* A ,Dieg_025, Thirsa_18, Danae_26, SAdmin$3 */
 INSERT INTO categorias (nombre, color) VALUES ('Polos','#C65F64'),('Pantalones','#C65F64'),('Vestidos','#C65F64');
 
-INSERT INTO proveedores (nombre) VALUES
- ('Proveedor 1'),('Proveedor 2'),('Proveedor 3'),('Proveedor 4'),
- ('Proveedor 5'),('Proveedor 6'),('Proveedor 7'),('Proveedor 8');
+USE modafacil;
+
+INSERT INTO categorias (nombre, color) VALUES
+('Camisas', '#C65F64'),
+('Casacas', '#C65F64'),
+('Shorts', '#C65F64'),
+('Jeans', '#C65F64'),
+('Poleras', '#C65F64'),
+('Ropa deportiva', '#C65F64'),
+('Blusas', '#C65F64'),
+('Faldas', '#C65F64'),
+('Chaquetas', '#C65F64'),
+('Tops', '#C65F64')
+ON DUPLICATE KEY UPDATE nombre = categorias.nombre;
+
+INSERT IGNORE INTO categoria_genero (id_categoria, genero)
+SELECT id_categoria, 'Hombre'
+FROM categorias
+WHERE nombre IN (
+    'Polos',
+    'Pantalones',
+    'Camisas',
+    'Casacas',
+    'Shorts',
+    'Jeans',
+    'Poleras',
+    'Ropa deportiva'
+);
+
+INSERT IGNORE INTO categoria_genero (id_categoria, genero)
+SELECT id_categoria, 'Mujer'
+FROM categorias
+WHERE nombre IN (
+    'Vestidos',
+    'Blusas',
+    'Pantalones',
+    'Faldas',
+    'Chaquetas',
+    'Polos',
+    'Jeans',
+    'Tops',
+    'Ropa deportiva'
+);
+
+INSERT INTO proveedores (nombre, ruc, contacto, telefono, activo) VALUES
+ ('Metro',      '20100070970', 'María Quispe',    '987 654 321', TRUE),
+ ('PlazaVea',   '20100038219', 'Carlos Mendoza',  '986 321 654', TRUE),
+ ('Falabella',  '20333363002', 'Lucía Torres',    '999 876 543', FALSE),
+ ('Ripley',     '20337564373', 'Jorge Huamán',    '987 112 334', TRUE),
+ ('Oechsle',    '20100128056', 'Ana Ramírez',     '985 667 788', TRUE),
+ ('Topitop',    '20378415221', 'Luis Paredes',    '984 221 908', TRUE);
 
 INSERT INTO productos (id_categoria, nombre, imagen, genero, descripcion, material, tipo_tela, ajuste, manga, cuello, ocasion) VALUES
  (1,'Polo Básico Negro para Hombre','p_camisero_1.jpg','Hombre',
@@ -129,8 +190,7 @@ INSERT INTO productos (id_categoria, nombre, imagen, genero, descripcion, materi
 
 INSERT INTO ofertas (id_producto, id_proveedor, precio) VALUES
  (1, 1, 39.90), (1, 2, 45.00), (1, 3, 42.00),
- (2, 1, 25.00), (2, 2, 28.00), (2, 3, 32.00), (2, 4, 27.00),
- (2, 5, 30.00), (2, 6, 29.00), (2, 7, 35.00), (2, 8, 31.00),
+ (2, 1, 25.00), (2, 2, 28.00), (2, 3, 32.00), (2, 4, 27.00), (2, 5, 30.00), (2, 6, 29.00),
  (3, 1, 42.00), (3, 2, 48.00), (3, 3, 50.00), (3, 4, 46.00), (3, 5, 55.00), (3, 6, 49.00);
 
 INSERT INTO producto_tallas (id_producto, id_proveedor, talla, stock) VALUES
@@ -139,15 +199,13 @@ INSERT INTO producto_tallas (id_producto, id_proveedor, talla, stock) VALUES
  (1, 2, 'S',  4), (1, 2, 'M',  6), (1, 2, 'L',  2), (1, 2, 'XL', 5), (1, 2, 'XXL', 0),
  (1, 3, 'S', 10), (1, 3, 'M',  0), (1, 3, 'L',  8), (1, 3, 'XL', 4), (1, 3, 'XXL', 1),
 
- -- Producto 2: Pantalón Slim Fit (Proveedores 1 al 8)
+ -- Producto 2: Pantalón Slim Fit (Proveedores 1 al 6)
  (2, 1, '28', 6), (2, 1, '30',  8), (2, 1, '32', 4), (2, 1, '34', 0), (2, 1, '36', 2),
  (2, 2, '28', 3), (2, 2, '30',  5), (2, 2, '32', 7), (2, 2, '34', 2), (2, 2, '36', 0),
  (2, 3, '28', 0), (2, 3, '30',  4), (2, 3, '32', 6), (2, 3, '34', 3), (2, 3, '36', 1),
  (2, 4, '28', 5), (2, 4, '30', 10), (2, 4, '32', 2), (2, 4, '34', 0), (2, 4, '36', 4),
  (2, 5, '28', 2), (2, 5, '30',  3), (2, 5, '32', 5), (2, 5, '34', 4), (2, 5, '36', 2),
  (2, 6, '28', 4), (2, 6, '30',  6), (2, 6, '32', 0), (2, 6, '34', 5), (2, 6, '36', 3),
- (2, 7, '28', 1), (2, 7, '30',  2), (2, 7, '32', 3), (2, 7, '34', 1), (2, 7, '36', 0),
- (2, 8, '28', 7), (2, 8, '30',  9), (2, 8, '32', 5), (2, 8, '34', 2), (2, 8, '36', 1),
 
  -- Producto 3: Vestido Casual Verano (Proveedores 1 al 6 - Agotado en todos para probar estado "Agotado")
  (3, 1, 'XS', 0), (3, 1, 'S', 0), (3, 1, 'M', 0), (3, 1, 'L', 0), (3, 1, 'XL', 0),

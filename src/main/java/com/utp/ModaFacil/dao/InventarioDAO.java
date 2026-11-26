@@ -1,12 +1,16 @@
 package com.utp.ModaFacil.dao;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.utp.ModaFacil.controller.AdminController.ProductoInventario;
+import com.utp.ModaFacil.controller.AdminController.ProveedorStock;
 import com.utp.ModaFacil.controller.AdminController.TallaStock;
 
 @Repository
@@ -41,9 +45,9 @@ public class InventarioDAO {
                     ? "/img/logo.png"
                     : (img.startsWith("/") || img.startsWith("http") ? img : "/img/" + img);
 
-            List<TallaStock> tallas = listarTallasPorProducto(idProducto);
-            int stockTotal = tallas.stream()
-                    .mapToInt(TallaStock::getStock)
+            List<ProveedorStock> proveedores = listarProveedoresPorProducto(idProducto);
+            int stockTotal = proveedores.stream()
+                    .mapToInt(ProveedorStock::getSubtotal)
                     .sum();
 
             return new ProductoInventario(
@@ -53,32 +57,78 @@ public class InventarioDAO {
                     categoria,
                     imagenUrl,
                     stockTotal,
-                    tallas
+                    proveedores
             );
         });
     }
 
-    public List<TallaStock> listarTallasPorProducto(Long idProducto) {
-        String sqlTallas = """
-            SELECT talla, stock
-            FROM producto_tallas
-            WHERE id_producto = ?
-            ORDER BY CASE talla
-                WHEN 'XS'  THEN 1
-                WHEN 'S'   THEN 2
-                WHEN 'M'   THEN 3
-                WHEN 'L'   THEN 4
-                WHEN 'XL'  THEN 5
-                WHEN 'XXL' THEN 6
-                ELSE 7
-            END, talla ASC
+    public List<ProveedorStock> listarProveedoresPorProducto(Long idProducto) {
+        String sql = """
+            SELECT pt.id_proveedor,
+                   pr.nombre AS nombre_proveedor,
+                   pt.talla,
+                   pt.stock
+            FROM producto_tallas pt
+            INNER JOIN proveedores pr ON pt.id_proveedor = pr.id_proveedor
+            WHERE pt.id_producto = ?
+            ORDER BY pt.id_proveedor ASC,
+                CASE pt.talla
+                    WHEN 'XS'  THEN 1
+                    WHEN 'S'   THEN 2
+                    WHEN 'M'   THEN 3
+                    WHEN 'L'   THEN 4
+                    WHEN 'XL'  THEN 5
+                    WHEN 'XXL' THEN 6
+                    ELSE 7
+                END, pt.talla ASC
         """;
 
-        return jdbcTemplate.query(
-                sqlTallas,
-                (rs, rowNum) -> new TallaStock(rs.getString("talla"), rs.getInt("stock")),
-                idProducto
-        );
+        Map<Long, ProveedorBuilder> mapa = new LinkedHashMap<>();
+
+        jdbcTemplate.query(sql, rs -> {
+            Long idProv = rs.getLong("id_proveedor");
+
+            // Limitar a un máximo de 6 proveedores por producto
+            if (!mapa.containsKey(idProv) && mapa.size() >= 6) {
+                return;
+            }
+
+            String nombreProv = "proveedor " + idProv;
+            String talla = rs.getString("talla");
+            int stock = rs.getInt("stock");
+
+            ProveedorBuilder builder = mapa.computeIfAbsent(
+                    idProv,
+                    k -> new ProveedorBuilder(idProv, nombreProv)
+            );
+            builder.tallas.add(new TallaStock(talla, stock));
+            builder.subtotal += stock;
+        }, idProducto);
+
+        // Tomar las tallas del producto desde el primer proveedor encontrado
+        List<String> tallasBase = new ArrayList<>();
+        if (!mapa.isEmpty()) {
+            for (TallaStock ts : mapa.values().iterator().next().tallas) {
+                tallasBase.add(ts.getTalla());
+            }
+        }
+
+        // Completar hasta 6 proveedores en memoria sin alterar la base de datos
+        for (long idFijo = 1; idFijo <= 6; idFijo++) {
+            if (!mapa.containsKey(idFijo)) {
+                ProveedorBuilder vacio = new ProveedorBuilder(idFijo, "proveedor " + idFijo);
+                for (String t : tallasBase) {
+                    vacio.tallas.add(new TallaStock(t, 0));
+                }
+                mapa.put(idFijo, vacio);
+            }
+        }
+
+        List<ProveedorStock> resultado = new ArrayList<>();
+        for (ProveedorBuilder b : mapa.values()) {
+            resultado.add(new ProveedorStock(b.idProv, b.nombreProv, b.subtotal, b.tallas));
+        }
+        return resultado;
     }
 
     public List<String> listarCategorias() {
@@ -87,16 +137,30 @@ public class InventarioDAO {
     }
 
     @Transactional
-    public void actualizarStockPorTallas(Long idProducto, List<String> tallas, List<Integer> cantidades) {
-        if (tallas == null || cantidades == null || tallas.size() != cantidades.size()) {
+    public void actualizarStockPorTallas(Long idProducto, List<Long> proveedores, List<String> tallas, List<Integer> cantidades) {
+        if (proveedores == null || tallas == null || cantidades == null
+                || proveedores.size() != tallas.size()
+                || tallas.size() != cantidades.size()) {
             return;
         }
 
-        String sqlUpdate = "UPDATE producto_tallas SET stock = ? WHERE id_producto = ? AND talla = ?";
+        String sqlUpdate = "UPDATE producto_tallas SET stock = ? WHERE id_producto = ? AND id_proveedor = ? AND talla = ?";
 
         for (int i = 0; i < tallas.size(); i++) {
             int nuevoStock = Math.max(0, cantidades.get(i));
-            jdbcTemplate.update(sqlUpdate, nuevoStock, idProducto, tallas.get(i));
+            jdbcTemplate.update(sqlUpdate, nuevoStock, idProducto, proveedores.get(i), tallas.get(i));
+        }
+    }
+
+    private static class ProveedorBuilder {
+        final Long idProv;
+        final String nombreProv;
+        int subtotal = 0;
+        final List<TallaStock> tallas = new ArrayList<>();
+
+        ProveedorBuilder(Long idProv, String nombreProv) {
+            this.idProv = idProv;
+            this.nombreProv = nombreProv;
         }
     }
 }

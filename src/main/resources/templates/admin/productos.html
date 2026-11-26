@@ -19,87 +19,34 @@
                 <p class="text-muted mb-4">Gestiona el catálogo de productos de ModaFacil</p>
 
                 <!-- FILTROS DE PRODUCTOS -->
-                <form id="formFiltros"
-                    class="filtros-productos"
-                    th:action="@{/admin/productos}"
-                    method="get">
-
+                <form id="formFiltros" class="filtros-productos" th:action="@{/admin/productos}" method="get">
                     <div class="row g-3 align-items-center">
-
                         <!-- Buscador -->
                         <div class="col-12 col-md-5">
                             <div class="input-group">
-
-                                <span class="input-group-text">
-                                    <i class="bi bi-search"></i>
-                                </span>
-
-                                <input type="text"
-                                    id="buscarProducto"
-                                    name="busqueda"
-                                    class="form-control"
-                                    th:value="${busqueda}"
-                                    placeholder="Buscar producto (nombre, código...)"
-                                    aria-label="Buscar producto">
-
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" id="buscarProducto" name="busqueda" class="form-control" th:value="${busqueda}" placeholder="Buscar producto (nombre, código...)" aria-label="Buscar producto">
                             </div>
                         </div>
-
                         <!-- Filtro de estado -->
                         <div class="col-12 col-md-3">
                             <div class="input-group">
-
-                                <label class="input-group-text"
-                                    for="filtroEstado">
-                                    Estado:
-                                </label>
-
-                                <select id="filtroEstado"
-                                        name="estado"
-                                        class="form-select">
-
-                                    <option value="todos"
-                                            th:selected="${estado == 'todos'}">
-                                        Todos
-                                    </option>
-
-                                    <option value="activo"
-                                            th:selected="${estado == 'activo'}">
-                                        Activo
-                                    </option>
-
-                                    <option value="inactivo"
-                                            th:selected="${estado == 'inactivo'}">
-                                        Inactivo
-                                    </option>
-
+                                <label class="input-group-text" for="filtroEstado">Estado:</label>
+                                <select id="filtroEstado" name="estado" class="form-select">
+                                    <option value="todos" th:selected="${estado == 'todos'}">Todos</option>
+                                    <option value="activo" th:selected="${estado == 'activo'}">Activo</option>
+                                    <option value="inactivo" th:selected="${estado == 'inactivo'}">Inactivo</option>
                                 </select>
-
                             </div>
                         </div>
-
                         <!-- Botón recargar -->
                         <div class="col-auto ms-md-auto">
-
-                            <a th:href="@{/admin/productos}"
-                            class="btn btn-recargar"
-                            title="Recargar productos"
-                            aria-label="Recargar productos">
-
-                                <i class="bi bi-arrow-clockwise"></i>
-
-                            </a>
-
+                            <a th:href="@{/admin/productos}" class="btn btn-recargar" title="Recargar productos" aria-label="Recargar productos"><i class="bi bi-arrow-clockwise"></i></a>
                         </div>
-
                     </div>
-
                     <noscript>
-                        <button type="submit" class="btn btn-primary mt-3">
-                            Buscar
-                        </button>
+                        <button type="submit" class="btn btn-primary mt-3">Buscar</button>
                     </noscript>
-
                 </form>
 
                 <p id="mensajeFiltros"
@@ -198,6 +145,10 @@
                                             <button type="button"
                                                     class="btn btn-accion btn-editar"
                                                     th:data-id="${producto.idProducto()}"
+                                                    th:data-url="@{/admin/productos/{id}/detalle(id=${producto.idProducto()})}"
+                                                    th:data-update-url="@{/admin/productos/{id}/actualizar(id=${producto.idProducto()})}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditarProducto"
                                                     title="Editar producto"
                                                     aria-label="Editar producto">
 
@@ -457,7 +408,371 @@
 
         </div>
 
+        <!-- MODAL EDITAR PRODUCTO -->
+        <div class="modal fade"
+            id="modalEditarProducto"
+            tabindex="-1"
+            aria-labelledby="tituloModalEditar"
+            aria-hidden="true"
+            th:data-img-base="@{/img/}">
+
+            <div class="modal-dialog modal-lg modal-dialog-centered
+                        modal-dialog-scrollable">
+
+                <div class="modal-content editar-modal">
+
+                    <!-- CABECERA DEL MODAL -->
+                    <div class="modal-header editar-header">
+
+                        <div class="d-flex align-items-center gap-3">
+
+                            <div class="editar-icono-header">
+                                <i class="bi bi-pencil"></i>
+                            </div>
+
+                            <div>
+
+                                <h5 class="modal-title fw-bold"
+                                    id="tituloModalEditar">
+                                    Editar producto
+                                </h5>
+
+                                <p class="mb-0 small text-muted">
+                                    Modifica la información del producto.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Botón cerrar -->
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Cerrar">
+                        </button>
+
+                    </div>
+
+                    <!-- CUERPO DEL MODAL -->
+                    <div class="modal-body p-4">
+
+                        <!-- Mensaje de carga o error -->
+                        <div id="editarMensaje"
+                            class="text-center"
+                            role="status">
+                        </div>
+
+                        <!-- FORMULARIO -->
+                        <form id="formEditarProducto"
+                            enctype="multipart/form-data">
+
+                            <!-- ID oculto del producto -->
+                            <input type="hidden"
+                                id="editarIdProducto"
+                                name="idProducto">
+                            <!-- Mensaje de éxito o error al guardar -->
+                            <div id="editarResultado" class="alert d-none" role="alert"></div>
+                            <!-- INFORMACIÓN PRINCIPAL -->
+                            <div class="row g-4 mb-4">
+
+                                <!-- IMAGEN DEL PRODUCTO -->
+                                <div class="col-12 col-md-4">
+
+                                    <div class="editar-imagen-contenedor">
+
+                                        <!-- Imagen actual -->
+                                        <img id="editarImagen"
+                                            class="editar-imagen"
+                                            alt="Imagen del producto">
+
+                                        <!-- Input oculto para imagen -->
+                                        <input type="file"
+                                            id="editarArchivoImagen"
+                                            name="imagen"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            class="d-none">
+
+                                        <!-- Cambiar imagen -->
+                                        <button type="button"
+                                                id="btnCambiarImagen"
+                                                class="btn btn-cambiar-imagen w-100 mt-3">
+
+                                            <i class="bi bi-upload me-2"></i>
+                                            Cambiar imagen
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- INFORMACIÓN DEL PRODUCTO -->
+                                <div class="col-12 col-md-8">
+
+                                    <section class="editar-seccion h-100">
+
+                                        <div class="d-flex align-items-center
+                                                    justify-content-between
+                                                    flex-wrap gap-2 mb-3">
+
+                                            <h5 class="editar-titulo-seccion mb-0">
+
+                                                <i class="bi bi-box-seam"></i>
+                                                Información del producto
+
+                                            </h5>
+
+                                            <!-- Código no editable -->
+                                            <span class="detalle-codigo">
+
+                                                Código:
+                                                <span id="editarCodigo"></span>
+
+                                            </span>
+
+                                        </div>
+
+                                        <!-- Nombre del producto -->
+                                        <div class="mb-3">
+
+                                            <label for="editarNombre"
+                                                class="form-label fw-semibold">
+
+                                                Nombre del producto
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarNombre" name="nombre" class="form-control" maxlength="120" required>
+
+                                        </div>
+
+                                        <!-- Categoría -->
+                                        <div class="mb-3">
+
+                                            <label for="editarCategoria"
+                                                class="form-label fw-semibold">
+
+                                                Categoría
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <select id="editarCategoria" name="idCategoria" class="form-select" required>
+                                                <option value="">Seleccione una categoría</option>
+                                            </select>
+
+                                        </div>
+
+                                    </section>
+
+                                </div>
+
+                            </div>
+
+                            <!-- DESCRIPCIÓN Y ESPECIFICACIONES -->
+                            <div class="row g-3">
+
+                                <!-- DESCRIPCIÓN -->
+                                <div class="col-12 col-lg-6">
+
+                                    <section class="editar-seccion h-100">
+
+                                        <h5 class="editar-titulo-seccion">
+
+                                            <i class="bi bi-file-earmark-text"></i>
+                                            Descripción
+
+                                        </h5>
+
+                                        <textarea id="editarDescripcion" name="descripcion" class="form-control" rows="8" maxlength="255" aria-label="Descripción del producto" placeholder="Ingrese la descripción del producto"></textarea>
+
+                                    </section>
+
+                                </div>
+
+                                <!-- ESPECIFICACIONES -->
+                                <div class="col-12 col-lg-6">
+
+                                    <section class="editar-seccion h-100">
+
+                                        <h5 class="editar-titulo-seccion">
+
+                                            <i class="bi bi-gear"></i>
+                                            Especificaciones
+
+                                        </h5>
+
+                                        <!-- Material -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarMaterial">
+
+                                                <i class="bi bi-flower1"></i>
+                                                Material
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarMaterial" name="material" class="form-control" maxlength="60" required>
+
+                                        </div>
+
+                                        <!-- Tipo de tela -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarTipoTela">
+
+                                                <i class="bi bi-grid"></i>
+                                                Tipo de tela
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarTipoTela" name="tipoTela" class="form-control" maxlength="60" required>
+
+                                        </div>
+
+                                        <!-- Ajuste -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarAjuste">
+
+                                                <i class="bi bi-arrows-expand"></i>
+                                                Ajuste
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarAjuste" name="ajuste" class="form-control" maxlength="40" required>
+
+                                        </div>
+
+                                        <!-- Manga -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarManga">
+
+                                                <i class="bi bi-diamond"></i>
+                                                Manga
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarManga" name="manga" class="form-control" maxlength="40" required>
+
+                                        </div>
+
+                                        <!-- Cuello -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarCuello">
+
+                                                <i class="bi bi-circle"></i>
+                                                Cuello
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarCuello" name="cuello" class="form-control" maxlength="60" required>
+
+                                        </div>
+
+                                        <!-- Género -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarGenero">
+
+                                                <i class="bi bi-person"></i>
+                                                Género
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <select id="editarGenero"
+                                                    name="genero"
+                                                    class="form-select"
+                                                    required>
+
+                                                <option value="">
+                                                    Seleccione
+                                                </option>
+
+                                                <option value="Hombre">
+                                                    Hombre
+                                                </option>
+
+                                                <option value="Mujer">
+                                                    Mujer
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+                                        <!-- Ocasión -->
+                                        <div class="editar-especificacion">
+
+                                            <label for="editarOcasion">
+
+                                                <i class="bi bi-calendar-event"></i>
+                                                Ocasión
+                                                <span class="text-danger">*</span>
+
+                                            </label>
+
+                                            <input type="text" id="editarOcasion" name="ocasion" class="form-control" maxlength="60" required>
+
+                                        </div>
+
+                                    </section>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <!-- PIE DEL MODAL -->
+                    <div class="modal-footer editar-footer">
+
+                        <!-- Editar inventario -->
+                        <button type="button" id="btnEditarInventario" class="btn btn-editar-inventario me-auto" th:data-url="@{/admin/inventario}">
+                            <i class="bi bi-layers me-2"></i> Editar inventario
+                        </button>
+
+                        <!-- Cancelar -->
+                        <button type="button"
+                                class="btn btn-cancelar-edicion"
+                                data-bs-dismiss="modal">
+
+                            Cancelar
+
+                        </button>
+
+                        <!-- Guardar cambios -->
+                        <button type="submit"
+                                form="formEditarProducto"
+                                id="btnGuardarProducto"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-floppy me-2"></i>
+                            Guardar cambios
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
         <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+        <script th:inline="javascript">const categoriasAdminPorGenero = /*[[${categoriasPorGenero}]]*/ {};</script>
         <script th:src="@{/js/admin-productos.js}"></script>
     </body>
 </html>
