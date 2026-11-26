@@ -146,7 +146,7 @@
     font-weight: 600;
     font-size: 0.88rem;
     border: none;
-    padding: 13px 16px;
+    padding: 11px 10px;
 }
 
 .table-inventario thead th:first-child {
@@ -160,7 +160,7 @@
 }
 
 .table-inventario tbody td {
-    padding: 14px 16px;
+    padding: 12px 10px;
     vertical-align: middle;
     border-bottom: 1px solid #f3eded;
     color: var(--color-primary);
@@ -178,23 +178,6 @@
     background-color: #f4f4f4;
     border: 1px solid #eee6e6;
     flex-shrink: 0;
-}
-
-/* Pills de tallas */
-.talla-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 11px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background-color: #f3f1f1;
-    color: var(--color-primary);
-}
-
-.talla-pill.agotado {
-    background-color: #fbe9e9;
-    color: var(--color-success);
 }
 
 /* Badges de Estado */
@@ -222,13 +205,14 @@
     border: 1px solid #e4d8d8;
     color: var(--color-primary);
     border-radius: 50px;
-    padding: 6px 16px;
-    font-size: 0.83rem;
+    padding: 6px 14px;
+    font-size: 0.82rem;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .btn-actualizar-stock i {
@@ -384,7 +368,7 @@
 
     .table-inventario thead th,
     .table-inventario tbody td {
-        padding: 11px 12px;
+        padding: 11px 10px;
         font-size: 0.85rem;
     }
 
@@ -416,4 +400,254 @@
         width: 40px;
         height: 30px;
     }
+}
+
+/* Filas de proveedores y píldoras de tallas en la tabla de inventario */
+.proveedor-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 6px;
+    min-height: 28px;
+}
+
+.proveedor-nombre {
+    min-width: 92px;
+    margin-right: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: capitalize;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.proveedor-subtotal {
+    min-height: 28px;
+    max-width: 90px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.talla-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+    min-width: 48px;
+    padding: 3px 6px;
+    border-radius: 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background-color: #f3f1f1;
+    color: var(--color-primary);
+}
+
+.talla-pill:last-child {
+    margin-right: 0;
+}
+
+.talla-pill.agotado {
+    background-color: #fbe9e9;
+    color: var(--color-success);
+}
+
+/* =========================================
+   MODAL MATRICIAL DE STOCK POR PROVEEDOR
+   ========================================= */
+.modal-matriz-dialog {
+    max-width: 920px;
+}
+
+.modal-stock-subtitulo {
+    font-size: 0.85rem;
+}
+
+.modal-stock-actual-card {
+    background-color: #f9ebeb;
+    border-radius: 14px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 175px;
+}
+
+.modal-stock-actual-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: rgba(195, 99, 99, 0.16);
+    color: var(--color-success);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.modal-stock-actual-label {
+    font-size: 0.78rem;
+    color: #6d5353;
+    line-height: 1.2;
+}
+
+.modal-stock-actual-valor {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1.25;
+}
+
+.table-matriz-stock {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #f0e4e4;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.table-matriz-stock thead th {
+    background-color: var(--color-success);
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 11px 10px;
+    border: none;
+    white-space: nowrap;
+}
+
+.table-matriz-stock thead th.col-proveedor-header {
+    text-align: left;
+    padding-left: 18px;
+}
+
+.table-matriz-stock tbody td {
+    padding: 10px 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f2e8e8;
+    background-color: var(--color-white);
+}
+
+.table-matriz-stock tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.matriz-proveedor-nombre {
+    padding-left: 10px !important;
+    font-weight: 600;
+    font-size: 0.86rem;
+    color: var(--color-primary);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.matriz-stepper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    background-color: #f9ebeb;
+    border-radius: 999px;
+    padding: 3px 7px;
+    min-width: 82px;
+}
+
+.matriz-stepper button {
+    border: none;
+    background: transparent;
+    color: #8c6b6b;
+    width: 20px;
+    height: 22px;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.matriz-stepper button:hover {
+    background-color: rgba(195, 99, 99, 0.16);
+    color: var(--color-primary);
+}
+
+.matriz-stepper input {
+    width: 30px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    padding: 0;
+}
+
+.matriz-stepper input:focus {
+    outline: none;
+}
+
+.matriz-stepper input::-webkit-outer-spin-button,
+.matriz-stepper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.matriz-stepper.celda-con-stock {
+    background-color: #f3f1f1;
+}
+
+.matriz-stepper.celda-con-stock input {
+    color: var(--color-primary);
+}
+
+.modal-stock-footer-bar {
+    background-color: #faf4f4;
+    border-top: 1px solid #f1e6e6 !important;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.btn-modal-cancelar {
+    background-color: var(--color-white);
+    border: 1px solid #dfd2d2;
+    color: var(--color-primary);
+    border-radius: 999px;
+    padding: 8px 22px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.btn-modal-cancelar:hover {
+    background-color: #f7f0f0;
+    color: var(--color-primary);
+}
+
+.btn-modal-guardar {
+    background-color: var(--color-success);
+    border: 1px solid var(--color-success);
+    color: var(--color-white);
+    border-radius: 999px;
+    padding: 8px 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 10px rgba(195, 99, 99, 0.28);
+}
+
+.btn-modal-guardar:hover {
+    background-color: #ad5252;
+    border-color: #ad5252;
+    color: var(--color-white);
 }

@@ -2,6 +2,7 @@ package com.utp.ModaFacil.dao;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,6 +13,7 @@ import com.utp.ModaFacil.model.Categoria;
 import com.utp.ModaFacil.model.Producto;
 import com.utp.ModaFacil.model.ProductoAdmin;
 import com.utp.ModaFacil.model.ProductoDetalleAdmin;
+import com.utp.ModaFacil.model.ProductoEditarAdmin;
 
 /** Acceso a las tablas categorias y productos. */
 @Repository
@@ -135,8 +137,7 @@ public class ProductoDAO {
         );
     }
    //producto-admin4
-    public Optional<ProductoDetalleAdmin> obtenerDetalleAdmin(
-        Long idProducto) {
+    public Optional<ProductoDetalleAdmin> obtenerDetalleAdmin(Long idProducto) {
 
         String sql = """
             SELECT
@@ -145,6 +146,7 @@ public class ProductoDAO {
                     GREATEST(5, LENGTH(p.id_producto)), '0')) AS codigo,
                 p.nombre,
                 p.imagen,
+                p.id_categoria,
                 c.nombre AS categoria,
                 p.activo,
                 p.descripcion,
@@ -160,15 +162,16 @@ public class ProductoDAO {
                 ON p.id_categoria = c.id_categoria
             WHERE p.id_producto = ?
             """;
-        System.out.println("[DAO] Consultando tallas");//
+
         List<String> tallas = obtenerTallasProducto(idProducto);
-        System.out.println("[DAO] Tallas obtenidas: " + tallas);//
-        System.out.println("[DAO] Consultando información del producto");//
-        List<ProductoDetalleAdmin> resultado = jdbc.query(sql,(rs, i) -> new ProductoDetalleAdmin(
+
+        List<ProductoDetalleAdmin> resultado = jdbc.query(sql, (rs, i) ->
+            new ProductoDetalleAdmin(
                 rs.getLong("id_producto"),
                 rs.getString("codigo"),
                 rs.getString("nombre"),
                 rs.getString("imagen"),
+                rs.getLong("id_categoria"),
                 rs.getString("categoria"),
                 rs.getBoolean("activo"),
                 rs.getString("descripcion"),
@@ -183,7 +186,75 @@ public class ProductoDAO {
             ),
             idProducto
         );
-        System.out.println("[DAO] Resultados obtenidos: " + resultado);//
+
         return resultado.stream().findFirst();
+    }
+
+    //producto-admin5
+    public boolean actualizarProductoAdmin(
+            Long idProducto,
+            ProductoEditarAdmin producto,
+            String imagen) {
+
+        String sql = """
+            UPDATE productos
+            SET nombre = ?,
+                id_categoria = ?,
+                imagen = COALESCE(?, imagen),
+                descripcion = ?,
+                material = ?,
+                tipo_tela = ?,
+                ajuste = ?,
+                manga = ?,
+                cuello = ?,
+                genero = ?,
+                ocasion = ?
+            WHERE id_producto = ?
+            """;
+
+        int filasAfectadas = jdbc.update(
+            sql,
+            producto.nombre(),
+            producto.idCategoria(),
+            imagen,
+            producto.descripcion(),
+            producto.material(),
+            producto.tipoTela(),
+            producto.ajuste(),
+            producto.manga(),
+            producto.cuello(),
+            producto.genero(),
+            producto.ocasion(),
+            idProducto
+        );
+
+        return filasAfectadas > 0;
+    }
+    //producto-admin6
+    public List<Categoria> listarCategoriasPorGenero(String genero) {
+
+        String sql = """
+            SELECT c.id_categoria, c.nombre, c.color
+            FROM categorias c
+            INNER JOIN categoria_genero cg
+                ON c.id_categoria = cg.id_categoria
+            WHERE cg.genero = ?
+            ORDER BY c.nombre
+            """;
+
+        return jdbc.query(sql, (rs, i) -> new Categoria(
+            rs.getLong("id_categoria"),
+            rs.getString("nombre"),
+            rs.getString("color")
+        ), genero);
+    }
+
+    //producto-admin7
+    public Map<String, List<Categoria>> obtenerCategoriasPorGenero() {
+
+        return Map.of(
+            "Hombre", listarCategoriasPorGenero("Hombre"),
+            "Mujer", listarCategoriasPorGenero("Mujer")
+        );
     }
 }

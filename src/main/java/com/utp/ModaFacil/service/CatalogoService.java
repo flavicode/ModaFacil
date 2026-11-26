@@ -184,6 +184,7 @@ public class CatalogoService {
         tienda.put("nombre", "Proveedor " + idProveedor);
         tienda.put("precio", precio);
         tienda.put("tallas", producto.get("tallas"));
+        tienda.put("tallasDisponibles", relacion.getOrDefault("tallasOferta", List.of()));
         tienda.put("stock", stock);
         tienda.put("estadoStock", estadoStock);
         tienda.put("claseStock", claseStock);

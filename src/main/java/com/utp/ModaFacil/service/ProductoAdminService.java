@@ -3,12 +3,14 @@ package com.utp.ModaFacil.service;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.utp.ModaFacil.dao.ProductoDAO;
 import com.utp.ModaFacil.model.ProductoAdmin;
 import com.utp.ModaFacil.model.ProductoDetalleAdmin;
+import com.utp.ModaFacil.model.Categoria;
 
 @Service
 public class ProductoAdminService {
@@ -50,5 +52,14 @@ public class ProductoAdminService {
         Long idProducto) {
             System.out.println("[SERVICE] Consultando producto: " + idProducto);//
         return productoDAO.obtenerDetalleAdmin(idProducto);
-}
+        }
+    
+    public List<Categoria> listarCategorias() {
+        return productoDAO.listarCategorias();
+    }
+
+    public Map<String, List<Categoria>> obtenerCategoriasPorGenero() {
+        return productoDAO.obtenerCategoriasPorGenero();
+    }
+
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,29 +24,61 @@ public class OfertaDAO {
 
     public OfertaDAO(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
-    public List<Map<String, Object>> obtenerRelaciones() {
-        // 1. Cargamos tallas y sumamos el stock total por producto en una sola consulta
-        Map<Long, List<String>> tallas = new HashMap<>();
-        Map<Long, Integer> stockPorProducto = new HashMap<>();
+        public List<Map<String, Object>> obtenerRelaciones() {
+        // 1. Cargamos tallas por producto (para el catálogo) y por (producto + proveedor)
+        Map<Long, Set<String>> tallasPorProducto = new HashMap<>();
+        Map<String, Set<String>> tallasPorOferta = new HashMap<>();
+        Map<String, Integer> stockPorOferta = new HashMap<>();
 
-        jdbc.query("SELECT id_producto, talla, stock FROM producto_tallas ORDER BY id_producto, talla", rs -> {
+        String sqlTallas = """
+            SELECT id_producto, id_proveedor, talla, stock
+            FROM producto_tallas
+            WHERE stock > 0
+            ORDER BY id_producto, id_proveedor,
+                CASE talla
+                    WHEN 'XS'  THEN 1
+                    WHEN 'S'   THEN 2
+                    WHEN 'M'   THEN 3
+                    WHEN 'L'   THEN 4
+                    WHEN 'XL'  THEN 5
+                    WHEN 'XXL' THEN 6
+                    ELSE 7
+                END,
+                CAST(talla AS UNSIGNED) ASC,
+                talla ASC
+            """;
+
+        jdbc.query(sqlTallas, rs -> {
             Long idProd = rs.getLong("id_producto");
-            tallas.computeIfAbsent(idProd, k -> new ArrayList<>())
-                  .add(rs.getString("talla"));
-            stockPorProducto.merge(idProd, rs.getInt("stock"), Integer::sum);
+            Long idProv = rs.getLong("id_proveedor");
+            String talla = rs.getString("talla");
+            int stock = rs.getInt("stock");
+            String claveOferta = idProd + "-" + idProv;
+
+            tallasPorProducto.computeIfAbsent(idProd, k -> new LinkedHashSet<>()).add(talla);
+            tallasPorOferta.computeIfAbsent(claveOferta, k -> new LinkedHashSet<>()).add(talla);
+            stockPorOferta.merge(claveOferta, stock, Integer::sum);
         });
 
-        // 2. Consultamos ofertas sin o.stock (ya que no existe en la tabla ofertas)
+        // 2. Consultamos SOLO las ofertas (producto + proveedor) que tengan stock > 0
         return jdbc.query(
-            "SELECT p.*, c.nombre AS categoria, o.id_proveedor, o.precio " +
+            "SELECT p.*, c.nombre AS categoria, o.id_proveedor, i.nombre AS nombre_proveedor, o.precio " +
             "FROM ofertas o " +
             "JOIN productos p   ON p.id_producto   = o.id_producto " +
             "JOIN categorias c  ON c.id_categoria  = p.id_categoria " +
             "JOIN proveedores i ON i.id_proveedor = o.id_proveedor AND i.activo = TRUE " +
             "WHERE p.activo = TRUE " +
+            "  AND EXISTS ( " +
+            "      SELECT 1 FROM producto_tallas pt " +
+            "      WHERE pt.id_producto = o.id_producto " +
+            "        AND pt.id_proveedor = o.id_proveedor " +
+            "        AND pt.stock > 0 " +
+            "  ) " +
             "ORDER BY p.id_producto, o.id_proveedor",
             (rs, n) -> {
                 Long idProducto = rs.getLong("id_producto");
+                Long idProveedor = rs.getLong("id_proveedor");
+                String claveOferta = idProducto + "-" + idProveedor;
 
                 Map<String, Object> producto = new HashMap<>();
                 producto.put("idProducto", idProducto);
@@ -58,14 +92,19 @@ public class OfertaDAO {
                 producto.put("manga", rs.getString("manga"));
                 producto.put("cuello", rs.getString("cuello"));
                 producto.put("ocasion", rs.getString("ocasion"));
-                producto.put("tallas", tallas.getOrDefault(idProducto, List.of()));
+                producto.put("tallas", new ArrayList<>(tallasPorProducto.getOrDefault(idProducto, Set.of())));
                 producto.put("categoria", Map.of("nombre", rs.getString("categoria")));
+
+                Map<String, Object> proveedor = new HashMap<>();
+                proveedor.put("idProveedor", idProveedor);
+                proveedor.put("nombre", rs.getString("nombre_proveedor"));
 
                 Map<String, Object> relacion = new HashMap<>();
                 relacion.put("producto", producto);
-                relacion.put("proveedor", Map.of("idProveedor", rs.getLong("id_proveedor")));
+                relacion.put("proveedor", proveedor);
                 relacion.put("precio", rs.getBigDecimal("precio"));
-                relacion.put("stock", stockPorProducto.getOrDefault(idProducto, 0));
+                relacion.put("stock", stockPorOferta.getOrDefault(claveOferta, 0));
+                relacion.put("tallasOferta", new ArrayList<>(tallasPorOferta.getOrDefault(claveOferta, Set.of())));
                 return relacion;
             });
     }
@@ -74,7 +113,10 @@ public class OfertaDAO {
     public Map<String, Object> obtenerOferta(Long idProducto, Long idProveedor) {
         try {
             return jdbc.queryForObject(
-                "SELECT o.precio, COALESCE((SELECT SUM(pt.stock) FROM producto_tallas pt WHERE pt.id_producto = o.id_producto), 0) AS stock " +
+                "SELECT o.precio, COALESCE(( " +
+                "    SELECT SUM(pt.stock) FROM producto_tallas pt " +
+                "    WHERE pt.id_producto = o.id_producto AND pt.id_proveedor = o.id_proveedor " +
+                "), 0) AS stock " +
                 "FROM ofertas o " +
                 "WHERE o.id_producto = ? AND o.id_proveedor = ?",
                 (rs, n) -> {
@@ -90,12 +132,14 @@ public class OfertaDAO {
         }
     }
 
+
     /** Descuenta stock de una talla específica en producto_tallas; devuelve false si no alcanza. */
-    public boolean descontarStockPorTalla(Long idProducto, String talla, int cantidad) {
+    public boolean descontarStockPorTalla(Long idProducto, Long idProveedor, String talla, int cantidad) {
         return jdbc.update(
-            "UPDATE producto_tallas SET stock = stock - ? WHERE id_producto = ? AND talla = ? AND stock >= ?",
-            cantidad, idProducto, talla, cantidad) == 1;
+            "UPDATE producto_tallas SET stock = stock - ? WHERE id_producto = ? AND id_proveedor = ? AND talla = ? AND stock >= ?",
+            cantidad, idProducto, idProveedor, talla, cantidad) == 1;
     }
+
 
     /** Mantiene compatibilidad si algún servicio antiguo llama descontarStock sin talla. */
     public boolean descontarStock(Long idProducto, Long idProveedor, int cantidad) {

@@ -27,6 +27,16 @@ CREATE TABLE categorias (
     nombre       VARCHAR(50) NOT NULL UNIQUE,
     color        VARCHAR(7)  NOT NULL DEFAULT '#C65F64'
 );
+
+CREATE TABLE categoria_genero (
+    id_categoria BIGINT NOT NULL,
+    genero ENUM('Hombre', 'Mujer') NOT NULL,
+    PRIMARY KEY (id_categoria, genero),
+    FOREIGN KEY (id_categoria)
+        REFERENCES categorias(id_categoria)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE productos (
     id_producto  BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_categoria BIGINT NOT NULL,
@@ -112,9 +122,53 @@ INSERT INTO usuarios (nombre, correo, contrasena, telefono, fecha_registro, rol)
 /* A ,Dieg_025, Thirsa_18, Danae_26, SAdmin$3 */
 INSERT INTO categorias (nombre, color) VALUES ('Polos','#C65F64'),('Pantalones','#C65F64'),('Vestidos','#C65F64');
 
+USE modafacil;
+
+INSERT INTO categorias (nombre, color) VALUES
+('Camisas', '#C65F64'),
+('Casacas', '#C65F64'),
+('Shorts', '#C65F64'),
+('Jeans', '#C65F64'),
+('Poleras', '#C65F64'),
+('Ropa deportiva', '#C65F64'),
+('Blusas', '#C65F64'),
+('Faldas', '#C65F64'),
+('Chaquetas', '#C65F64'),
+('Tops', '#C65F64')
+ON DUPLICATE KEY UPDATE nombre = categorias.nombre;
+
+INSERT IGNORE INTO categoria_genero (id_categoria, genero)
+SELECT id_categoria, 'Hombre'
+FROM categorias
+WHERE nombre IN (
+    'Polos',
+    'Pantalones',
+    'Camisas',
+    'Casacas',
+    'Shorts',
+    'Jeans',
+    'Poleras',
+    'Ropa deportiva'
+);
+
+INSERT IGNORE INTO categoria_genero (id_categoria, genero)
+SELECT id_categoria, 'Mujer'
+FROM categorias
+WHERE nombre IN (
+    'Vestidos',
+    'Blusas',
+    'Pantalones',
+    'Faldas',
+    'Chaquetas',
+    'Polos',
+    'Jeans',
+    'Tops',
+    'Ropa deportiva'
+);
+
 INSERT INTO proveedores (nombre) VALUES
  ('Proveedor 1'),('Proveedor 2'),('Proveedor 3'),('Proveedor 4'),
- ('Proveedor 5'),('Proveedor 6'),('Proveedor 7'),('Proveedor 8');
+ ('Proveedor 5'),(' 6'),('Proveedor 7'),('Proveedor 8');
 
 INSERT INTO productos (id_categoria, nombre, imagen, genero, descripcion, material, tipo_tela, ajuste, manga, cuello, ocasion) VALUES
  (1,'Polo Básico Negro para Hombre','p_camisero_1.jpg','Hombre',

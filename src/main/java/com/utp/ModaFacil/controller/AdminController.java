@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.utp.ModaFacil.dao.InventarioDAO;
+import com.utp.ModaFacil.dao.ProveedorDAO;
 import com.utp.ModaFacil.model.ProductoDetalleAdmin;
 import com.utp.ModaFacil.model.Usuario;
 import com.utp.ModaFacil.service.ProductoAdminService;
@@ -61,6 +62,7 @@ public class AdminController {
         model.addAttribute("totalProductos",productoAdminService.contarProductos());
         model.addAttribute("busqueda", busqueda);
         model.addAttribute("estado", estado);
+        model.addAttribute("categoriasPorGenero", productoAdminService.obtenerCategoriasPorGenero());
         return "admin/productos";
     }
     @PostMapping("/productos/{id}/estado")
@@ -125,6 +127,7 @@ public class AdminController {
         model.addAttribute("productosConStock", productosConStock);
         model.addAttribute("productosAgotados", productosAgotados);
         model.addAttribute("totalRegistros", productosInventario.size());
+        model.addAttribute("categorias", categorias);
 
         return "admin/inventario";
     }
@@ -143,7 +146,7 @@ public class AdminController {
             return "redirect:/login";
         }
 
-        inventarioDAO.actualizarStockPorTallas(productoId, tallas, cantidades);
+        inventarioDAO.actualizarStockPorTallas(productoId, proveedores, tallas, cantidades);
         redirectAttributes.addFlashAttribute("mensajeExito", "Stock actualizado correctamente.");
         return "redirect:/admin/inventario";
     }
@@ -160,16 +163,17 @@ public class AdminController {
         private final String categoria;
         private final String imagen;
         private final int stockTotal;
-        private final List<TallaStock> tallas;
+        private final List<ProveedorStock> proveedores;
+        
 
-        public ProductoInventario(Long id, String codigo, String nombre, String categoria, String imagen, int stockTotal, List<TallaStock> tallas) {
+        public ProductoInventario(Long id, String codigo, String nombre, String categoria, String imagen, int stockTotal, List<ProveedorStock> proveedores) {
             this.id = id;
             this.codigo = codigo;
             this.nombre = nombre;
             this.categoria = categoria;
             this.imagen = imagen;
             this.stockTotal = stockTotal;
-            this.tallas = tallas;
+            this.proveedores = proveedores;
         }
 
         public Long getId() { return id; }
@@ -178,6 +182,25 @@ public class AdminController {
         public String getCategoria() { return categoria; }
         public String getImagen() { return imagen; }
         public int getStockTotal() { return stockTotal; }
+        public List<ProveedorStock> getProveedores() { return proveedores; }
+    }
+
+public static class ProveedorStock {
+        private final Long idProveedor;
+        private final String nombreProveedor;
+        private final int subtotal;
+        private final List<TallaStock> tallas;
+
+        public ProveedorStock(Long idProveedor, String nombreProveedor, int subtotal, List<TallaStock> tallas) {
+            this.idProveedor = idProveedor;
+            this.nombreProveedor = nombreProveedor;
+            this.subtotal = subtotal;
+            this.tallas = tallas;
+        }
+
+        public Long getIdProveedor() { return idProveedor; }
+        public String getNombreProveedor() { return nombreProveedor; }
+        public int getSubtotal() { return subtotal; }
         public List<TallaStock> getTallas() { return tallas; }
     }
 

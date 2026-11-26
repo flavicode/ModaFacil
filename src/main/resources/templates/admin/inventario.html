@@ -19,9 +19,9 @@
                 <p class="text-muted mb-4">Control de stock por producto y talla.</p>
 
                 <!-- Alerta de confirmación tras guardar -->
-                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+                <div th:if="\${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>
-                    <span th:text="${mensajeExito}">Stock actualizado.</span>
+                    <span th:text="\${mensajeExito}">Stock actualizado.</span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
 
@@ -35,7 +35,7 @@
                             <div>
                                 <div class="small fw-semibold text-muted">Total de unidades</div>
                                 <div class="h3 fw-bold text-primary mb-0"
-                                     th:text="${#numbers.formatInteger(totalUnidades, 1, 'COMMA')}">1,280</div>
+                                     th:text="\${#numbers.formatInteger(totalUnidades, 1, 'COMMA')}">1,280</div>
                             </div>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                             </div>
                             <div>
                                 <div class="small fw-semibold text-muted">Productos con stock</div>
-                                <div class="h3 fw-bold text-primary mb-0" th:text="${productosConStock}">244</div>
+                                <div class="h3 fw-bold text-primary mb-0" th:text="\${productosConStock}">244</div>
                             </div>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                             </div>
                             <div>
                                 <div class="small fw-semibold text-muted">Productos agotados</div>
-                                <div class="h3 fw-bold text-primary mb-0" th:text="${productosAgotados}">12</div>
+                                <div class="h3 fw-bold text-primary mb-0" th:text="\${productosAgotados}">12</div>
                             </div>
                         </div>
                     </div>
@@ -88,9 +88,9 @@
                     <div class="col-10 col-sm-5 col-xl-3">
                         <select id="filtroCategoria" class="form-select filter-box shadow-none text-primary fw-medium">
                             <option value="todas" selected>Categoría: Todas</option>
-                            <option th:each="cat : ${categorias}"
-                                    th:value="${cat}"
-                                    th:text="|Categoría: ${cat}|">Categoría: Polos</option>
+                            <option th:each="cat : \${categorias}"
+                                    th:value="\${cat}"
+                                    th:text="|Categoría: \${cat}|">Categoría: Polos</option>
                         </select>
                     </div>
 
@@ -107,67 +107,87 @@
                         <table class="table table-inventario align-middle" id="tablaInventario">
                             <thead>
                                 <tr>
-                                    <th style="width: 50px;">#</th>
-                                    <th style="min-width: 210px;">Producto</th>
-                                    <th style="min-width: 230px;">Tallas y stock</th>
+                                    <th style="width: 45px;">#</th>
+                                    <th style="min-width: 195px;">Producto</th>
+                                    <th style="min-width: 390px;">Tallas y stock</th>
+                                    <th class="text-center text-nowrap">Stock por proveedor</th>
                                     <th class="text-center text-nowrap">Stock total</th>
                                     <th class="text-center text-nowrap">Estado</th>
                                     <th class="text-center text-nowrap">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="prod, iter : ${productos}"
+                                <tr th:each="prod, iter : \${productos}"
                                     class="fila-producto"
-                                    th:data-nombre="${prod.nombre.toLowerCase()}"
-                                    th:data-codigo="${prod.codigo.toLowerCase()}"
-                                    th:data-categoria="${prod.categoria}"
-                                    th:data-estado="${prod.stockTotal > 0 ? 'en-stock' : 'agotado'}">
+                                    th:data-nombre="\${prod.nombre.toLowerCase()}"
+                                    th:data-codigo="\${prod.codigo.toLowerCase()}"
+                                    th:data-categoria="\${prod.categoria}"
+                                    th:data-estado="\${prod.stockTotal > 0 ? 'en-stock' : 'agotado'}">
 
-                                    <td class="fw-bold text-muted" th:text="${iter.count}">1</td>
+                                    <td class="fw-bold text-muted" th:text="\${iter.count}">1</td>
 
                                     <td>
                                         <div class="d-flex align-items-center gap-3">
-                                            <img th:src="${prod.imagen}"
+                                            <img th:src="\${prod.imagen}"
                                                  onerror="this.src='https://placehold.co/92x92/f4f4f4/c0a0a0?text=Prenda'"
                                                  alt="Prenda" class="product-thumb">
                                             <div>
-                                                <div class="fw-bold text-primary" th:text="${prod.nombre}">Polo Básico</div>
-                                                <div class="small text-muted" th:text="${prod.codigo}">P00001</div>
+                                                <div class="fw-bold text-primary" th:text="\${prod.nombre}">Polo Básico</div>
+                                                <div class="small text-muted" th:text="\${prod.codigo}">P00001</div>
                                             </div>
                                         </div>
                                     </td>
 
+                                    <!-- Columna 3: Nombre del proveedor + píldoras de tallas -->
                                     <td>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <span th:each="t : ${prod.tallas}"
-                                                  class="talla-pill"
-                                                  th:classappend="${t.stock == 0} ? 'agotado'"
-                                                  th:text="${t.talla + ': ' + t.stock}">S: 8</span>
+                                        <div class="d-flex flex-column gap-2">
+                                            <div th:each="imp : \${prod.proveedores}" class="proveedor-row">
+                                                <span class="proveedor-nombre" th:text="\${imp.nombreProveedor}">Proveedor 1</span>
+                                                <div class="d-flex flex-nowrap align-items-center">
+                                                    <span th:each="t : \${imp.tallas}"
+                                                        class="talla-pill"
+                                                        th:classappend="\${t.stock == 0} ? 'agotado'"
+                                                        th:text="\${t.talla + ': ' + t.stock}">S: 8</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
 
-                                    <td class="text-center fw-bold fs-6 text-nowrap" th:text="${prod.stockTotal}">25</td>
+                                    <!-- Columna 4: Subtotal por proveedor alineado con cada fila -->
+                                    <td class="text-center">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div th:each="imp : \${prod.proveedores}"
+                                                class="proveedor-subtotal fw-semibold text-primary"
+                                                th:text="\${imp.subtotal}">28</div>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center fw-bold fs-6 text-nowrap" th:text="\${prod.stockTotal}">25</td>
 
                                     <td class="text-center text-nowrap">
-                                        <span th:if="${prod.stockTotal > 0}" class="badge-estado badge-en-stock">En stock</span>
-                                        <span th:if="${prod.stockTotal == 0}" class="badge-estado badge-agotado">Agotado</span>
+                                        <span th:if="\${prod.stockTotal > 0}" class="badge-estado badge-en-stock">En stock</span>
+                                        <span th:if="\${prod.stockTotal == 0}" class="badge-estado badge-agotado">Agotado</span>
                                     </td>
 
                                     <td class="text-center text-nowrap">
                                         <div class="d-none datos-tallas-producto">
-                                            <span th:each="t : ${prod.tallas}"
-                                                  th:data-talla="${t.talla}"
-                                                  th:data-stock="${t.stock}"></span>
+                                            <th:block th:each="imp : \${prod.proveedores}">
+                                                <span th:each="t : \${imp.tallas}"
+                                                    th:data-id-proveedor="\${imp.idProveedor}"
+                                                    th:data-proveedor="\${imp.nombreProveedor}"
+                                                    th:data-talla="\${t.talla}"
+                                                    th:data-stock="\${t.stock}"></span>
+                                            </th:block>
                                         </div>
 
                                         <button type="button"
                                                 class="btn-actualizar-stock"
-                                                th:data-id="${prod.id}"
-                                                th:data-nombre="${prod.nombre}"
-                                                th:data-codigo="${prod.codigo}"
-                                                th:data-categoria="${prod.categoria}"
-                                                th:data-imagen="${prod.imagen}"
-                                                th:data-total="${prod.stockTotal}"
+                                                th:data-id="\${prod.id}"
+                                                th:data-nombre="\${prod.nombre}"
+                                                th:data-codigo="\${prod.codigo}"
+                                                th:data-categoria="\${prod.categoria}"
+                                                th:data-imagen="\${prod.imagen}"
+                                                th:data-total="\${prod.stockTotal}"
                                                 onclick="abrirModalStock(this)">
                                             <i class="bi bi-pencil"></i> Actualizar stock
                                         </button>
@@ -181,7 +201,7 @@
                 <!-- 4. PIE DE TABLA Y BOTÓN MOSTRAR MÁS -->
                 <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
                     <div class="text-muted small" id="contadorResultados">
-                        Mostrando <span th:text="${#lists.size(productos)}">3</span> de <span th:text="${totalRegistros}">3</span> productos
+                        Mostrando <span th:text="\${#lists.size(productos)}">3</span> de <span th:text="\${totalRegistros}">3</span> productos
                     </div>
                     <div>
                         <button type="button" id="btnMostrarMas" class="btn btn-moda-principal px-4 py-2 rounded-3 fw-semibold shadow-sm">
@@ -194,13 +214,15 @@
         </div>
 
         <!-- =========================================
-             MODAL ACTUALIZAR STOCK
+             MODAL ACTUALIZAR STOCK (MATRICIAL)
              ========================================= -->
         <div class="modal fade" id="modalActualizarStock" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <div class="modal-dialog modal-dialog-centered modal-matriz-dialog modal-fullscreen-sm-down">
                 <div class="modal-content modal-stock-content shadow">
                     <form th:action="@{/admin/inventario/actualizar}" method="post">
                         <input type="hidden" name="productoId" id="modalProductoId">
+                        <!-- Contenedor donde se inyectan los inputs hidden para el POST -->
+                        <div id="modalInputsOcultos" class="d-none"></div>
 
                         <!-- Cabecera del Modal -->
                         <div class="modal-header border-0 pb-2 pt-3 px-3 px-md-4 align-items-start">
@@ -210,7 +232,7 @@
                                 </div>
                                 <div>
                                     <h4 class="modal-title fw-bold text-primary mb-0">Actualizar Stock</h4>
-                                    <p class="text-muted small mb-0">Modifica la cantidad disponible por talla.</p>
+                                    <p class="text-muted modal-stock-subtitulo mb-0">Modifica la cantidad disponible por talla de cada proveedor.</p>
                                 </div>
                             </div>
                             <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -222,55 +244,48 @@
                             <div class="modal-product-box d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-3">
                                 <div class="d-flex align-items-center gap-3">
                                     <img id="modalProductoImg" src="" alt="Producto"
-                                         style="width: 64px; height: 64px; object-fit: cover; border-radius: 12px; background: #f4f4f4; flex-shrink: 0;">
+                                         style="width: 66px; height: 66px; object-fit: cover; border-radius: 12px; background: #f4f4f4; flex-shrink: 0;">
                                     <div>
-                                        <h5 class="fw-bold text-primary mb-1" id="modalProductoNombre">Polo Básico</h5>
-                                        <div class="small text-muted">Código: <span id="modalProductoCodigo" class="fw-medium">P00001</span></div>
-                                        <div class="small text-muted">Categoría: <span id="modalProductoCategoria" class="fw-medium">Polos</span></div>
+                                        <h5 class="fw-bold text-primary mb-1" id="modalProductoNombre">Vestido Casual Verano</h5>
+                                        <div class="small text-muted">Categoría: <span id="modalProductoCategoria" class="fw-medium">Vestidos</span></div>
+                                        <div class="small text-muted d-none">Código: <span id="modalProductoCodigo" class="fw-medium">P00003</span></div>
                                     </div>
                                 </div>
 
-                                <div class="modal-stock-actual-box">
-                                    <i class="bi bi-box-seam fs-4 text-success"></i>
+                                <div class="modal-stock-actual-card">
+                                    <div class="modal-stock-actual-icon">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
                                     <div>
-                                        <div class="small text-muted">Stock total actual</div>
-                                        <div class="fw-bold text-primary fs-6" id="modalStockActualTexto">25 unidades</div>
+                                        <div class="modal-stock-actual-label">Stock total actual</div>
+                                        <div class="modal-stock-actual-valor" id="modalStockActualTexto">0 unidades</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Tabla Editable de Tallas -->
+                            <!-- Tabla Matricial: Proveedores en filas, Tallas en columnas -->
                             <div class="table-responsive">
-                                <table class="table table-modal-tallas text-center align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 25%;">Talla</th>
-                                            <th style="width: 35%;">Stock actual</th>
-                                            <th style="width: 40%;">Nuevo stock</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="modalTablaTallasBody">
-                                    </tbody>
+                                <table class="table table-matriz-stock text-center align-middle mb-0">
+                                    <thead id="modalMatrizHead"></thead>
+                                    <tbody id="modalMatrizBody"></tbody>
                                 </table>
-                            </div>
-
-                            <!-- Barra de Nuevo Stock Total -->
-                            <div class="nuevo-total-bar d-flex align-items-center justify-content-between mt-3">
-                                <div class="d-flex align-items-center gap-2 fw-bold text-primary">
-                                    <i class="bi bi-box-seam fs-5 text-success"></i>
-                                    <span>Nuevo stock total</span>
-                                </div>
-                                <div class="fw-bold fs-5 text-success" id="modalNuevoTotalTexto">25 unidades</div>
                             </div>
                         </div>
 
                         <!-- Pie del Modal -->
-                        <div class="modal-footer border-0 px-3 px-md-4 pb-3 pt-2 gap-2">
-                            <button type="button" class="btn btn-light border px-4 py-2 rounded-3 fw-medium text-primary"
-                                    data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-moda-principal px-4 py-2 rounded-3 fw-semibold">
-                                <i class="bi bi-check2 me-1"></i> Guardar Cambios
-                            </button>
+                        <div class="modal-footer modal-stock-footer-bar px-3 px-md-4 py-3 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+                            <div class="small text-muted d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle fs-6 text-primary"></i>
+                                <span>Puedes ajustar el stock de cada talla según el proveedor.</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-modal-cancelar" data-bs-dismiss="modal">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-modal-guardar">
+                                    <i class="bi bi-check2 me-1"></i> Guardar cambios
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -279,7 +294,7 @@
 
         <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
 
-        <!-- Script para Modal, Stepper y Filtros -->
+        <!-- Script para Modal Matricial, Stepper y Filtros -->
         <script>
             let modalStockInstance = null;
 
@@ -300,41 +315,99 @@
                 const imgEl = document.getElementById('modalProductoImg');
                 imgEl.src = imagen;
                 imgEl.onerror = function() {
-                    this.src = 'https://placehold.co/128x128/f4f4f4/c0a0a0?text=Prenda';
+                    this.src = 'https://placehold.co/132x132/f4f4f4/c0a0a0?text=Prenda';
                 };
 
                 const spansTallas = btn.parentElement.querySelectorAll('.datos-tallas-producto span');
-                const tbody = document.getElementById('modalTablaTallasBody');
+                const thead = document.getElementById('modalMatrizHead');
+                const tbody = document.getElementById('modalMatrizBody');
+                const hiddenContainer = document.getElementById('modalInputsOcultos');
+
+                thead.innerHTML = '';
                 tbody.innerHTML = '';
+                hiddenContainer.innerHTML = '';
+
+                // Agrupar datos por proveedor manteniendo el orden y recolectar tallas únicas
+                const proveedoresMap = new Map();
+                const tallasSet = new Set();
 
                 spansTallas.forEach(span => {
+                    const idProveedor = span.getAttribute('data-id-proveedor');
+                    const proveedor = span.getAttribute('data-proveedor');
                     const talla = span.getAttribute('data-talla');
                     const stock = parseInt(span.getAttribute('data-stock'), 10) || 0;
 
-                    const tr = document.createElement('tr');
-                    if (stock === 0) {
-                        tr.classList.add('fila-sin-stock');
-                    }
+                    tallasSet.add(talla);
 
-                    tr.innerHTML = `
-                        <td class="fw-bold text-primary">
-                            ${talla}
-                            <input type="hidden" name="tallas" value="${talla}">
-                        </td>
-                        <td class="fw-bold text-primary">${stock}</td>
-                        <td>
-                            <div class="stock-stepper">
-                                <button type="button" onclick="cambiarCantidad(this, -1)">−</button>
-                                <input type="number" name="cantidades" class="input-nuevo-stock"
-                                       value="${stock}" min="0" oninput="recalcularTotalModal()">
-                                <button type="button" onclick="cambiarCantidad(this, 1)">+</button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+                    if (!proveedoresMap.has(idProveedor)) {
+                        proveedoresMap.set(idProveedor, {
+                            idProveedor: idProveedor,
+                            nombreProveedor: proveedor,
+                            stocksPorTalla: new Map()
+                        });
+                    }
+                    proveedoresMap.get(idProveedor).stocksPorTalla.set(talla, stock);
                 });
 
-                recalcularTotalModal();
+                const tallasOrdenadas = Array.from(tallasSet);
+
+                // Encabezado de columnas: Proveedor + cada talla
+                let headHtml = '<tr><th class="col-proveedor-header"><i class="bi bi-people-fill me-2"></i>Proveedor</th>';
+                tallasOrdenadas.forEach(talla => {
+                    headHtml += `<th><i class="bi bi-tag-fill me-1 small opacity-75"></i>${talla}</th>`;
+                });
+                headHtml += '</tr>';
+                thead.innerHTML = headHtml;
+
+                // Filas por proveedor y creación de inputs hidden sincronizados
+                let idx = 0;
+                proveedoresMap.forEach(imp => {
+                    const tr = document.createElement('tr');
+
+                    const tdNombre = document.createElement('td');
+                    tdNombre.className = 'matriz-proveedor-nombre';
+                    tdNombre.textContent = imp.nombreProveedor;
+                    tr.appendChild(tdNombre);
+
+                    tallasOrdenadas.forEach(talla => {
+                        const stock = imp.stocksPorTalla.has(talla) ? imp.stocksPorTalla.get(talla) : 0;
+                        const inputKey = `celda-stock-${idx}`;
+                        idx++;
+
+                        // Inputs hidden para enviar listas paralelas al controlador
+                        const hProv = document.createElement('input');
+                        hProv.type = 'hidden';
+                        hProv.name = 'proveedores';
+                        hProv.value = imp.idProveedor;
+
+                        const hTalla = document.createElement('input');
+                        hTalla.type = 'hidden';
+                        hTalla.name = 'tallas';
+                        hTalla.value = talla;
+
+                        const hCant = document.createElement('input');
+                        hCant.type = 'hidden';
+                        hCant.name = 'cantidades';
+                        hCant.value = stock;
+                        hCant.setAttribute('data-hidden-for', inputKey);
+
+                        hiddenContainer.append(hProv, hTalla, hCant);
+
+                        const td = document.createElement('td');
+                        const claseStock = stock > 0 ? 'celda-con-stock' : '';
+                        td.innerHTML = `
+                            <div class="matriz-stepper ${claseStock}">
+                                <button type="button" onclick="cambiarCantidadMatriz(this, -1)" aria-label="Disminuir">−</button>
+                                <input type="number" class="input-matriz-stock" data-key="${inputKey}"
+                                       value="${stock}" min="0" oninput="sincronizarCeldaMatriz(this)">
+                                <button type="button" onclick="cambiarCantidadMatriz(this, 1)" aria-label="Aumentar">+</button>
+                            </div>
+                        `;
+                        tr.appendChild(td);
+                    });
+
+                    tbody.appendChild(tr);
+                });
 
                 if (!modalStockInstance) {
                     modalStockInstance = new bootstrap.Modal(document.getElementById('modalActualizarStock'));
@@ -342,35 +415,30 @@
                 modalStockInstance.show();
             }
 
-            function cambiarCantidad(boton, delta) {
-                const input = boton.parentElement.querySelector('.input-nuevo-stock');
-                let valorActual = parseInt(input.value, 10) || 0;
-                let nuevoValor = Math.max(0, valorActual + delta);
+            function cambiarCantidadMatriz(boton, delta) {
+                const stepper = boton.closest('.matriz-stepper');
+                const input = stepper.querySelector('.input-matriz-stock');
+                const valorActual = parseInt(input.value, 10) || 0;
+                const nuevoValor = Math.max(0, valorActual + delta);
                 input.value = nuevoValor;
-                recalcularTotalModal();
+                sincronizarCeldaMatriz(input);
             }
 
-            function recalcularTotalModal() {
-                const inputs = document.querySelectorAll('#modalTablaTallasBody .input-nuevo-stock');
-                let suma = 0;
+            function sincronizarCeldaMatriz(input) {
+                let val = parseInt(input.value, 10);
+                if (isNaN(val) || val < 0) {
+                    val = 0;
+                    input.value = 0;
+                }
 
-                inputs.forEach(input => {
-                    let val = parseInt(input.value, 10);
-                    if (isNaN(val) || val < 0) {
-                        val = 0;
-                        input.value = 0;
-                    }
-                    suma += val;
+                const stepper = input.closest('.matriz-stepper');
+                stepper.classList.toggle('celda-con-stock', val > 0);
 
-                    const fila = input.closest('tr');
-                    if (val === 0) {
-                        fila.classList.add('fila-sin-stock');
-                    } else {
-                        fila.classList.remove('fila-sin-stock');
-                    }
-                });
-
-                document.getElementById('modalNuevoTotalTexto').textContent = suma + ' unidades';
+                const key = input.getAttribute('data-key');
+                const hiddenInput = document.querySelector(`#modalInputsOcultos input[data-hidden-for="${key}"]`);
+                if (hiddenInput) {
+                    hiddenInput.value = val;
+                }
             }
 
             document.addEventListener('DOMContentLoaded', () => {
