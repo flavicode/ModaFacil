@@ -14,8 +14,14 @@
 @media (min-width: 992px) {
     .admin-sidebar {
         position: sticky;
-        top: 68px;
-        height: calc(100vh - 68px);
+        top: 0;
+        max-height: 100vh;
+        overflow-y: auto;
+        z-index: 1030;
+    }
+    .admin-sidebar .offcanvas-body {
+        height: auto !important;
+        min-height: 100%;
     }
 }
 

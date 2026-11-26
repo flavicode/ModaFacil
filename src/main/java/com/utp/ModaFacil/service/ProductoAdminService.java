@@ -48,7 +48,7 @@ public class ProductoAdminService {
 
     public Optional<ProductoDetalleAdmin> obtenerDetalle(
         Long idProducto) {
-
-    return productoDAO.obtenerDetalleAdmin(idProducto);
+            System.out.println("[SERVICE] Consultando producto: " + idProducto);//
+        return productoDAO.obtenerDetalleAdmin(idProducto);
 }
 }

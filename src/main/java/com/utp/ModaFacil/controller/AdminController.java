@@ -18,6 +18,7 @@ import com.utp.ModaFacil.dao.InventarioDAO;
 import com.utp.ModaFacil.model.ProductoDetalleAdmin;
 import com.utp.ModaFacil.model.Usuario;
 import com.utp.ModaFacil.service.ProductoAdminService;
+import java.util.Optional;//
 
 import jakarta.servlet.http.HttpSession;
 
@@ -96,6 +97,7 @@ public class AdminController {
                     );
         }
 
+
     @GetMapping("/inventario")
     public String inventario(HttpSession session, Model model) {
         if (!esAdmin(session)) {
@@ -127,9 +129,11 @@ public class AdminController {
         return "admin/inventario";
     }
 
+/*Modifique Thirsa*/
     @PostMapping("/inventario/actualizar")
     public String actualizarStock(
             @RequestParam("productoId") Long productoId,
+            @RequestParam("proveedores") List<Long> proveedores,
             @RequestParam("tallas") List<String> tallas,
             @RequestParam("cantidades") List<Integer> cantidades,
             HttpSession session,

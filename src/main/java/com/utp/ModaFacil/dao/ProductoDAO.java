@@ -114,15 +114,24 @@ public class ProductoDAO {
     }
 
     //producto-admin3
-    private List<String> obtenerTallasProducto(Long idProducto) {
+    public List<String> obtenerTallasProducto(Long idProducto) {
         String sql = """
-            SELECT DISTINCT t.nombre
-            FROM producto_tallas pt
-            INNER JOIN tallas t
-                ON pt.id_talla = t.id_talla
-            WHERE pt.id_producto = ?
+            SELECT DISTINCT talla
+            FROM producto_tallas
+            WHERE id_producto = ?
+            ORDER BY
+                CASE talla
+                    WHEN 'XS' THEN 1
+                    WHEN 'S' THEN 2
+                    WHEN 'M' THEN 3
+                    WHEN 'L' THEN 4
+                    WHEN 'XL' THEN 5
+                    WHEN 'XXL' THEN 6
+                    ELSE 7
+                END,
+                talla
             """;
-        return jdbc.query(sql,(rs, i) -> rs.getString("nombre"),idProducto
+        return jdbc.queryForList(sql,String.class,idProducto
         );
     }
    //producto-admin4
@@ -151,7 +160,10 @@ public class ProductoDAO {
                 ON p.id_categoria = c.id_categoria
             WHERE p.id_producto = ?
             """;
+        System.out.println("[DAO] Consultando tallas");//
         List<String> tallas = obtenerTallasProducto(idProducto);
+        System.out.println("[DAO] Tallas obtenidas: " + tallas);//
+        System.out.println("[DAO] Consultando información del producto");//
         List<ProductoDetalleAdmin> resultado = jdbc.query(sql,(rs, i) -> new ProductoDetalleAdmin(
                 rs.getLong("id_producto"),
                 rs.getString("codigo"),
@@ -171,6 +183,7 @@ public class ProductoDAO {
             ),
             idProducto
         );
+        System.out.println("[DAO] Resultados obtenidos: " + resultado);//
         return resultado.stream().findFirst();
     }
 }

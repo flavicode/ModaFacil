@@ -144,6 +144,9 @@ document.addEventListener("click", async (event) => {
     }
     botonDetalleActual = boton;
     const url = boton.dataset.url;
+    //
+    console.log("ID del producto:", boton.dataset.id);
+    console.log("URL del detalle:", url);
     // Cancelar una petición anterior
     if (peticionDetalle) {
         peticionDetalle.abort();
@@ -164,11 +167,16 @@ document.addEventListener("click", async (event) => {
             signal: controlador.signal,
             cache: "no-store"
         });
+        //
+        console.log("Estado HTTP:", respuesta.status);
+        console.log("Respuesta:", respuesta);
         if (!respuesta.ok || respuesta.redirected) {
             throw new Error("No se pudo obtener el producto");
         }
         // Convertir la respuesta a JSON
         const producto = await respuesta.json();
+        //
+        console.log("Producto recibido:", producto);
         if (controlador.signal.aborted) {
             return;
         }
