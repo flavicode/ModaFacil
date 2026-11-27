@@ -257,4 +257,21 @@ public class ProductoDAO {
             "Mujer", listarCategoriasPorGenero("Mujer")
         );
     }
+
+    // Validar categoría según el género 8
+    public boolean existeCategoriaPorGenero(Long idCategoria, String genero) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM categoria_genero
+            WHERE id_categoria = ?
+            AND genero = ?
+            """;
+        Integer total = jdbc.queryForObject(
+            sql,
+            Integer.class,
+            idCategoria,
+            genero
+        );
+        return total != null && total > 0;
+    }
 }

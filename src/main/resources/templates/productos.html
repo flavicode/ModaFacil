@@ -118,15 +118,14 @@
         <!-- DATOS DE THYMELEAF -->
         <script th:inline="javascript">
             const categoriasGlobales = /*[[${categorias}]]*/ [];
-
             window.relacionesServidor = /*[[${relacionesServidor}]]*/ [];
+            window.categoriasServidorPorGenero = /*[[${categoriasPorGenero}]]*/ {};
         </script>
 
-
-        <!-- 1. PROCESAMIENTO DE DATOS -->
+        <!-- PROCESAMIENTO DE DATOS -->
         <script th:src="@{/js/productos-data.js}" defer></script>
 
-        <!-- JAVASCRIPT DE PRODUCTO-->
+        <!-- JAVASCRIPT DE PRODUCTOS -->
         <script th:src="@{/js/productos.js}" defer></script>
 
         <!-- JAVASCRIPT DEL CATÁLOGO -->

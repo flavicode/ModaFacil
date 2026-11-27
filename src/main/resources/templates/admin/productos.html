@@ -146,6 +146,7 @@
                                                     class="btn btn-accion btn-editar"
                                                     th:data-id="${producto.idProducto()}"
                                                     th:data-url="@{/admin/productos/{id}/detalle(id=${producto.idProducto()})}"
+                                                    th:data-update-url="@{/admin/productos/{id}/actualizar(id=${producto.idProducto()})}"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalEditarProducto"
                                                     title="Editar producto"
@@ -470,7 +471,8 @@
                             <input type="hidden"
                                 id="editarIdProducto"
                                 name="idProducto">
-
+                            <!-- Mensaje de éxito o error al guardar -->
+                            <div id="editarResultado" class="alert d-none" role="alert"></div>
                             <!-- INFORMACIÓN PRINCIPAL -->
                             <div class="row g-4 mb-4">
 
@@ -542,11 +544,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarNombre"
-                                                name="nombre"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarNombre" name="nombre" class="form-control" maxlength="120" required>
 
                                         </div>
 
@@ -588,13 +586,7 @@
 
                                         </h5>
 
-                                        <textarea id="editarDescripcion"
-                                                name="descripcion"
-                                                class="form-control"
-                                                rows="8"
-                                                aria-label="Descripción del producto"
-                                                placeholder="Ingrese la descripción del producto">
-                                        </textarea>
+                                        <textarea id="editarDescripcion" name="descripcion" class="form-control" rows="8" maxlength="255" aria-label="Descripción del producto" placeholder="Ingrese la descripción del producto"></textarea>
 
                                     </section>
 
@@ -623,11 +615,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarMaterial"
-                                                name="material"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarMaterial" name="material" class="form-control" maxlength="60" required>
 
                                         </div>
 
@@ -642,11 +630,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarTipoTela"
-                                                name="tipoTela"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarTipoTela" name="tipoTela" class="form-control" maxlength="60" required>
 
                                         </div>
 
@@ -661,11 +645,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarAjuste"
-                                                name="ajuste"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarAjuste" name="ajuste" class="form-control" maxlength="40" required>
 
                                         </div>
 
@@ -680,11 +660,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarManga"
-                                                name="manga"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarManga" name="manga" class="form-control" maxlength="40" required>
 
                                         </div>
 
@@ -699,11 +675,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarCuello"
-                                                name="cuello"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarCuello" name="cuello" class="form-control" maxlength="60" required>
 
                                         </div>
 
@@ -750,11 +722,7 @@
 
                                             </label>
 
-                                            <input type="text"
-                                                id="editarOcasion"
-                                                name="ocasion"
-                                                class="form-control"
-                                                required>
+                                            <input type="text" id="editarOcasion" name="ocasion" class="form-control" maxlength="60" required>
 
                                         </div>
 

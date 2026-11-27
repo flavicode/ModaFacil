@@ -30,10 +30,8 @@ public class CarritoController {
     // ==========================================
     // OBTENER CARRITO DE LA SESIÓN
     // ==========================================
-
     @SuppressWarnings("unchecked")
     private List<CarritoItem> obtenerCarrito(HttpSession session) {
-
         Object carrito = session.getAttribute("carrito");
 
         if (carrito instanceof List<?>) {
@@ -42,24 +40,23 @@ public class CarritoController {
 
         List<CarritoItem> nuevoCarrito = new ArrayList<>();
         session.setAttribute("carrito", nuevoCarrito);
-
         return nuevoCarrito;
     }
 
     // ==========================================
-    // CONTAR UNIDADES POR PRODUCTO E PROVEEDOR
-    // INCLUYE TODAS LAS TALLAS
+    // CONTAR UNIDADES POR PRODUCTO, PROVEEDOR Y TALLA
     // ==========================================
-
-    private int cantidadReservada(
+    private int cantidadReservadaPorTalla(
             List<CarritoItem> carrito,
             Long idProducto,
-            Long idProveedor) {
+            Long idProveedor,
+            String talla) {
 
         return carrito.stream()
                 .filter(item ->
                         Objects.equals(item.getIdProducto(), idProducto)
-                        && Objects.equals(item.getIdProveedor(), idProveedor))
+                        && Objects.equals(item.getIdProveedor(), idProveedor)
+                        && Objects.equals(item.getTalla(), talla))
                 .mapToInt(CarritoItem::getCantidad)
                 .sum();
     }
@@ -67,7 +64,6 @@ public class CarritoController {
     // ==========================================
     // AGREGAR PRODUCTO AL CARRITO
     // ==========================================
-
     @PostMapping("/agregar")
     public String agregar(
             @RequestParam Long idProducto,
@@ -77,92 +73,58 @@ public class CarritoController {
             HttpSession session,
             RedirectAttributes redirect) {
 
-        // VALIDAR SESIÓN
         if (session.getAttribute("logged") == null) {
             return "redirect:/login";
         }
-
-        System.out.println("===== AGREGAR AL CARRITO =====");
-        System.out.println("Producto: " + idProducto);
-        System.out.println("Proveedor: " + idProveedor);
-        System.out.println("Talla: " + talla);
-        System.out.println("Cantidad: " + cantidad);
 
         String destino = "redirect:/comparar?id=" + idProducto;
 
         // OBTENER OFERTA REAL DEL PROVEEDOR
         Map<String, Object> oferta =
-                catalogoService.obtenerOfertaProveedor(
-                        idProducto, idProveedor);
+                catalogoService.obtenerOfertaProveedor(idProducto, idProveedor);
 
         if (oferta == null) {
-            redirect.addFlashAttribute(
-                    "errorCarrito",
-                    "Producto no disponible en esta tienda."
-            );
+            redirect.addFlashAttribute("errorCarrito", "Producto no disponible en esta tienda.");
             return destino;
         }
 
         // OBTENER PRODUCTO DESDE LAS RELACIONES
         Map<String, Object> producto = null;
-
-        for (Map<String, Object> relacion :
-                catalogoService.obtenerRelaciones()) {
-
+        for (Map<String, Object> relacion : catalogoService.obtenerRelaciones()) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> datosProducto =
-                    (Map<String, Object>) relacion.get("producto");
+            Map<String, Object> datosProducto = (Map<String, Object>) relacion.get("producto");
 
-            if (datosProducto != null &&
-                    Objects.equals(
-                            datosProducto.get("idProducto"), idProducto)) {
-
+            if (datosProducto != null && Objects.equals(datosProducto.get("idProducto"), idProducto)) {
                 producto = datosProducto;
                 break;
             }
         }
 
         if (producto == null) {
-            redirect.addFlashAttribute(
-                    "errorCarrito", "Producto no encontrado."
-            );
+            redirect.addFlashAttribute("errorCarrito", "Producto no encontrado.");
             return destino;
         }
 
         // VALIDAR TALLA
         @SuppressWarnings("unchecked")
-        List<String> tallas =
-                (List<String>) producto.get("tallas");
+        List<String> tallas = (List<String>) producto.get("tallas");
 
-        if (talla == null ||
-                tallas == null ||
-                !tallas.contains(talla)) {
-
-            redirect.addFlashAttribute(
-                    "errorCarrito", "Selecciona una talla válida."
-            );
+        if (talla == null || tallas == null || !tallas.contains(talla)) {
+            redirect.addFlashAttribute("errorCarrito", "Selecciona una talla válida.");
             return destino;
         }
 
-        // PRECIO Y STOCK DE LA TIENDA SELECCIONADA
-        BigDecimal precio =
-                (BigDecimal) oferta.get("precio");
-
-        int stock =
-                ((Number) oferta.get("stock")).intValue();
+        // PRECIO Y STOCK ESPECÍFICO DE ESA TALLA EN ESE PROVEEDOR
+        BigDecimal precio = (BigDecimal) oferta.get("precio");
+        int stockTalla = catalogoService.obtenerStockPorTalla(idProducto, idProveedor, talla);
 
         List<CarritoItem> carrito = obtenerCarrito(session);
+        int reservado = cantidadReservadaPorTalla(carrito, idProducto, idProveedor, talla);
 
-        // VALIDAR STOCK CONSIDERANDO TODAS LAS TALLAS
-        int reservado = cantidadReservada(
-                carrito, idProducto, idProveedor);
-
-        if (cantidad < 1 ||
-                reservado + (long) cantidad > stock) {
-
+        if (cantidad < 1 || reservado + (long) cantidad > stockTalla) {
             redirect.addFlashAttribute(
                     "errorCarrito",
-                    "Cantidad inválida o superior al stock disponible."
+                    "Cantidad inválida o superior al stock disponible para la talla " + talla + "."
             );
             return destino;
         }
@@ -177,13 +139,8 @@ public class CarritoController {
                 .orElse(null);
 
         if (existente != null) {
-
-            existente.setCantidad(
-                    existente.getCantidad() + cantidad
-            );
-
+            existente.setCantidad(existente.getCantidad() + cantidad);
         } else {
-
             CarritoItem nuevo = new CarritoItem(
                     idProducto,
                     idProveedor,
@@ -194,22 +151,16 @@ public class CarritoController {
                     precio,
                     cantidad
             );
-
             carrito.add(nuevo);
         }
 
-        redirect.addFlashAttribute(
-                "mensajeCarrito",
-                "Producto agregado al carrito correctamente."
-        );
-
+        redirect.addFlashAttribute("mensajeCarrito", "Producto agregado al carrito correctamente.");
         return destino + "&carrito=abierto";
     }
 
     // ==========================================
     // AUMENTAR O DISMINUIR CANTIDAD
     // ==========================================
-
     @PostMapping("/cantidad")
     public String cambiarCantidad(
             @RequestParam Long idProducto,
@@ -222,8 +173,7 @@ public class CarritoController {
             return "redirect:/login";
         }
 
-        String destino = "redirect:/comparar?id="
-                + idProducto + "&carrito=abierto";
+        String destino = "redirect:/comparar?id=" + idProducto + "&carrito=abierto";
 
         if (cambio != 1 && cambio != -1) {
             return destino;
@@ -243,26 +193,12 @@ public class CarritoController {
             return destino;
         }
 
-        Map<String, Object> oferta =
-                catalogoService.obtenerOfertaProveedor(
-                        idProducto, idProveedor);
-
-        if (oferta == null) {
-            return destino;
-        }
-
-        int stock =
-                ((Number) oferta.get("stock")).intValue();
-
+        // VALIDAR EL STOCK REAL DE ESA TALLA EN ESE PROVEEDOR
+        int stockTalla = catalogoService.obtenerStockPorTalla(idProducto, idProveedor, talla);
         int nuevaCantidad = item.getCantidad() + cambio;
+        int reservado = cantidadReservadaPorTalla(carrito, idProducto, idProveedor, talla);
 
-        int reservado = cantidadReservada(
-                carrito, idProducto, idProveedor);
-
-        // VALIDAR EL STOCK TOTAL DEL PROVEEDOR
-        if (nuevaCantidad >= 1 &&
-                reservado + cambio <= stock) {
-
+        if (nuevaCantidad >= 1 && reservado + cambio <= stockTalla) {
             item.setCantidad(nuevaCantidad);
         }
 

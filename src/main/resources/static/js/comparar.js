@@ -1,117 +1,95 @@
-
 document.addEventListener("DOMContentLoaded", () => {
 
-    // OBTENER BOTONES DE TALLAS
-    const botonesTallas = document.querySelectorAll(
-        ".comparar-talla-btn"
-    );
+    // ==========================================
+    // 1. SELECTOR DE TALLAS PRINCIPAL (ARRIBA)
+    // ==========================================
+    const botonesTallas = document.querySelectorAll(".comparar-talla-btn");
+    const inputTalla = document.getElementById("talla-seleccionada");
 
-    // INPUT QUE ALMACENA LA TALLA SELECCIONADA
-    const inputTalla = document.getElementById(
-        "talla-seleccionada"
-    );
+    if (inputTalla && botonesTallas.length > 0) {
+        function seleccionarTalla(boton) {
+            if (!boton) return;
 
-    if (!inputTalla || botonesTallas.length === 0) {
-        return;
-    }
+            botonesTallas.forEach(btn => {
+                btn.classList.remove("activa");
+                btn.setAttribute("aria-pressed", "false");
+            });
 
-    // SELECCIONAR UNA TALLA
-    function seleccionarTalla(boton) {
+            boton.classList.add("activa");
+            boton.setAttribute("aria-pressed", "true");
+            inputTalla.value = boton.dataset.talla;
+        }
 
-        // QUITAR SELECCIÓN ANTERIOR
-        botonesTallas.forEach(btn => {
-            btn.classList.remove("activa");
-            btn.setAttribute("aria-pressed", "false");
+        botonesTallas.forEach(boton => {
+            boton.addEventListener("click", () => seleccionarTalla(boton));
         });
 
-        // ACTIVAR NUEVA TALLA
-        boton.classList.add("activa");
-        boton.setAttribute("aria-pressed", "true");
+        const tallaInicial = Array.from(botonesTallas).find(
+            boton => boton.dataset.talla === "M"
+        ) || botonesTallas[0];
 
-        // GUARDAR VALOR
-        inputTalla.value = boton.dataset.talla;
-
-        console.log("Talla seleccionada:", inputTalla.value);
+        seleccionarTalla(tallaInicial);
     }
 
-    // REGISTRAR EVENTOS
-    botonesTallas.forEach(boton => {
-
-        boton.addEventListener("click", () => {
-            seleccionarTalla(boton);
-        });
-
-    });
-
-    // TALLA PREDETERMINADA: M SI EXISTE
-    const tallaInicial = Array.from(botonesTallas).find(
-        boton => boton.dataset.talla === "M"
-    ) || botonesTallas[0];
-
-    seleccionarTalla(tallaInicial);
-
-});
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    // ELEMENTOS DEL SELECTOR
+    // ==========================================
+    // 2. SELECTOR DE CANTIDAD PRINCIPAL (ARRIBA)
+    // ==========================================
     const btnRestar = document.getElementById("btn-restar");
     const btnSumar = document.getElementById("btn-sumar");
-    const inputCantidad = document.getElementById(
-        "cantidad-producto"
-    );
+    const inputCantidad = document.getElementById("cantidad-producto");
 
-    // VERIFICAR QUE EXISTAN
-    if (!btnRestar || !btnSumar || !inputCantidad) {
-        return;
-    }
+    if (btnRestar && btnSumar && inputCantidad) {
+        const stockMaximo = Number(inputCantidad.max);
 
-    // STOCK DISPONIBLE
-    const stockMaximo = Number(inputCantidad.max);
-
-    // ACTUALIZAR ESTADO DE BOTONES
-    function actualizarBotones() {
-
-        const cantidad = Number(inputCantidad.value);
-
-        btnRestar.disabled = cantidad <= 1;
-        btnSumar.disabled = cantidad >= stockMaximo;
-    }
-
-    // DISMINUIR CANTIDAD
-    btnRestar.addEventListener("click", () => {
-
-        let cantidad = Number(inputCantidad.value);
-
-        if (cantidad > 1) {
-            cantidad--;
-            inputCantidad.value = cantidad;
+        function actualizarBotones() {
+            const cantidad = Number(inputCantidad.value);
+            btnRestar.disabled = cantidad <= 1;
+            btnSumar.disabled = cantidad >= stockMaximo;
         }
 
-        actualizarBotones();
-    });
+        btnRestar.addEventListener("click", () => {
+            let cantidad = Number(inputCantidad.value);
+            if (cantidad > 1) {
+                inputCantidad.value = --cantidad;
+            }
+            actualizarBotones();
+        });
 
-    // AUMENTAR CANTIDAD
-    btnSumar.addEventListener("click", () => {
+        btnSumar.addEventListener("click", () => {
+            let cantidad = Number(inputCantidad.value);
+            if (cantidad < stockMaximo) {
+                inputCantidad.value = ++cantidad;
+            }
+            actualizarBotones();
+        });
 
-        let cantidad = Number(inputCantidad.value);
-
-        if (cantidad < stockMaximo) {
-            cantidad++;
-            inputCantidad.value = cantidad;
+        if (stockMaximo > 0) {
+            actualizarBotones();
+        } else {
+            btnRestar.disabled = true;
+            btnSumar.disabled = true;
         }
-
-        actualizarBotones();
-    });
-
-    // ESTADO INICIAL
-    if (stockMaximo > 0) {
-        actualizarBotones();
-    } else {
-        btnRestar.disabled = true;
-        btnSumar.disabled = true;
     }
+
+    // ==========================================
+    // 3. RADIOS DE TALLA EN LA TABLA COMPARATIVA
+    // ==========================================
+    document.querySelectorAll(".comparacion-form-carrito").forEach(form => {
+        form.addEventListener("submit", (e) => {
+            const fila = form.closest("tr");
+            const radioSeleccionado = fila.querySelector(".comparacion-talla-radio:checked");
+
+            if (!radioSeleccionado) {
+                e.preventDefault();
+                alert("Por favor, selecciona una talla disponible.");
+                return;
+            }
+
+            const inputTallaTabla = form.querySelector(".input-talla-tabla");
+            if (inputTallaTabla) {
+                inputTallaTabla.value = radioSeleccionado.value;
+            }
+        });
+    });
 
 });

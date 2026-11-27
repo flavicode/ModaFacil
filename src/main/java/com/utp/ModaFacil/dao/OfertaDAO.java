@@ -35,7 +35,7 @@ public class OfertaDAO {
             FROM producto_tallas
             WHERE stock > 0
             ORDER BY id_producto, id_proveedor,
-                CASE talla
+                CASE UPPER(TRIM(talla))
                     WHEN 'XS'  THEN 1
                     WHEN 'S'   THEN 2
                     WHEN 'M'   THEN 3
@@ -92,7 +92,7 @@ public class OfertaDAO {
                 producto.put("manga", rs.getString("manga"));
                 producto.put("cuello", rs.getString("cuello"));
                 producto.put("ocasion", rs.getString("ocasion"));
-                producto.put("tallas", new ArrayList<>(tallasPorProducto.getOrDefault(idProducto, Set.of())));
+                producto.put("tallas", ordenarTallas(tallasPorProducto.getOrDefault(idProducto, Set.of())));
                 producto.put("categoria", Map.of("nombre", rs.getString("categoria")));
 
                 Map<String, Object> proveedor = new HashMap<>();
@@ -107,6 +107,30 @@ public class OfertaDAO {
                 relacion.put("tallasOferta", new ArrayList<>(tallasPorOferta.getOrDefault(claveOferta, Set.of())));
                 return relacion;
             });
+    }
+
+    private List<String> ordenarTallas(Set<String> tallasSet) {
+        List<String> ordenLetras = List.of("XS", "S", "M", "L", "XL", "XXL");
+        List<String> lista = new ArrayList<>(tallasSet);
+
+        lista.sort((a, b) -> {
+            String t1 = a.trim().toUpperCase();
+            String t2 = b.trim().toUpperCase();
+            int idx1 = ordenLetras.indexOf(t1);
+            int idx2 = ordenLetras.indexOf(t2);
+
+            if (idx1 != -1 && idx2 != -1) return Integer.compare(idx1, idx2);
+            if (idx1 != -1) return -1;
+            if (idx2 != -1) return 1;
+
+            try {
+                return Integer.compare(Integer.parseInt(t1), Integer.parseInt(t2));
+            } catch (NumberFormatException e) {
+                return t1.compareTo(t2);
+            }
+        });
+
+        return lista;
     }
 
     /** Equivale a CatalogoService.obtenerOfertaProveedor(...). */
@@ -154,4 +178,16 @@ public class OfertaDAO {
         Map<String, Object> o = obtenerOferta(idProducto, idProveedor);
         return o == null ? null : (BigDecimal) o.get("precio");
     }
+    /** Obtiene el stock disponible de una talla específica para un proveedor. */
+    public int obtenerStockPorTalla(Long idProducto, Long idProveedor, String talla) {
+        try {
+            Integer stock = jdbc.queryForObject(
+                "SELECT stock FROM producto_tallas WHERE id_producto = ? AND id_proveedor = ? AND talla = ?",
+                Integer.class, idProducto, idProveedor, talla);
+            return stock != null ? stock : 0;
+        } catch (EmptyResultDataAccessException e) {
+            return 0;
+        }
+    }
+
 }

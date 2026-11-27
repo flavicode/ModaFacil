@@ -1,33 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ==========================================
     // 1. CATEGORÍAS POR GÉNERO
-    // ==========================================
+    const categoriasServidor = window.categoriasServidorPorGenero ?? {};
 
     const categoriasPorGenero = {
-        Hombre: [
-            "Polos", "Pantalones", "Camisas",
-            "Casacas", "Shorts", "Jeans",
-            "Poleras", "Ropa deportiva"
-        ],
-        Mujer: [
-            "Vestidos", "Blusas", "Pantalones",
-            "Faldas", "Chaquetas", "Polos",
-            "Jeans", "Tops", "Ropa deportiva"
-        ]
+        Hombre: (categoriasServidor.Hombre ?? [])
+            .map(categoria => categoria.nombre),
+
+        Mujer: (categoriasServidor.Mujer ?? [])
+            .map(categoria => categoria.nombre)
     };
+    console.log("Categorías del servidor:", categoriasServidor);
+    console.log("Categorías por género:", categoriasPorGenero);
 
-    // ==========================================
     // 2. ESTADO INICIAL
-    // ==========================================
-
     let generoSeleccionado = "Todos";
     let categoriaSeleccionada = "Todas";
 
-    // ==========================================
     // 3. ELEMENTOS HTML
-    // ==========================================
-
     const contenedorCategorias =
         document.getElementById("contenedor-categorias");
 
@@ -46,10 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const botonRestablecer =
         document.getElementById("ver-todos");
 
-    // ==========================================
     // 4. NOTIFICAR CAMBIOS DE FILTROS
-    // ==========================================
-
     function notificarFiltros() {
 
         document.dispatchEvent(
@@ -62,10 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 
-    // ==========================================
     // 5. OBTENER CATEGORÍAS
-    // ==========================================
-
     function obtenerCategorias() {
 
         if (generoSeleccionado === "Todos") {
@@ -79,10 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return categoriasPorGenero[generoSeleccionado];
     }
 
-    // ==========================================
     // 6. CREAR BOTÓN DE CATEGORÍA
-    // ==========================================
-
     function crearBotonCategoria(categoria) {
 
         const boton = document.createElement("button");
@@ -113,10 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return boton;
     }
 
-    // ==========================================
     // 7. RENDERIZAR CATEGORÍAS
-    // ==========================================
-
     function renderizarCategorias() {
 
         contenedorCategorias.replaceChildren();
@@ -136,10 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         actualizarNavegacion();
     }
 
-    // ==========================================
     // 8. ACTUALIZAR NAVEGACIÓN
-    // ==========================================
-
     function actualizarNavegacion() {
 
         botonAnterior.hidden =
@@ -149,10 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
         botonMas.disabled = false;
     }
 
-    // ==========================================
     // 9. BOTÓN + MÁS
-    // ==========================================
-
     botonMas.addEventListener("click", () => {
 
         const maximo =
@@ -174,10 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ==========================================
     // 10. BOTÓN ANTERIOR
-    // ==========================================
-
     botonAnterior.addEventListener("click", () => {
 
         viewport.scrollBy({
@@ -186,10 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ==========================================
     // 11. EVENTOS DE DESPLAZAMIENTO
-    // ==========================================
-
     viewport.addEventListener(
         "scroll",
         actualizarNavegacion
@@ -200,10 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         actualizarNavegacion
     );
 
-    // ==========================================
     // 12. SELECCIONAR HOMBRE O MUJER
-    // ==========================================
-
     botonesGenero.forEach(boton => {
 
         boton.addEventListener("click", () => {
@@ -222,10 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ==========================================
     // 13. BOTÓN VER TODOS
-    // ==========================================
-
     botonRestablecer.addEventListener("click", () => {
 
         generoSeleccionado = "Todos";
@@ -241,10 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         notificarFiltros();
     });
 
-    // ==========================================
     // 14. INICIALIZACIÓN
-    // ==========================================
-
     renderizarCategorias();
 
 });

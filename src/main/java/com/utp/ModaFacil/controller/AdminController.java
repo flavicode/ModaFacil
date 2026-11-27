@@ -13,13 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.utp.ModaFacil.model.ProductoEditarAdmin;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.dao.DataAccessException;
 
 import com.utp.ModaFacil.dao.InventarioDAO;
-import com.utp.ModaFacil.dao.ProveedorDAO;
 import com.utp.ModaFacil.model.ProductoDetalleAdmin;
 import com.utp.ModaFacil.model.Usuario;
 import com.utp.ModaFacil.service.ProductoAdminService;
-import java.util.Optional;//
 
 import jakarta.servlet.http.HttpSession;
 
@@ -99,6 +101,67 @@ public class AdminController {
                     );
         }
 
+        //
+        @PostMapping("/productos/{id}/actualizar")
+        @ResponseBody
+        public ResponseEntity<Map<String, Object>> actualizarProducto(
+                @PathVariable("id") Long idProducto,
+                @ModelAttribute ProductoEditarAdmin producto,
+                @RequestParam(name = "imagen", required = false) MultipartFile imagen,
+                HttpSession session) {
+
+            // Validar permisos
+            if (!esAdmin(session)) {
+                return ResponseEntity.status(403).body(
+                    Map.of(
+                        "ok", false,
+                        "mensaje", "No tienes permisos de administrador."
+                    )
+                );
+            }
+            try {
+                // El almacenamiento de imágenes se implementará después
+                if (imagen != null && !imagen.isEmpty()) {
+                    throw new IllegalArgumentException(
+                        "El cambio de imagen todavía no está habilitado."
+                    );
+                }
+                boolean actualizado = productoAdminService.actualizarProducto(
+                    idProducto,
+                    producto,
+                    null
+                );
+                if (!actualizado) {
+                    return ResponseEntity.status(404).body(
+                        Map.of(
+                            "ok", false,
+                            "mensaje", "No se pudo actualizar el producto."
+                        )
+                    );
+                }
+                return ResponseEntity.ok(
+                    Map.of(
+                        "ok", true,
+                        "mensaje", "Producto actualizado correctamente."
+                    )
+                );
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(
+                    Map.of(
+                        "ok", false,
+                        "mensaje", e.getMessage()
+                    )
+                );
+            } catch (DataAccessException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(500).body(
+                    Map.of(
+                        "ok", false,
+                        "mensaje", "Ocurrió un error al actualizar el producto."
+                    )
+                );
+            }
+        }
 
     @GetMapping("/inventario")
     public String inventario(HttpSession session, Model model) {

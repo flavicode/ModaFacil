@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
     <head th:fragment="headAdmin(titleText)">
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -15,7 +15,8 @@
         <link rel="stylesheet" th:href="@{/css/style-global.css(v=2)}"/>
         <link rel="stylesheet" th:href="@{/css/admin.css(v=3)}"/>
         <link rel="icon" type="image/png" th:href="@{/img/logo.png}"/>
-        <link rel="stylesheet" th:href="@{/css/admin-productos.css}">
+        <link th:if="${paginaActual == 'productos'}" rel="stylesheet" th:href="@{/css/admin-productos.css}"/>
+        <link th:if="${paginaActual == 'proveedores'}" rel="stylesheet" th:href="@{/css/admin-proveedores.css}"/>
     </head>
     <body>
 

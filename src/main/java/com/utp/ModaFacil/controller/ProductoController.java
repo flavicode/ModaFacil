@@ -18,20 +18,16 @@ public class ProductoController {
     }
 
     @GetMapping("/productos")
-    public String mostrarProductos(
-            Model model,
-            HttpSession session) {
+    public String mostrarProductos(Model model, HttpSession session) {
 
         if (session.getAttribute("logged") == null) {
             return "redirect:/login";
         }
 
         model.addAttribute("paginaActual", "productos");
-
-        model.addAttribute(
-            "relacionesServidor",
-            catalogoService.obtenerRelaciones()
-        );
+        model.addAttribute("relacionesServidor", catalogoService.obtenerRelaciones());
+        model.addAttribute("categorias", catalogoService.obtenerCategorias());
+        model.addAttribute("categoriasPorGenero", catalogoService.obtenerCategoriasPorGenero());
 
         return "productos";
     }

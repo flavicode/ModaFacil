@@ -7,8 +7,6 @@
     padding-bottom: 65px;
 }
 
-/* DISTRIBUCIÓN PRINCIPAL */
-
 .comparar-producto {
     align-items: flex-start;
 }
@@ -23,11 +21,9 @@
     background-color: #f8f8f8;
     border: 1px solid #e8e3e3;
     border-radius: 12px;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     overflow: hidden;
 }
 
@@ -82,7 +78,6 @@
     display: flex;
     align-items: baseline;
     gap: 5px;
-
     font-size: 14px;
     color: #333;
     line-height: 1.5;
@@ -103,7 +98,7 @@
 }
 
 /* =====================================
-   TALLAS DISPONIBLES
+   TALLAS DISPONIBLES (FICHA SUPERIOR)
 ===================================== */
 
 .comparar-tallas {
@@ -123,37 +118,24 @@
     gap: 9px;
 }
 
-/* BOTÓN DE TALLA */
-
 .comparar-talla-btn {
     min-width: 42px;
     height: 38px;
     padding: 0 11px;
-
     background-color: #fff;
     color: #333;
-
     border: 1px solid #ded5d5;
     border-radius: 6px;
-
     font-size: 14px;
     font-weight: 500;
-
     cursor: pointer;
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-
-/* HOVER */
 
 .comparar-talla-btn:hover {
     border-color: #bc6465;
     background-color: #fcf3f3;
 }
-
-/* TALLA SELECCIONADA */
 
 .comparar-talla-btn.activa,
 .comparar-talla-btn.activa:hover {
@@ -162,13 +144,10 @@
     border-color: #bc6465;
 }
 
-/* ACCESIBILIDAD CON TECLADO */
-
 .comparar-talla-btn:focus-visible {
     outline: 2px solid #8d4548;
     outline-offset: 3px;
 }
-
 
 /* =========================================
    TARJETA MEJOR PRECIO
@@ -182,11 +161,9 @@
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* CABECERA */
-
 .mejor-precio-header {
     background: #bc6465;
-    color: white;
+    color: #fff;
     padding: 14px 12px;
     display: flex;
     justify-content: center;
@@ -196,8 +173,6 @@
     font-weight: 700;
     text-align: center;
 }
-
-/* CONTENIDO DE PRECIO */
 
 .mejor-precio-contenido {
     background: #faf3f2;
@@ -218,7 +193,6 @@
     color: #bc6868;
     margin-bottom: 10px;
 }
-
 
 .mejor-precio-ahorro {
     display: inline-block;
@@ -243,7 +217,7 @@
 
 .mejor-precio-compra {
     padding: 15px;
-    background-color: white;
+    background-color: #fff;
 }
 
 .cantidad-contenedor {
@@ -284,6 +258,7 @@
 
 .cantidad-selector button:disabled {
     color: #ccc;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
@@ -294,7 +269,7 @@
     border: none;
     outline: none;
     font-weight: 600;
-    background: white;
+    background: #fff;
     appearance: textfield;
     -moz-appearance: textfield;
 }
@@ -305,18 +280,13 @@
     margin: 0;
 }
 
-.cantidad-selector button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
 /* BOTÓN CARRITO */
 
 .btn-agregar-carrito {
     display: block;
     width: 100%;
     background-color: #bd6668;
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 6px;
     padding: 12px;
@@ -328,7 +298,6 @@
 .btn-agregar-carrito:hover:not(:disabled) {
     background-color: #a85558;
 }
-
 
 .btn-agregar-carrito:disabled {
     opacity: 0.6;
@@ -375,11 +344,9 @@
 .producto-datos-card {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-
     margin-top: 12px;
     padding: 14px 6px;
-
-    background: white;
+    background: #fff;
     border: 1px solid #e8dddd;
     border-radius: 10px;
 }
@@ -390,7 +357,6 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-
     min-width: 0;
     gap: 5px;
     padding: 0 6px;
@@ -474,7 +440,7 @@
 }
 
 /* ==========================================
-   CONTENEDOR DE TABLA
+   CONTENEDOR Y TABLA
 ========================================== */
 
 .comparacion-tabla-contenedor {
@@ -488,10 +454,6 @@
     font-size: 14px;
 }
 
-/* ==========================================
-   CABECERA DE LA TABLA
-========================================== */
-
 .comparacion-tabla thead {
     background-color: #f8f3f3;
 }
@@ -503,10 +465,6 @@
     font-weight: 600;
     color: #555555;
 }
-
-/* ==========================================
-   FILAS DE LA TABLA
-========================================== */
 
 .comparacion-tabla td {
     padding: 16px 18px;
@@ -521,10 +479,6 @@
 .comparacion-tabla tbody tr:hover {
     background-color: #fcf7f7;
 }
-
-/* ==========================================
-   FILA DE MEJOR PRECIO
-========================================== */
 
 .comparacion-tabla tbody tr.fila-mejor-precio {
     background-color: #f9eeee;
@@ -565,8 +519,6 @@
     color: #252525;
 }
 
-/* ETIQUETA MEJOR PRECIO */
-
 .comparacion-mejor-etiqueta {
     display: inline-block;
     padding: 3px 7px;
@@ -597,7 +549,7 @@
 }
 
 /* ==========================================
-   TALLAS DISPONIBLES
+   TALLAS DISPONIBLES (RADIO BUTTONS)
 ========================================== */
 
 .comparacion-tallas-lista {
@@ -607,23 +559,52 @@
     flex-wrap: wrap;
 }
 
+.comparacion-talla-radio {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+}
+
 .comparacion-talla {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 30px;
-    height: 30px;
-    padding: 0 7px;
-    border: 1px solid #e2cece;
-    border-radius: 5px;
-    background-color: #faf6f6;
-    color: #444444;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 6px;
     font-size: 12px;
+    font-weight: 600;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* ==========================================
-   SIN TIENDAS
-========================================== */
+/* Tallas CON stock */
+.comparacion-talla.talla-con-stock {
+    background-color: var(--color-success-light);
+    color: var(--color-primary);
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.comparacion-talla.talla-con-stock:hover {
+    border-color: var(--color-success);
+}
+
+/* Talla SELECCIONADA (radio marcado) */
+.comparacion-talla-radio:checked + .comparacion-talla.talla-con-stock {
+    background-color: var(--color-success);
+    color: var(--color-white) !important;
+    border-color: var(--color-success);
+}
+
+/* Tallas SIN stock */
+.comparacion-talla.talla-sin-stock {
+    background-color: var(--color-white);
+    color: var(--color-placeholder) !important;
+    border: 1px solid #eee6e6;
+    cursor: not-allowed;
+}
 
 .comparacion-sin-tiendas {
     padding: 25px !important;
@@ -643,32 +624,24 @@
     white-space: nowrap;
 }
 
-/* MÁS DE 10 PRENDAS */
-
 .comparacion-stock-estado.stock-alto {
     color: #25834a;
 }
-
-/* ENTRE 2 Y 10 PRENDAS */
 
 .comparacion-stock-estado.stock-bajo {
     color: #d88a21;
 }
 
-/* SOLO 1 PRENDA */
-
 .comparacion-stock-estado.stock-ultimo {
     color: #c65f64;
 }
-
-/* SIN EXISTENCIAS */
 
 .comparacion-stock-estado.stock-sin {
     color: #858585;
 }
 
 /* ==========================================
-   COLUMNA ACCIONES - COMPARACIÓN DE PRECIOS
+   COLUMNA ACCIONES
 ========================================== */
 
 .comparacion-form-carrito {

@@ -281,6 +281,8 @@ const archivoImagenEditar = document.getElementById("editarArchivoImagen");
 const btnCambiarImagen = document.getElementById("btnCambiarImagen");
 const btnGuardarProducto = document.getElementById("btnGuardarProducto");
 const btnEditarInventario = document.getElementById("btnEditarInventario");
+const resultadoEditar = document.getElementById("editarResultado");
+let urlActualizarProducto;
 
 const modalEditar = bootstrap.Modal.getOrCreateInstance(modalEditarElemento, {
     backdrop: "static",
@@ -304,6 +306,11 @@ modalEditarElemento.addEventListener("show.bs.modal", async (event) => {
 
     const idProducto = boton.dataset.id;
     const url = boton.dataset.url;
+    // URL para actualizar el producto
+    urlActualizarProducto = boton.dataset.updateUrl;
+    // Limpiar mensajes anteriores
+    resultadoEditar.className = "alert d-none";
+    resultadoEditar.textContent = "";
 
     console.log("Editar producto:", idProducto);
     console.log("URL del producto:", url);
@@ -354,11 +361,10 @@ modalEditarElemento.addEventListener("show.bs.modal", async (event) => {
         // Mostrar formulario
         mensajeEditar.classList.add("d-none");
         formularioEditar.classList.remove("d-none");
-
+        // Habilitar botones
         btnEditarInventario.disabled = false;
-
-        // El guardado se habilitará al implementar el backend
-        btnGuardarProducto.disabled = true;
+        btnGuardarProducto.disabled = false;
+        btnGuardarProducto.innerHTML = `<i class="bi bi-floppy me-2"></i>Guardar cambios`;
 
     } catch (error) {
 
@@ -474,8 +480,11 @@ btnEditarInventario.addEventListener("click", () => {
 });
 
 // CANCELAR PETICIÓN AL CERRAR EL MODAL
-modalEditarElemento.addEventListener("hide.bs.modal", () => {
-
+modalEditarElemento.addEventListener("hide.bs.modal", (event) => {
+    if (btnCambiarImagen.disabled) {
+        event.preventDefault();
+        return;
+    }
     if (peticionEditar) {
         peticionEditar.abort();
     }
@@ -495,9 +504,80 @@ modalEditarElemento.addEventListener("hidden.bs.modal", () => {
     botonEditarActual?.focus();
 });
 
-// EVITAR ENVÍO DEL FORMULARIO POR AHORA
-formularioEditar.addEventListener("submit", (event) => {
+// GUARDAR CAMBIOS DEL PRODUCTO
+formularioEditar.addEventListener("submit", async (event) => {
     event.preventDefault();
+    // Validar formulario y URL
+    if (btnGuardarProducto.disabled ||
+        !formularioEditar.reportValidity() ||
+        !urlActualizarProducto) {
+        return;
+    }
+    // Limpiar mensajes anteriores
+    resultadoEditar.className = "alert d-none";
+    resultadoEditar.textContent = "";
+    // Obtener datos del formulario
+    const datos = new FormData(formularioEditar);
+    // Deshabilitar botones durante el guardado
+    btnGuardarProducto.disabled = true;
+    btnEditarInventario.disabled = true;
+    btnCambiarImagen.disabled = true;
+    // Mostrar indicador de carga
+    btnGuardarProducto.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Guardando...
+    `;
+    let guardado = false;
+    try {
+        // Enviar datos al Controller
+        const respuesta = await fetch(urlActualizarProducto, {
+            method: "POST",
+            body: datos
+        });
+        // Validar sesión
+        if (respuesta.redirected) {
+            throw new Error("La sesión ha expirado.");
+        }
+        // Validar formato de respuesta
+        const tipoContenido = respuesta.headers.get("content-type") ?? "";
+        if (!tipoContenido.includes("application/json")) {
+            throw new Error("El servidor devolvió una respuesta inesperada.");
+        }
+        // Convertir respuesta a JSON
+        const resultado = await respuesta.json();
+        // Validar resultado
+        if (!respuesta.ok || !resultado.ok) {
+            throw new Error(
+                resultado.mensaje ?? "No se pudo actualizar el producto."
+            );
+        }
+        // Mostrar mensaje de éxito
+        resultadoEditar.className = "alert alert-success";
+        resultadoEditar.textContent = resultado.mensaje;
+        guardado = true;
+        // Recargar página
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    } catch (error) {
+        // Mostrar mensaje de error
+        resultadoEditar.className = "alert alert-danger";
+        resultadoEditar.textContent = error.message;
+        console.error("Error al actualizar producto:", error);
+    } finally {
+        // Restaurar botones si ocurrió un error
+        if (!guardado) {
+
+            btnGuardarProducto.disabled = false;
+            btnEditarInventario.disabled = false;
+            btnCambiarImagen.disabled = false;
+
+            btnGuardarProducto.innerHTML = `
+                <i class="bi bi-floppy me-2"></i>
+                Guardar cambios
+            `;
+        }
+    }
 });
 
 // CARGAR CATEGORÍAS SEGÚN EL GÉNERO
