@@ -112,30 +112,34 @@
 
                     <!-- TALLAS -->
                     <div class="comparar-tallas"
-                         th:if="${productoSeleccionado.tallas != null
-                                 and !productoSeleccionado.tallas.isEmpty()}">
+                        th:if="${productoSeleccionado.tallas != null and !productoSeleccionado.tallas.isEmpty()}">
 
                         <h3 class="comparar-tallas-titulo">
                             Tallas disponibles:
                         </h3>
 
                         <div class="comparar-tallas-opciones"
-                             role="group"
-                             aria-label="Seleccionar talla">
+                            role="group"
+                            aria-label="Seleccionar talla">
 
-                            <button
-                                th:each="talla : ${productoSeleccionado.tallas}"
-                                type="button"
-                                class="comparar-talla-btn"
-                                th:text="${talla}"
-                                th:attr="data-talla=${talla},aria-label=|Talla ${talla}|"
-                                aria-pressed="false">
-                                M
-                            </button>
+                            <th:block th:each="talla : ${productoSeleccionado.tallas}"
+                                    th:with="hayStockEnAlgunaTienda=${!#lists.isEmpty(tiendasComparacion.?[#lists.contains(tallasDisponibles, #root.talla)])}">
+
+                                <button
+                                    type="button"
+                                    class="comparar-talla-btn"
+                                    th:text="${talla}"
+                                    th:disabled="${!hayStockEnAlgunaTienda}"
+                                    th:classappend="${!hayStockEnAlgunaTienda} ? 'talla-sin-stock' : ''"
+                                    th:attr="data-talla=${talla},aria-label=|Talla ${talla}|"
+                                    aria-pressed="false">
+                                    M
+                                </button>
+
+                            </th:block>
 
                         </div>
 
-                        
                         <input
                             type="hidden"
                             id="talla-seleccionada"
@@ -143,8 +147,8 @@
                             form="form-agregar-carrito"
                             value="">
 
-
                     </div>
+
 
                 </div>
 
@@ -467,7 +471,7 @@
                                     <div class="comparacion-tallas-lista">
                                         <th:block th:each="talla : ${tienda.tallas}"
                                                 th:with="disponible=${#lists.contains(tienda.tallasDisponibles, talla)},
-                                                        primeraDisponible=${!#lists.isEmpty(tienda.tallasDisponibles) and tienda.tallasDisponibles.toString().equals(talla.toString())}">
+                                                        primeraDisponible=${!#lists.isEmpty(tienda.tallasDisponibles) and tienda.tallasDisponibles[0].toString().equals(talla.toString())}">
 
                                             <input type="radio"
                                                 class="btn-check comparacion-talla-radio"
@@ -485,9 +489,9 @@
                                                 M
                                             </label>
                                         </th:block>
-
                                     </div>
                                 </td>
+
 
 
                                 <!-- =====================================

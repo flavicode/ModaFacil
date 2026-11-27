@@ -26,7 +26,7 @@
                 <div class="container d-flex align-items-center">
                     
                     <!-- 1. Logo idéntico al header normal (a la izquierda) -->
-                    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0 py-0" href="/admin/dashboard">
+                    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0 py-0"th:href="@{/admin/dashboard}">
                         <img th:src="@{/img/logo.png}" alt="Logo ModaFácil" class="flex-shrink-0 rounded-3" style="width: 38px; height: 38px; object-fit: cover;">
                         <span class="d-none d-sm-inline">Moda<span class="text-success">Fácil</span></span>
                     </a>
@@ -47,13 +47,13 @@
                             
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="adminDropdown">
                                 <li>
-                                    <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" href="/">
+                                    <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" th:href="@{/}">
                                         <i class="bi bi-shop text-muted"></i> Ir a la tienda
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider my-1"></li>
                                 <li>
-                                    <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-danger text-decoration-none" href="/logout">
+                                    <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-danger text-decoration-none" th:href="@{/logout}">
                                         <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                                     </a>
                                 </li>
@@ -79,23 +79,23 @@
                     <p class="fw-bold text-primary small px-3 mb-3 d-none d-lg-block">Panel Administrativo</p>
                     
                     <nav class="nav flex-column gap-1">
-                        <a class="admin-nav-link" th:classappend="${paginaActual == 'dashboard' ? 'active' : ''}" href="/admin/dashboard">
+                        <a class="admin-nav-link" th:classappend="${paginaActual == 'dashboard' ? 'active' : ''}"th:href="@{/admin/dashboard}">
                             <i class="bi bi-grid"></i>
                             <span>Dashboard</span>
                         </a>
-                        <a class="admin-nav-link" th:classappend="${paginaActual == 'productos' ? 'active' : ''}" href="/admin/productos">
+                        <a class="admin-nav-link" th:classappend="${paginaActual == 'productos' ? 'active' : ''}"th:href="@{/admin/productos}">
                             <i class="bi bi-box-seam"></i>
                             <span>Productos</span>
                         </a>
-                        <a class="admin-nav-link" th:classappend="${paginaActual == 'inventario' ? 'active' : ''}" href="/admin/inventario">
+                        <a class="admin-nav-link" th:classappend="${paginaActual == 'inventario' ? 'active' : ''}" th:href="@{/admin/inventario}">
                             <i class="bi bi-layers"></i>
                             <span>Inventario</span>
                         </a>
-                        <a class="admin-nav-link" th:classappend="${paginaActual == 'ventas' ? 'active' : ''}" href="/admin/ventas">
+                        <a class="admin-nav-link" th:classappend="${paginaActual == 'ventas' ? 'active' : ''}" th:href="@{/admin/ventas}">
                             <i class="bi bi-credit-card"></i>
                             <span>Ventas y pagos</span>
                         </a>
-                        <a class="admin-nav-link" th:classappend="${paginaActual == 'proveedores' ? 'active' : ''}" href="/admin/proveedores">
+                        <a class="admin-nav-link" th:classappend="${paginaActual == 'proveedores' ? 'active' : ''}" th:href="@{/admin/proveedores}">
                             <i class="bi bi-truck"></i>
                             <span>Proveedores</span>
                         </a>
@@ -104,11 +104,11 @@
 
                 <!-- Opciones de cuenta (SOLO visibles en móvil/tablet, ocultas en escritorio) -->
                 <div class="pt-3 border-top d-flex flex-column gap-1 d-lg-none">
-                    <a class="admin-nav-link" href="/">
+                    <a class="admin-nav-link" th:href="@{/}">
                         <i class="bi bi-shop"></i>
                         <span>Ir a la tienda</span>
                     </a>
-                    <a class="admin-nav-link text-danger" href="/logout">
+                    <a class="admin-nav-link text-danger" th:href="@{/logout}">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Cerrar sesión</span>
                     </a>

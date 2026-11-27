@@ -6,9 +6,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const botonesTallas = document.querySelectorAll(".comparar-talla-btn");
     const inputTalla = document.getElementById("talla-seleccionada");
 
+    // Obtener todas las tallas que tienen stock en al menos un importador de la tabla
+    const radiosConStock = document.querySelectorAll(".comparacion-talla-radio:not(:disabled)");
+    const tallasDisponiblesGlobal = new Set(
+        Array.from(radiosConStock).map(radio => radio.value)
+    );
+
     if (inputTalla && botonesTallas.length > 0) {
+        // Deshabilitar arriba las tallas que no tienen stock en ningún importador
+        botonesTallas.forEach(boton => {
+            const tieneStock = tallasDisponiblesGlobal.has(boton.dataset.talla);
+            boton.disabled = !tieneStock;
+            if (!tieneStock) {
+                boton.classList.add("talla-sin-stock");
+            }
+        });
+
         function seleccionarTalla(boton) {
-            if (!boton) return;
+            if (!boton || boton.disabled) return;
 
             botonesTallas.forEach(btn => {
                 btn.classList.remove("activa");
@@ -24,11 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
             boton.addEventListener("click", () => seleccionarTalla(boton));
         });
 
-        const tallaInicial = Array.from(botonesTallas).find(
-            boton => boton.dataset.talla === "M"
-        ) || botonesTallas[0];
-
-        seleccionarTalla(tallaInicial);
+        // Seleccionar predefinido el PRIMER botón habilitado (con stock)
+        const tallaInicial = Array.from(botonesTallas).find(boton => !boton.disabled);
+        if (tallaInicial) {
+            seleccionarTalla(tallaInicial);
+        }
     }
 
     // ==========================================
@@ -74,22 +89,45 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 3. RADIOS DE TALLA EN LA TABLA COMPARATIVA
     // ==========================================
-    document.querySelectorAll(".comparacion-form-carrito").forEach(form => {
-        form.addEventListener("submit", (e) => {
-            const fila = form.closest("tr");
-            const radioSeleccionado = fila.querySelector(".comparacion-talla-radio:checked");
+    document.querySelectorAll(".comparacion-tabla tbody tr").forEach(fila => {
+        const radios = fila.querySelectorAll(".comparacion-talla-radio:not(:disabled)");
+        const form = fila.querySelector(".comparacion-form-carrito");
+        const inputTallaTabla = form ? form.querySelector(".input-talla-tabla") : null;
 
-            if (!radioSeleccionado) {
-                e.preventDefault();
-                alert("Por favor, selecciona una talla disponible.");
-                return;
+        if (radios.length > 0) {
+            let radioActivo = Array.from(radios).find(r => r.checked);
+            if (!radioActivo) {
+                radios[0].checked = true;
+                radioActivo = radios[0];
             }
-
-            const inputTallaTabla = form.querySelector(".input-talla-tabla");
             if (inputTallaTabla) {
-                inputTallaTabla.value = radioSeleccionado.value;
+                inputTallaTabla.value = radioActivo.value;
             }
+        }
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                if (radio.checked && inputTallaTabla) {
+                    inputTallaTabla.value = radio.value;
+                }
+            });
         });
+
+        if (form) {
+            form.addEventListener("submit", (e) => {
+                const radioSeleccionado = fila.querySelector(".comparacion-talla-radio:checked");
+
+                if (!radioSeleccionado) {
+                    e.preventDefault();
+                    alert("Por favor, selecciona una talla disponible.");
+                    return;
+                }
+
+                if (inputTallaTabla) {
+                    inputTallaTabla.value = radioSeleccionado.value;
+                }
+            });
+        }
     });
 
 });

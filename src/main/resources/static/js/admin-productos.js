@@ -439,6 +439,12 @@ archivoImagenEditar.addEventListener("change", () => {
     if (!archivo) {
         return;
     }
+    // Validar tamaño máximo de la imagen
+    if (archivo.size > 5 * 1024 * 1024) {
+        alert("La imagen no puede superar los 5 MB.");
+        archivoImagenEditar.value = "";
+        return;
+    }
 
     // Validar formato de imagen
     const formatosPermitidos = [
@@ -629,3 +635,17 @@ function cargarCategoriasPorGenero(genero, idCategoriaSeleccionada = null) {
         cargarCategoriasPorGenero(genero, categoriaActual);
     });
 }
+
+// REDIRIGIR AL INVENTARIO DEL PRODUCTO
+btnEditarInventario.addEventListener("click", () => {
+
+    const idProducto = document.getElementById("editarIdProducto").value;
+    const urlInventario = btnEditarInventario.dataset.url;
+
+    if (!idProducto || !urlInventario) {
+        return;
+    }
+
+    window.location.href =
+        `${urlInventario}?idProducto=${encodeURIComponent(idProducto)}`;
+});

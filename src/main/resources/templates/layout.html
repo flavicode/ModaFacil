@@ -24,7 +24,7 @@
         <header th:fragment="header" class="bg-background">
             <nav class="navbar navbar-expand-lg navbar-light border-bottom sticky-top py-2">
                 <div class="container d-flex align-items-center">
-                    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0 py-0" href="/">
+                    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-primary m-0 py-0" th:href="@{/}">
                         <img th:src="@{/img/logo.png}" alt="Logo ModaFácil" class="flex-shrink-0 rounded-3" style="width: 38px; height: 38px; object-fit: cover;">
                         <span class="d-none d-sm-inline">Moda<span class="text-success">Facil</span></span>
                     </a>
@@ -34,31 +34,34 @@
                     <div class="collapse navbar-collapse align-items-center" id="navbarNav">
                         <ul class="navbar-nav ms-lg-4 mb-0 fw-medium gap-3 gap-xl-4 text-center text-lg-start d-lg-flex align-items-lg-center pt-3 pt-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link nav-link-custom py-lg-0" th:classappend="${paginaActual == 'inicio' ? 'active' : ''}"  href="/">Página Principal</a></li>
+                                <a class="nav-link nav-link-custom py-lg-0" th:classappend="${paginaActual == 'inicio' ? 'active' : ''}"  th:href="@{/}">Página Principal</a></li>
                             <!--Catálogo de Productos-->
                             <li class="nav-item">
                                 <!-- Si NO hay sesión iniciada: Abre el Modal -->
-                                <a th:if="${session.logged == null}" 
-                                   class="nav-link nav-link-custom py-lg-0" 
+                                <a th:if="${session.logged == null}" class="nav-link nav-link-custom py-lg-0"
                                    th:classappend="${paginaActual == 'productos' ? 'active' : ''}" 
-                                   href="#" data-bs-toggle="modal" data-bs-target="#modalAvisoLogin">Catálogo de Productos</a>
+                                   href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#modalAvisoLogin">Catálogo de Productos</a>
                                 
                                 <!-- Si SÍ hay sesión iniciada: Entra al catálogo normal -->
-                                <a th:if="${session.logged != null}" 
-                                   class="nav-link nav-link-custom py-lg-0" 
+                                <a th:if="${session.logged != null}" class="nav-link nav-link-custom py-lg-0" 
                                    th:classappend="${paginaActual == 'productos' ? 'active' : ''}" 
-                                   href="/productos">Catálogo de Productos</a>
+                                   th:href="@{/productos}">Catálogo de Productos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-custom py-lg-0 btn-nav-comparar" th:classappend="${paginaActual == 'comparar' ? 'active' : ''}" href="/comparar">Comparar Precios</a></li>
+                                <a th:if="${session.logged == null}" class="nav-link nav-link-custom py-lg-0 btn-nav-comparar"
+                                    th:classappend="${paginaActual == 'comparar' ? 'active' : ''}"
+                                    href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#modalAvisoLogin">Comparar Precios</a></li>
+                                <a th:if="${session.logged != null}" class="nav-link nav-link-custom py-lg-0 btn-nav-comparar"
+                                    th:classappend="${paginaActual == 'comparar' ? 'active' : ''}"
+                                    th:href="@{/comparar}">Comparar Precios</a></li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-custom py-lg-0" th:classappend="${paginaActual == 'contacto' ? 'active' : ''}" href="/contacto">Contacto</a></li>
+                                <a class="nav-link nav-link-custom py-lg-0" th:classappend="${paginaActual == 'contacto' ? 'active' : ''}" th:href="@{/contacto}">Contacto</a></li>
                         </ul>
 
                         <!-- Si NO hay sesión iniciada -->
                         <div th:if="${session.logged == null}" class="d-flex flex-column flex-lg-row align-items-center gap-3 pt-2 pt-lg-0 ms-lg-auto">
-                            <a href="/login" class="nav-link nav-link-custom fw-bold text-nowrap py-lg-0">Iniciar Sesión</a>
-                            <a href="/registro" class="btn bg-success text-white px-4 py-2 rounded-3 fw-bold w-100 w-lg-auto text-nowrap border-0">Registrarme</a>
+                            <a th:href="@{/login}" class="nav-link nav-link-custom fw-bold text-nowrap py-lg-0">Iniciar Sesión</a>
+                            <a th:href="@{/registro}" class="btn bg-success text-white px-4 py-2 rounded-3 fw-bold w-100 w-lg-auto text-nowrap border-0">Registrarme</a>
                         </div>
 
                         <!-- Si SÍ hay sesión iniciada -->
@@ -80,31 +83,31 @@
                                 <!-- Menú desplegable -->
                                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="userMenuDropdown">
                                     <li>
-                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" href="/compras">
+                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" th:href="@{/compras}">
                                             <i class="bi bi-bag-check text-muted"></i> Ver compras
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" href="/perfil">
+                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-dark text-decoration-none" th:href="@{/perfil}">
                                             <i class="bi bi-gear text-muted"></i> Editar perfil
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider my-1"></li>
                                     <li>
-                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-danger text-decoration-none" href="/logout">
+                                        <a class="dropdown-menu-item d-flex align-items-center gap-2 px-3 py-2 small fw-medium text-danger text-decoration-none" th:href="@{/logout}">
                                             <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                             <div class="d-flex d-lg-none justify-content-around align-items-center w-100 py-2 border-top mt-2">
-                                <a href="/compras" class="text-secondary p-2" title="Ver compras">
+                                <a th:href="@{/compras}" class="text-secondary p-2" title="Ver compras">
                                     <i class="bi bi-bag-check fs-3"></i>
                                 </a>
-                                <a href="/perfil" class="text-secondary p-2" title="Editar perfil">
+                                <a th:href="@{/perfil}" class="text-secondary p-2" title="Editar perfil">
                                     <i class="bi bi-gear fs-3"></i>
                                 </a>
-                                <a href="/logout" class="text-danger p-2" title="Cerrar sesión">
+                                <a th:href="@{/logout}" class="text-danger p-2" title="Cerrar sesión">
                                     <i class="bi bi-box-arrow-right fs-3"></i>
                                 </a>
                             </div>
@@ -126,8 +129,8 @@
                             <p class="text-muted mt-3 mb-4">Para explorar nuestro catálogo de productos y ver los mejores precios de los proveedores, necesitas acceder a tu cuenta.</p>
                             
                             <div class="d-grid gap-2">
-                                <a href="/login" class="btn fw-bold py-2 btn-moda-principal">Iniciar Sesión</a>
-                                <a href="/registro" class="btn btn-outline-secondary fw-bold py-2 border-0">¿No tienes cuenta? Regístrate gratis</a>
+                                <a th:href="@{/login}" class="btn fw-bold py-2 btn-moda-principal">Iniciar Sesión</a>
+                                <a th:href="@{/registro}" class="btn btn-outline-secondary fw-bold py-2 border-0">¿No tienes cuenta? Regístrate gratis</a>
                             </div>
                         </div>
                     </div>
@@ -153,16 +156,19 @@
                     <div class="col-6 col-md-3 col-lg-3 offset-lg-1">
                         <h6 class="fw-bold text-dark text-uppercase small tracking-wider mb-3">Explorar</h6>
                         <ul class="list-unstyled d-flex flex-column gap-2 small">
-                            <li><a href="/" class="nav-link-custom text-decoration-none">Página Principal</a></li>
-                            <li><a href="/login" class="nav-link-custom text-decoration-none">Iniciar Sesión</a></li>
+                            <li><a th:href="@{/}" class="nav-link-custom text-decoration-none">Página Principal</a></li>
+                            <li><a th:href="@{/login}" class="nav-link-custom text-decoration-none">Iniciar Sesión</a></li>
+                            <li><a th:href="@{/registro}" class="nav-link-custom text-decoration-none">Registrarse</a></li>
                             <li><a th:href="@{/productos}" class="nav-link-custom text-decoration-none">Catálogo de Productos</a></li>
-                            <li><a href="/comparar" class="nav-link-custom text-decoration-none btn-nav-comparar">Comparar Precios</a></li>
+                            <li><a th:href="@{/comparar}" class="nav-link-custom text-decoration-none btn-nav-comparar">Comparar Precios</a></li>
+                            <li><a th:href="@{/carrito}" class="nav-link-custom text-decoration-none">Carrito</a></li>
                         </ul>
                     </div>
                     <div class="col-6 col-md-3 col-lg-3">
                         <h6 class="fw-bold text-dark text-uppercase small tracking-wider mb-3">Compañía</h6>
                         <ul class="list-unstyled d-flex flex-column gap-2 small mb-4">
-                            <li><a href="/contacto" class="nav-link-custom text-decoration-none">Contacto</a></li>
+                            <li><a th:href="@{/contacto}" class="nav-link-custom text-decoration-none">Contacto</a></li>
+                            <li><a th:href="@{/terminos}" class="nav-link-custom text-decoration-none">Terminos y condiciones</a></li>
                         </ul>
                         <h6 class="fw-bold text-dark text-uppercase small tracking-wider mb-3">Redes Sociales</h6>
                         <div class="d-flex gap-3 fs-5">

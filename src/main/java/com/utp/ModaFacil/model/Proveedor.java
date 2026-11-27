@@ -6,7 +6,6 @@ public class Proveedor {
     private String ruc;
     private String contacto;
     private String telefono;
-    private boolean activo;
     private int productosAsociados;
 
     public Proveedor() {
@@ -18,7 +17,6 @@ public class Proveedor {
         this.ruc = ruc;
         this.contacto = contacto;
         this.telefono = telefono;
-        this.activo = activo;
         this.productosAsociados = productosAsociados;
     }
 
@@ -60,14 +58,6 @@ public class Proveedor {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
     }
 
     public int getProductosAsociados() {

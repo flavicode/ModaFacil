@@ -66,7 +66,7 @@ public class OfertaDAO {
             "FROM ofertas o " +
             "JOIN productos p   ON p.id_producto   = o.id_producto " +
             "JOIN categorias c  ON c.id_categoria  = p.id_categoria " +
-            "JOIN proveedores i ON i.id_proveedor = o.id_proveedor AND i.activo = TRUE " +
+            "JOIN proveedores i ON i.id_proveedor = o.id_proveedor " +
             "WHERE p.activo = TRUE " +
             "  AND EXISTS ( " +
             "      SELECT 1 FROM producto_tallas pt " +

@@ -21,8 +21,7 @@ CREATE TABLE proveedores (
     nombre        VARCHAR(100) NOT NULL,
     ruc           VARCHAR(11)  NULL UNIQUE,
     contacto      VARCHAR(100) NULL,
-    telefono      VARCHAR(20)  NULL,
-    activo        BOOLEAN NOT NULL DEFAULT TRUE
+    telefono      VARCHAR(20)  NULL
 );
 
 CREATE TABLE categorias (
@@ -169,13 +168,13 @@ WHERE nombre IN (
     'Ropa deportiva'
 );
 
-INSERT INTO proveedores (nombre, ruc, contacto, telefono, activo) VALUES
- ('Metro',      '20100070970', 'María Quispe',    '987 654 321', TRUE),
- ('PlazaVea',   '20100038219', 'Carlos Mendoza',  '986 321 654', TRUE),
- ('Falabella',  '20333363002', 'Lucía Torres',    '999 876 543', FALSE),
- ('Ripley',     '20337564373', 'Jorge Huamán',    '987 112 334', TRUE),
- ('Oechsle',    '20100128056', 'Ana Ramírez',     '985 667 788', TRUE),
- ('Topitop',    '20378415221', 'Luis Paredes',    '984 221 908', TRUE);
+INSERT INTO proveedores (nombre, ruc, contacto, telefono) VALUES
+ ('Metro',      '20100070970', 'María Quispe',    '987 654 321'),
+ ('PlazaVea',   '20100038219', 'Carlos Mendoza',  '986 321 654'),
+ ('Falabella',  '20333363002', 'Lucía Torres',    '999 876 543'),
+ ('Ripley',     '20337564373', 'Jorge Huamán',    '987 112 334'),
+ ('Oechsle',    '20100128056', 'Ana Ramírez',     '985 667 788'),
+ ('Topitop',    '20378415221', 'Luis Paredes',    '984 221 908');
 
 INSERT INTO productos (id_categoria, nombre, imagen, genero, descripcion, material, tipo_tela, ajuste, manga, cuello, ocasion) VALUES
  (1,'Polo Básico Negro para Hombre','p_camisero_1.jpg','Hombre',

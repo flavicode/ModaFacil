@@ -1,492 +1,226 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="~{layout-admin :: headAdmin('Inventario')}"></head>
-    <body>
-
-        <!-- Header superior -->
-        <header th:replace="~{layout-admin :: headerAdmin}"></header>
-
-        <!-- Contenedor Aside + Main -->
-        <div class="admin-wrapper">
-            <aside th:replace="~{layout-admin :: sidebarAdmin}"></aside>
-
-            <main class="admin-main p-3 p-md-4 p-xl-5">
-                <!-- Breadcrumb y Título -->
-                <nav aria-label="breadcrumb" class="small text-muted mb-1">
-                    <i class="bi bi-house text-success"></i> / Inventario
-                </nav>
-                <h2 class="fw-bold text-primary mb-1">Inventario</h2>
-                <p class="text-muted mb-4">Control de stock por producto y talla.</p>
-
-                <!-- Alerta de confirmación tras guardar -->
-                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <span th:text="${mensajeExito}">Stock actualizado.</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                </div>
-
-                <!-- 1. TARJETAS KPI -->
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-sm-6 col-xl-4">
-                        <div class="kpi-card h-100">
-                            <div class="kpi-icon-box kpi-icon-primary">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
-                            <div>
-                                <div class="small fw-semibold text-muted">Total de unidades</div>
-                                <div class="h3 fw-bold text-primary mb-0"
-                                     th:text="${#numbers.formatInteger(totalUnidades, 1, 'COMMA')}">1,280</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-xl-4">
-                        <div class="kpi-card h-100">
-                            <div class="kpi-icon-box kpi-icon-green">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="small fw-semibold text-muted">Productos con stock</div>
-                                <div class="h3 fw-bold text-primary mb-0" th:text="${productosConStock}">244</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-xl-4">
-                        <div class="kpi-card h-100">
-                            <div class="kpi-icon-box kpi-icon-primary">
-                                <i class="bi bi-exclamation-triangle"></i>
-                            </div>
-                            <div>
-                                <div class="small fw-semibold text-muted">Productos agotados</div>
-                                <div class="h3 fw-bold text-primary mb-0" th:text="${productosAgotados}">12</div>
-                            </div>
+<head th:replace="~{layout-admin :: headAdmin('Inventario')}"></head>
+<body>
+    <!-- Header superior -->
+    <header th:replace="~{layout-admin :: headerAdmin}"></header>
+    <!-- Contenedor Aside + Main -->
+    <div class="admin-wrapper">
+        <aside th:replace="~{layout-admin :: sidebarAdmin}"></aside>
+        <main class="admin-main p-3 p-md-4 p-xl-5">
+            <!-- Breadcrumb y Título -->
+            <nav aria-label="breadcrumb" class="small text-muted mb-1"><i class="bi bi-house text-success"></i> / Inventario</nav>
+            <h2 class="fw-bold text-primary mb-1">Inventario</h2>
+            <p class="text-muted mb-4">Control de stock por producto y talla.</p>
+            <!-- Alerta de confirmación tras guardar -->
+            <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span th:text="${mensajeExito}">Stock actualizado.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+            <!-- Alerta de error al actualizar stock -->
+            <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                <span th:text="${mensajeError}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+            <!-- 1. TARJETAS KPI -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-sm-6 col-xl-4">
+                    <div class="kpi-card h-100">
+                        <div class="kpi-icon-box kpi-icon-primary"><i class="bi bi-box-seam"></i></div>
+                        <div>
+                            <div class="small fw-semibold text-muted">Total de unidades</div>
+                            <div class="h3 fw-bold text-primary mb-0" th:text="${#numbers.formatInteger(totalUnidades, 1, 'COMMA')}">1,280</div>
                         </div>
                     </div>
                 </div>
-
-                <!-- 2. BARRA DE BÚSQUEDA Y FILTROS -->
-                <div class="row g-2 mb-4 align-items-center">
-                    <div class="col-12 col-xl-5">
-                        <div class="input-group filter-box px-3 align-items-center">
-                            <i class="bi bi-search text-muted me-2"></i>
-                            <input type="text" id="filtroBusqueda" class="form-control border-0 shadow-none p-0 bg-transparent"
-                                   placeholder="Buscar producto (nombre o código)...">
+                <div class="col-12 col-sm-6 col-xl-4">
+                    <div class="kpi-card h-100">
+                        <div class="kpi-icon-box kpi-icon-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
                         </div>
-                    </div>
-
-                    <div class="col-12 col-sm-5 col-xl-3">
-                        <select id="filtroEstado" class="form-select filter-box shadow-none text-primary fw-medium">
-                            <option value="todos" selected>Estado: Todos</option>
-                            <option value="en-stock">Estado: En stock</option>
-                            <option value="agotado">Estado: Agotado</option>
-                        </select>
-                    </div>
-
-                    <div class="col-10 col-sm-5 col-xl-3">
-                        <select id="filtroCategoria" class="form-select filter-box shadow-none text-primary fw-medium">
-                            <option value="todas" selected>Categoría: Todas</option>
-                            <option th:each="cat : ${categorias}"
-                                    th:value="${cat}"
-                                    th:text="|Categoría: ${cat}|">Categoría: Polos</option>
-                        </select>
-                    </div>
-
-                    <div class="col-2 col-sm-2 col-xl-1 d-flex justify-content-end">
-                        <button type="button" id="btnResetFiltros" class="btn-refresh-filter" title="Restablecer filtros">
-                            <i class="bi bi-arrow-clockwise fs-5"></i>
-                        </button>
+                        <div>
+                            <div class="small fw-semibold text-muted">Productos con stock</div>
+                            <div class="h3 fw-bold text-primary mb-0" th:text="${productosConStock}">244</div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- 3. TABLA DE INVENTARIO -->
-                <div class="inventory-card mb-4">
-                    <div class="table-responsive">
-                        <table class="table table-inventario align-middle" id="tablaInventario">
-                            <thead>
-                                <tr>
-                                    <th style="width: 45px;">#</th>
-                                    <th style="min-width: 195px;">Producto</th>
-                                    <th style="min-width: 390px;">Tallas y stock</th>
-                                    <th class="text-center text-nowrap">Stock por proveedor</th>
-                                    <th class="text-center text-nowrap">Stock total</th>
-                                    <th class="text-center text-nowrap">Estado</th>
-                                    <th class="text-center text-nowrap">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="prod, iter : ${productos}"
-                                    class="fila-producto"
-                                    th:data-nombre="${prod.nombre != null ? prod.nombre.toLowerCase() : ''}"
-                                    th:data-codigo="${prod.codigo != null ? prod.codigo.toLowerCase() : ''}"
-                                    th:data-categoria="${prod.categoria}"
-                                    th:data-estado="${prod.stockTotal > 0 ? 'en-stock' : 'agotado'}">
-
-                                    <td class="fw-bold text-muted" th:text="${iter.count}">1</td>
-
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <img th:src="${prod.imagen}"
-                                                 onerror="this.src='https://placehold.co/92x92/f4f4f4/c0a0a0?text=Prenda'"
-                                                 alt="Prenda" class="product-thumb">
-                                            <div>
-                                                <div class="fw-bold text-primary" th:text="${prod.nombre}">Polo Básico</div>
-                                                <div class="small text-muted" th:text="${prod.codigo}">P00001</div>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <!-- Columna 3: Nombre del proveedor + píldoras de tallas -->
-                                    <td>
-                                        <div class="d-flex flex-column gap-2">
-                                            <div th:each="imp : ${prod.proveedores}" class="proveedor-row">
-                                                <span class="proveedor-nombre" th:text="${imp.nombreProveedor}">Proveedor 1</span>
-                                                <div class="d-flex flex-nowrap align-items-center">
-                                                    <span th:each="t : ${imp.tallas}"
-                                                        class="talla-pill"
-                                                        th:classappend="${t.stock == 0} ? 'agotado'"
-                                                        th:text="${t.talla + ': ' + t.stock}">S: 8</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <!-- Columna 4: Subtotal por proveedor alineado con cada fila -->
-                                    <td class="text-center">
-                                        <div class="d-flex flex-column gap-2">
-                                            <div th:each="imp : ${prod.proveedores}"
-                                                class="proveedor-subtotal fw-semibold text-primary"
-                                                th:text="${imp.subtotal}">28</div>
-                                        </div>
-                                    </td>
-
-                                    <td class="text-center fw-bold fs-6 text-nowrap" th:text="${prod.stockTotal}">25</td>
-
-                                    <td class="text-center text-nowrap">
-                                        <span th:if="${prod.stockTotal > 0}" class="badge-estado badge-en-stock">En stock</span>
-                                        <span th:if="${prod.stockTotal == 0}" class="badge-estado badge-agotado">Agotado</span>
-                                    </td>
-
-                                    <td class="text-center text-nowrap">
-                                        <div class="d-none datos-tallas-producto">
-                                            <th:block th:each="imp : ${prod.proveedores}">
-                                                <span th:each="t : ${imp.tallas}"
-                                                    th:data-id-proveedor="${imp.idProveedor}"
-                                                    th:data-proveedor="${imp.nombreProveedor}"
-                                                    th:data-talla="${t.talla}"
-                                                    th:data-stock="${t.stock}"></span>
-                                            </th:block>
-                                        </div>
-
-                                        <button type="button"
-                                                class="btn-actualizar-stock"
-                                                th:data-id="${prod.id}"
-                                                th:data-nombre="${prod.nombre}"
-                                                th:data-codigo="${prod.codigo}"
-                                                th:data-categoria="${prod.categoria}"
-                                                th:data-imagen="${prod.imagen}"
-                                                th:data-total="${prod.stockTotal}"
-                                                onclick="abrirModalStock(this)">
-                                            <i class="bi bi-pencil"></i> Actualizar stock
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 4. PIE DE TABLA Y BOTÓN MOSTRAR MÁS -->
-                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-                    <div class="text-muted small" id="contadorResultados">
-                        Mostrando <span th:text="${#lists.size(productos)}">3</span> de <span th:text="${totalRegistros}">3</span> productos
-                    </div>
-                    <div>
-                        <button type="button" id="btnMostrarMas" class="btn btn-moda-principal px-4 py-2 rounded-3 fw-semibold shadow-sm">
-                            <i class="bi bi-chevron-down me-1"></i> Mostrar más productos
-                        </button>
-                    </div>
-                    <div class="d-none d-md-block" style="width: 180px;"></div>
-                </div>
-            </main>
-        </div>
-
-        <!-- =========================================
-             MODAL ACTUALIZAR STOCK (MATRICIAL)
-             ========================================= -->
-        <div class="modal fade" id="modalActualizarStock" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-matriz-dialog modal-fullscreen-sm-down">
-                <div class="modal-content modal-stock-content shadow">
-                    <form th:action="@{/admin/inventario/actualizar}" method="post">
-                        <input type="hidden" name="productoId" id="modalProductoId">
-                        <!-- Contenedor donde se inyectan los inputs hidden para el POST -->
-                        <div id="modalInputsOcultos" class="d-none"></div>
-
-                        <!-- Cabecera del Modal -->
-                        <div class="modal-header border-0 pb-2 pt-3 px-3 px-md-4 align-items-start">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="modal-header-icon">
-                                    <i class="bi bi-layers"></i>
-                                </div>
-                                <div>
-                                    <h4 class="modal-title fw-bold text-primary mb-0">Actualizar Stock</h4>
-                                    <p class="text-muted modal-stock-subtitulo mb-0">Modifica la cantidad disponible por talla de cada proveedor.</p>
-                                </div>
-                            </div>
-                            <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="col-12 col-xl-4">
+                    <div class="kpi-card h-100">
+                        <div class="kpi-icon-box kpi-icon-primary"><i class="bi bi-exclamation-triangle"></i></div>
+                        <div>
+                            <div class="small fw-semibold text-muted">Productos agotados</div>
+                            <div class="h3 fw-bold text-primary mb-0" th:text="${productosAgotados}">12</div>
                         </div>
-
-                        <!-- Cuerpo del Modal -->
-                        <div class="modal-body px-3 px-md-4 py-3">
-                            <!-- Tarjeta de Resumen del Producto -->
-                            <div class="modal-product-box d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <img id="modalProductoImg" src="" alt="Producto"
-                                         style="width: 66px; height: 66px; object-fit: cover; border-radius: 12px; background: #f4f4f4; flex-shrink: 0;">
-                                    <div>
-                                        <h5 class="fw-bold text-primary mb-1" id="modalProductoNombre">Vestido Casual Verano</h5>
-                                        <div class="small text-muted">Categoría: <span id="modalProductoCategoria" class="fw-medium">Vestidos</span></div>
-                                        <div class="small text-muted d-none">Código: <span id="modalProductoCodigo" class="fw-medium">P00003</span></div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-stock-actual-card">
-                                    <div class="modal-stock-actual-icon">
-                                        <i class="bi bi-box-seam"></i>
-                                    </div>
-                                    <div>
-                                        <div class="modal-stock-actual-label">Stock total actual</div>
-                                        <div class="modal-stock-actual-valor" id="modalStockActualTexto">0 unidades</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Tabla Matricial: Proveedores en filas, Tallas en columnas -->
-                            <div class="table-responsive">
-                                <table class="table table-matriz-stock text-center align-middle mb-0">
-                                    <thead id="modalMatrizHead"></thead>
-                                    <tbody id="modalMatrizBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Pie del Modal -->
-                        <div class="modal-footer modal-stock-footer-bar px-3 px-md-4 py-3 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
-                            <div class="small text-muted d-flex align-items-center gap-2">
-                                <i class="bi bi-info-circle fs-6 text-primary"></i>
-                                <span>Puedes ajustar el stock de cada talla según el proveedor.</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-modal-cancelar" data-bs-dismiss="modal">
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-modal-guardar">
-                                    <i class="bi bi-check2 me-1"></i> Guardar cambios
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
+            <!-- 2. BARRA DE BÚSQUEDA Y FILTROS -->
+            <div class="row g-2 mb-4 align-items-center">
+                <div class="col-12 col-xl-5">
+                    <div class="input-group filter-box px-3 align-items-center">
+                        <i class="bi bi-search text-muted me-2"></i>
+                        <input type="text" id="filtroBusqueda" class="form-control border-0 shadow-none p-0 bg-transparent" placeholder="Buscar producto (nombre o código)...">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-5 col-xl-3">
+                    <select id="filtroEstado" class="form-select filter-box shadow-none text-primary fw-medium">
+                        <option value="todos" selected>Estado: Todos</option>
+                        <option value="en-stock">Estado: En stock</option>
+                        <option value="agotado">Estado: Agotado</option>
+                    </select>
+                </div>
+                <div class="col-10 col-sm-5 col-xl-3">
+                    <select id="filtroCategoria" class="form-select filter-box shadow-none text-primary fw-medium">
+                        <option value="todas" selected>Categoría: Todas</option>
+                        <option th:each="cat : ${categorias}" th:value="${cat}" th:text="|Categoría: ${cat}|">Categoría: Polos</option>
+                    </select>
+                </div>
+                <div class="col-2 col-sm-2 col-xl-1 d-flex justify-content-end">
+                    <button type="button" id="btnResetFiltros" class="btn-refresh-filter" title="Restablecer filtros"><i class="bi bi-arrow-clockwise fs-5"></i></button>
+                </div>
+            </div>
 
-        <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+            <!-- 3. TABLA DE INVENTARIO -->
+            <div class="inventory-card mb-4">
+                <div class="table-responsive">
+                    <table class="table table-inventario align-middle" id="tablaInventario">
+                        <thead>
+                            <tr>
+                                <th style="width: 45px;">#</th>
+                                <th style="min-width: 195px;">Producto</th>
+                                <th style="min-width: 390px;">Tallas y stock</th>
+                                <th class="text-center text-nowrap">Stock por proveedor</th>
+                                <th class="text-center text-nowrap">Stock total</th>
+                                <th class="text-center text-nowrap">Estado</th>
+                                <th class="text-center text-nowrap">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="prod, iter : ${productos}" class="fila-producto" th:data-nombre="${prod.nombre != null ? prod.nombre.toLowerCase() : ''}" th:data-codigo="${prod.codigo != null ? prod.codigo.toLowerCase() : ''}" th:data-categoria="${prod.categoria}" th:data-estado="${prod.stockTotal > 0 ? 'en-stock' : 'agotado'}">
+                                <td class="fw-bold text-muted" th:text="${iter.count}">1</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img th:src="${prod.imagen}" onerror="this.src='https://placehold.co/92x92/f4f4f4/c0a0a0?text=Prenda'" alt="Prenda" class="product-thumb">
+                                        <div>
+                                            <div class="fw-bold text-primary" th:text="${prod.nombre}">Polo Básico</div>
+                                            <div class="small text-muted" th:text="${prod.codigo}">P00001</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <!-- Columna 3: Nombre del proveedor + píldoras de tallas -->
+                                <td>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div th:each="imp : ${prod.proveedores}" class="proveedor-row">
+                                            <span class="proveedor-nombre" th:text="${imp.nombreProveedor}">Proveedor 1</span>
+                                            <div class="d-flex flex-nowrap align-items-center">
+                                                <span th:each="t : ${imp.tallas}" class="talla-pill" th:classappend="${t.stock == 0} ? 'agotado'" th:text="${t.talla + ': ' + t.stock}">S: 8</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <!-- Columna 4: Subtotal por proveedor alineado con cada fila -->
+                                <td class="text-center">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div th:each="imp : ${prod.proveedores}" class="proveedor-subtotal fw-semibold text-primary" th:text="${imp.subtotal}">28</div>
+                                    </div>
+                                </td>
+                                <td class="text-center fw-bold fs-6 text-nowrap" th:text="${prod.stockTotal}">25</td>
+                                <td class="text-center text-nowrap">
+                                    <span th:if="${prod.stockTotal > 0}" class="badge-estado badge-en-stock">En stock</span>
+                                    <span th:if="${prod.stockTotal == 0}" class="badge-estado badge-agotado">Agotado</span>
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <div class="d-none datos-tallas-producto">
+                                        <th:block th:each="imp : ${prod.proveedores}">
+                                            <span th:each="t : ${imp.tallas}" th:data-id-proveedor="${imp.idProveedor}" th:data-proveedor="${imp.nombreProveedor}" th:data-talla="${t.talla}" th:data-stock="${t.stock}"></span>
+                                        </th:block>
+                                    </div>
+                                    <button type="button" class="btn-actualizar-stock" th:data-id="${prod.id}" th:data-nombre="${prod.nombre}" th:data-codigo="${prod.codigo}" th:data-categoria="${prod.categoria}" th:data-imagen="${prod.imagen}" th:data-total="${prod.stockTotal}" th:disabled="${#lists.isEmpty(prod.proveedores) or #lists.isEmpty(prod.proveedores[0].tallas)}" onclick="abrirModalStock(this)"><i class="bi bi-pencil"></i> Actualizar stock</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-        <!-- Script para Modal Matricial, Stepper y Filtros -->
-        <script>
-            let modalStockInstance = null;
 
-            function abrirModalStock(btn) {
-                const id = btn.getAttribute('data-id');
-                const nombre = btn.getAttribute('data-nombre');
-                const codigo = btn.getAttribute('data-codigo');
-                const categoria = btn.getAttribute('data-categoria');
-                const imagen = btn.getAttribute('data-imagen');
-                const totalActual = btn.getAttribute('data-total');
-
-                document.getElementById('modalProductoId').value = id;
-                document.getElementById('modalProductoNombre').textContent = nombre;
-                document.getElementById('modalProductoCodigo').textContent = codigo;
-                document.getElementById('modalProductoCategoria').textContent = categoria;
-                document.getElementById('modalStockActualTexto').textContent = totalActual + ' unidades';
-
-                const imgEl = document.getElementById('modalProductoImg');
-                imgEl.src = imagen;
-                imgEl.onerror = function() {
-                    this.src = 'https://placehold.co/132x132/f4f4f4/c0a0a0?text=Prenda';
-                };
-
-                const spansTallas = btn.parentElement.querySelectorAll('.datos-tallas-producto span');
-                const thead = document.getElementById('modalMatrizHead');
-                const tbody = document.getElementById('modalMatrizBody');
-                const hiddenContainer = document.getElementById('modalInputsOcultos');
-
-                thead.innerHTML = '';
-                tbody.innerHTML = '';
-                hiddenContainer.innerHTML = '';
-
-                // Agrupar datos por proveedor manteniendo el orden y recolectar tallas únicas
-                const proveedoresMap = new Map();
-                const tallasSet = new Set();
-
-                spansTallas.forEach(span => {
-                    const idProveedor = span.getAttribute('data-id-proveedor');
-                    const proveedor = span.getAttribute('data-proveedor');
-                    const talla = span.getAttribute('data-talla');
-                    const stock = parseInt(span.getAttribute('data-stock'), 10) || 0;
-
-                    tallasSet.add(talla);
-
-                    if (!proveedoresMap.has(idProveedor)) {
-                        proveedoresMap.set(idProveedor, {
-                            idProveedor: idProveedor,
-                            nombreProveedor: proveedor,
-                            stocksPorTalla: new Map()
-                        });
-                    }
-                    proveedoresMap.get(idProveedor).stocksPorTalla.set(talla, stock);
-                });
-
-                const tallasOrdenadas = Array.from(tallasSet);
-
-                // Encabezado de columnas: Proveedor + cada talla
-                let headHtml = '<tr><th class="col-proveedor-header"><i class="bi bi-people-fill me-2"></i>Proveedor</th>';
-                tallasOrdenadas.forEach(talla => {
-                    headHtml += `<th><i class="bi bi-tag-fill me-1 small opacity-75"></i>${talla}</th>`;
-                });
-                headHtml += '</tr>';
-                thead.innerHTML = headHtml;
-
-                // Filas por proveedor y creación de inputs hidden sincronizados
-                let idx = 0;
-                proveedoresMap.forEach(imp => {
-                    const tr = document.createElement('tr');
-
-                    const tdNombre = document.createElement('td');
-                    tdNombre.className = 'matriz-proveedor-nombre';
-                    tdNombre.textContent = imp.nombreProveedor;
-                    tr.appendChild(tdNombre);
-
-                    tallasOrdenadas.forEach(talla => {
-                        const stock = imp.stocksPorTalla.has(talla) ? imp.stocksPorTalla.get(talla) : 0;
-                        const inputKey = `celda-stock-${idx}`;
-                        idx++;
-
-                        // Inputs hidden para enviar listas paralelas al controlador
-                        const hProv = document.createElement('input');
-                        hProv.type = 'hidden';
-                        hProv.name = 'proveedores';
-                        hProv.value = imp.idProveedor;
-
-                        const hTalla = document.createElement('input');
-                        hTalla.type = 'hidden';
-                        hTalla.name = 'tallas';
-                        hTalla.value = talla;
-
-                        const hCant = document.createElement('input');
-                        hCant.type = 'hidden';
-                        hCant.name = 'cantidades';
-                        hCant.value = stock;
-                        hCant.setAttribute('data-hidden-for', inputKey);
-
-                        hiddenContainer.append(hProv, hTalla, hCant);
-
-                        const td = document.createElement('td');
-                        const claseStock = stock > 0 ? 'celda-con-stock' : '';
-                        td.innerHTML = `
-                            <div class="matriz-stepper ${claseStock}">
-                                <button type="button" onclick="cambiarCantidadMatriz(this, -1)" aria-label="Disminuir">−</button>
-                                <input type="number" class="input-matriz-stock" data-key="${inputKey}"
-                                       value="${stock}" min="0" oninput="sincronizarCeldaMatriz(this)">
-                                <button type="button" onclick="cambiarCantidadMatriz(this, 1)" aria-label="Aumentar">+</button>
+            <!-- 4. PIE DE TABLA Y BOTÓN MOSTRAR MÁS -->
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                <div class="text-muted small" id="contadorResultados">Mostrando <span th:text="${#lists.size(productos)}">3</span> de <span th:text="${totalRegistros}">3</span> productos</div>
+                <div>
+                    <button type="button" id="btnMostrarMas" class="btn btn-moda-principal px-4 py-2 rounded-3 fw-semibold shadow-sm"><i class="bi bi-chevron-down me-1"></i> Mostrar más productos</button>
+                </div>
+                <div class="d-none d-md-block" style="width: 180px;"></div>
+            </div>
+        </main>
+    </div>
+    <!-- =========================================
+         MODAL ACTUALIZAR STOCK (MATRICIAL)
+         ========================================= -->
+    <div class="modal fade" id="modalActualizarStock" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-matriz-dialog modal-fullscreen-sm-down">
+            <div class="modal-content modal-stock-content shadow">
+                <form th:action="@{/admin/inventario/actualizar}" method="post">
+                    <input type="hidden" name="productoId" id="modalProductoId">
+                    <!-- Contenedor donde se inyectan los inputs hidden para el POST -->
+                    <div id="modalInputsOcultos" class="d-none"></div>
+                    <!-- Cabecera del Modal -->
+                    <div class="modal-header border-0 pb-2 pt-3 px-3 px-md-4 align-items-start">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="modal-header-icon"><i class="bi bi-layers"></i></div>
+                            <div>
+                                <h4 class="modal-title fw-bold text-primary mb-0">Actualizar Stock</h4>
+                                <p class="text-muted modal-stock-subtitulo mb-0">Modifica la cantidad disponible por talla de cada proveedor.</p>
                             </div>
-                        `;
-                        tr.appendChild(td);
-                    });
-
-                    tbody.appendChild(tr);
-                });
-
-                if (!modalStockInstance) {
-                    modalStockInstance = new bootstrap.Modal(document.getElementById('modalActualizarStock'));
-                }
-                modalStockInstance.show();
-            }
-
-            function cambiarCantidadMatriz(boton, delta) {
-                const stepper = boton.closest('.matriz-stepper');
-                const input = stepper.querySelector('.input-matriz-stock');
-                const valorActual = parseInt(input.value, 10) || 0;
-                const nuevoValor = Math.max(0, valorActual + delta);
-                input.value = nuevoValor;
-                sincronizarCeldaMatriz(input);
-            }
-
-            function sincronizarCeldaMatriz(input) {
-                let val = parseInt(input.value, 10);
-                if (isNaN(val) || val < 0) {
-                    val = 0;
-                    input.value = 0;
-                }
-
-                const stepper = input.closest('.matriz-stepper');
-                stepper.classList.toggle('celda-con-stock', val > 0);
-
-                const key = input.getAttribute('data-key');
-                const hiddenInput = document.querySelector(`#modalInputsOcultos input[data-hidden-for="${key}"]`);
-                if (hiddenInput) {
-                    hiddenInput.value = val;
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                const inputBusqueda = document.getElementById('filtroBusqueda');
-                const selectEstado = document.getElementById('filtroEstado');
-                const selectCategoria = document.getElementById('filtroCategoria');
-                const btnReset = document.getElementById('btnResetFiltros');
-                const filas = document.querySelectorAll('.fila-producto');
-
-                function aplicarFiltros() {
-                    const texto = inputBusqueda.value.trim().toLowerCase();
-                    const estado = selectEstado.value;
-                    const categoria = selectCategoria.value;
-                    let visibles = 0;
-
-                    filas.forEach(fila => {
-                        const nombre = fila.getAttribute('data-nombre');
-                        const codigo = fila.getAttribute('data-codigo');
-                        const cat = fila.getAttribute('data-categoria');
-                        const est = fila.getAttribute('data-estado');
-
-                        const coincideTexto = nombre.includes(texto) || codigo.includes(texto);
-                        const coincideEstado = (estado === 'todos') || (est === estado);
-                        const coincideCat = (categoria === 'todas') || (cat === categoria);
-
-                        if (coincideTexto && coincideEstado && coincideCat) {
-                            fila.style.display = '';
-                            visibles++;
-                        } else {
-                            fila.style.display = 'none';
-                        }
-                    });
-
-                    document.getElementById('contadorResultados').textContent =
-                        `Mostrando ${visibles} de ${filas.length} productos`;
-                }
-
-                inputBusqueda.addEventListener('input', aplicarFiltros);
-                selectEstado.addEventListener('change', aplicarFiltros);
-                selectCategoria.addEventListener('change', aplicarFiltros);
-
-                btnReset.addEventListener('click', () => {
-                    inputBusqueda.value = '';
-                    selectEstado.value = 'todos';
-                    selectCategoria.value = 'todas';
-                    aplicarFiltros();
-                });
-            });
-        </script>
-    </body>
+                        </div>
+                        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <!-- Cuerpo del Modal -->
+                    <div class="modal-body px-3 px-md-4 py-3">
+                        <!-- Tarjeta de Resumen del Producto -->
+                        <div class="modal-product-box d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <img id="modalProductoImg" src="" alt="Producto" style="width: 66px; height: 66px; object-fit: cover; border-radius: 12px; background: #f4f4f4; flex-shrink: 0;">
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-1" id="modalProductoNombre">Vestido Casual Verano</h5>
+                                    <div class="small text-muted">Categoría: <span id="modalProductoCategoria" class="fw-medium">Vestidos</span></div>
+                                    <div class="small text-muted d-none">Código: <span id="modalProductoCodigo" class="fw-medium">P00003</span></div>
+                                </div>
+                            </div>
+                            <div class="modal-stock-actual-card">
+                                <div class="modal-stock-actual-icon"><i class="bi bi-box-seam"></i></div>
+                                <div>
+                                    <div class="modal-stock-actual-label">Stock total actual</div>
+                                    <div class="modal-stock-actual-valor" id="modalStockActualTexto">0 unidades</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Tabla Matricial: Proveedores en filas, Tallas en columnas -->
+                        <div class="table-responsive">
+                            <table class="table table-matriz-stock text-center align-middle mb-0">
+                                <thead id="modalMatrizHead"></thead>
+                                <tbody id="modalMatrizBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Pie del Modal -->
+                    <div class="modal-footer modal-stock-footer-bar px-3 px-md-4 py-3 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+                        <div class="small text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle fs-6 text-primary"></i>
+                            <span>Puedes ajustar el stock de cada talla según el proveedor.</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-modal-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-modal-guardar"><i class="bi bi-check2 me-1"></i> Guardar cambios</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{layout-admin :: scriptsAdmin}"></div>
+    <script th:src="@{/js/admin-inventario.js}"></script>
+</body>
 </html>

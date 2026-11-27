@@ -17,6 +17,9 @@ public class CarritoCompletoController {
 
     @GetMapping("/carrito")
     public String verCarrito(HttpSession session, Model model) {
+        if (session.getAttribute("logged") == null) {
+            return "redirect:/login";
+        }
         model.addAttribute("items", carritoService.obtenerItems(session));
         model.addAttribute("subtotal", carritoService.calcularSubtotal(session));
 

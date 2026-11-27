@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://thymeleaf.org">
 <head th:replace="~{layout :: head('Carrito de Compras','carrito-completo.css')}"></head>
 
 <body>
@@ -32,65 +32,72 @@
             </div>
 
             <!-- LISTA DE ITEMS -->
-            <th:block th:each="item : ${items}">
+            <div class="carrito-item-bloque"
+                 th:each="item : ${items}"
+                 th:attr="data-key=|${item.idProducto}-${item.idProveedor}-${item.talla}|">
                 
-            <!-- PRENDA SELECCIONADA -->
-            <section class="carrito-tarjeta">
+                <!-- PRENDA SELECCIONADA -->
+                <section class="carrito-tarjeta">
 
-                <h2 class="seccion-titulo">PRENDA SELECCIONADA</h2>
+                    <h2 class="seccion-titulo">PRENDA SELECCIONADA</h2>
 
-                <div class="prenda-contenido">
+                    <div class="prenda-contenido">
 
-                    <!-- IMAGEN DEL PRODUCTO -->
-                    <img th:src="@{/img/{img}(img=${item.imagen})}"
-                        alt="Imagen del producto"
-                        class="prenda-imagen">
+                        <!-- IMAGEN DEL PRODUCTO -->
+                        <img th:src="@{/img/{img}(img=${item.imagen})}"
+                             alt="Imagen del producto"
+                             class="prenda-imagen">
 
-                    <!-- INFORMACIÓN DEL PRODUCTO -->
-                    <div class="prenda-informacion">
+                        <!-- INFORMACIÓN DEL PRODUCTO -->
+                        <div class="prenda-informacion">
 
-                        <h3 th:text="${item.nombre}">
-                            Nombre del producto
-                        </h3>
+                            <h3 th:text="${item.nombre}">
+                                Nombre del producto
+                            </h3>
 
-                        <p>
-                            Talla:
-                            <span th:text="${item.talla}">M</span>
-                        </p>
+                            <p>
+                                Talla:
+                                <span th:text="${item.talla}">M</span>
+                            </p>
 
-                        <p>
-                            Precio unitario: S/
-                            <span th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 2)}">
-                                0.00
-                            </span>
-                        </p>
+                            <p>
+                                Precio unitario: S/
+                                <span th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 2)}">
+                                    0.00
+                                </span>
+                            </p>
+
+                        </div>
+
+                        <!-- CONTROL DE CANTIDAD -->
+                        <div class="prenda-cantidad">
+
+                            <button type="button"
+                                    th:attr="data-id=${item.idProducto},
+                                             data-proveedor=${item.idProveedor},
+                                             data-talla=${item.talla},
+                                             data-nombre=${item.nombre}"
+                                    onclick="cambiarCantidadCompleto(this, -1)">
+                                −
+                            </button>
+
+                            <span class="cantidad-valor" th:text="${item.cantidad}">1</span>
+
+                            <button type="button"
+                                    th:attr="data-id=${item.idProducto},
+                                             data-proveedor=${item.idProveedor},
+                                             data-talla=${item.talla},
+                                             data-nombre=${item.nombre}"
+                                    onclick="cambiarCantidadCompleto(this, 1)">
+                                +
+                            </button>
+
+                        </div>
 
                     </div>
 
-                    <!-- CONTROL DE CANTIDAD -->
-                    <div class="prenda-cantidad">
+                </section>
 
-                        <button type="button"
-                                th:attr="data-id=${item.idProducto}"
-                                onclick="cambiarCantidad(this,-1)">
-                            −
-                        </button>
-
-                        <span th:text="${item.cantidad}">1</span>
-
-                        <button type="button"
-                                th:attr="data-id=${item.idProducto}"
-                                onclick="cambiarCantidad(this,1)">
-                            +
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            
                 <!-- PROVEEDOR -->
                 <section class="carrito-tarjeta">
                     <h2 class="seccion-titulo">PROVEEDOR</h2>
@@ -100,16 +107,18 @@
                     </div>
                     <p class="delivery-texto">🚚 Delivery a toda Lima Metropolitana</p>
                 </section>
-            </th:block>
-            
+
+            </div>
 
             <!-- DESGLOSE DE COSTOS -->
-            <section class="carrito-tarjeta" th:unless="${#lists.isEmpty(items)}">
+            <section id="seccion-desglose" class="carrito-tarjeta" th:unless="${#lists.isEmpty(items)}">
                 <h2 class="seccion-titulo">DESGLOSE DE COSTOS</h2>
 
-                <div th:each="item : ${items}" class="desglose-fila">
-                    <span th:text="|${item.nombre} (x${item.cantidad})|"></span>
-                    <span th:text="|S/ ${#numbers.formatDecimal(item.subtotal, 1, 2)}|"></span>
+                <div th:each="item : ${items}"
+                     class="desglose-fila"
+                     th:attr="data-key=|${item.idProducto}-${item.idProveedor}-${item.talla}|">
+                    <span class="desglose-nombre" th:text="|${item.nombre} (x${item.cantidad})|"></span>
+                    <span class="desglose-precio" th:text="|S/ ${#numbers.formatDecimal(item.subtotal, 1, 2)}|"></span>
                 </div>
 
                 <div class="desglose-fila">
@@ -121,20 +130,97 @@
 
                 <div class="desglose-total">
                     <strong>Monto Total a Pagar</strong>
-                    <strong th:text="|S/ ${#numbers.formatDecimal(subtotal, 1, 2)}|"></strong>
+                    <strong id="monto-total-pagar" th:text="|S/ ${#numbers.formatDecimal(subtotal, 1, 2)}|"></strong>
                 </div>
             </section>
 
-            <a th:unless="${#lists.isEmpty(items)}" th:href="@{/pago}" class="boton-confirmar">
+            <a id="btn-proceder-pago" th:unless="${#lists.isEmpty(items)}" th:href="@{/pago}" class="boton-confirmar">
                 Confirmar y Proceder al Pago
             </a>
 
         </div>
 
+        <!-- TOKEN CSRF OCULTO SI SPRING SECURITY ESTÁ ACTIVO -->
+        <input th:if="${_csrf != null}"
+               type="hidden"
+               id="csrf-token-carrito"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
+
     </main>
 
     <!-- FOOTER GENERAL -->
     <div th:replace="~{layout :: footer}"></div>
+
+    <!-- SCRIPT PARA ACTUALIZAR CANTIDAD SIN RECARGAR -->
+    <script>
+        async function cambiarCantidadCompleto(boton, cambio) {
+            const idProducto = boton.dataset.id;
+            const idProveedor = boton.dataset.proveedor;
+            const talla = boton.dataset.talla;
+            const nombre = boton.dataset.nombre;
+            const key = `${idProducto}-${idProveedor}-${talla}`;
+
+            const formData = new FormData();
+            formData.append("idProducto", idProducto);
+            formData.append("idProveedor", idProveedor);
+            formData.append("talla", talla);
+            formData.append("cambio", cambio);
+
+            const csrfInput = document.getElementById("csrf-token-carrito");
+            if (csrfInput) {
+                formData.append(csrfInput.name, csrfInput.value);
+            }
+
+            try {
+                const resp = await fetch("/comparar/carrito/cantidad/ajax", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (!data.ok) return;
+
+                const bloqueProducto = document.querySelector(`.carrito-item-bloque[data-key="${key}"]`);
+                const filaDesglose = document.querySelector(`.desglose-fila[data-key="${key}"]`);
+
+                if (data.eliminado) {
+                    bloqueProducto?.remove();
+                    filaDesglose?.remove();
+                } else {
+                    // Actualizar contador de la prenda
+                    if (bloqueProducto) {
+                        bloqueProducto.querySelector(".cantidad-valor").textContent = data.cantidad;
+                    }
+                    // Actualizar fila en el desglose de costos
+                    if (filaDesglose) {
+                        filaDesglose.querySelector(".desglose-nombre").textContent = `${nombre} (x${data.cantidad})`;
+                        filaDesglose.querySelector(".desglose-precio").textContent = `S/ ${data.subtotalItem.replace(".", ",")}`;
+                    }
+                }
+
+                // Actualizar monto total a pagar
+                const totalPagar = document.getElementById("monto-total-pagar");
+                if (totalPagar) {
+                    totalPagar.textContent = `S/ ${data.subtotalCarrito.replace(".", ",")}`;
+                }
+
+                // Actualizar badge rojo del header
+                const badgeHeader = document.querySelector(".carrito-contador");
+                if (badgeHeader) {
+                    badgeHeader.textContent = data.totalItems;
+                }
+
+                // Si el carrito quedó vacío (0 items), recargar para mostrar el mensaje de vacío
+                if (data.totalItems === 0) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error("Error al actualizar cantidad:", error);
+            }
+        }
+    </script>
 
 </body>
 </html>

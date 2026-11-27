@@ -17,10 +17,6 @@ public class ProveedorService {
         this.proveedorDAO = proveedorDAO;
     }
 
-    public List<Proveedor> listarProveedores(String busqueda, String estado) {
-        return proveedorDAO.listarProveedores(busqueda, estado);
-    }
-
     public Optional<Proveedor> obtenerPorId(Long idProveedor) {
         return proveedorDAO.buscarPorId(idProveedor);
     }
@@ -34,10 +30,6 @@ public class ProveedorService {
         validarProveedor(datos);
         datos.setIdProveedor(idProveedor);
         return proveedorDAO.actualizar(datos) > 0;
-    }
-
-    public boolean cambiarEstado(Long idProveedor, boolean activo) {
-        return proveedorDAO.actualizarEstado(idProveedor, activo) > 0;
     }
 
     public boolean eliminarProveedor(Long idProveedor) {

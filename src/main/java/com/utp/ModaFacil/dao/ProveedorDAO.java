@@ -20,14 +20,13 @@ public class ProveedorDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Proveedor> listarProveedores(String busqueda, String estado) {
+    public List<Proveedor> listarProveedores(String busqueda) {
         StringBuilder sql = new StringBuilder("""
             SELECT p.id_proveedor,
                    p.nombre,
                    p.ruc,
                    p.contacto,
                    p.telefono,
-                   p.activo,
                    COUNT(DISTINCT o.id_producto) AS productos_asociados
             FROM proveedores p
             LEFT JOIN ofertas o ON o.id_proveedor = p.id_proveedor
@@ -50,14 +49,8 @@ public class ProveedorDAO {
             params.add(like);
         }
 
-        if ("activo".equalsIgnoreCase(estado)) {
-            sql.append(" AND p.activo = TRUE ");
-        } else if ("inactivo".equalsIgnoreCase(estado)) {
-            sql.append(" AND p.activo = FALSE ");
-        }
-
         sql.append("""
-            GROUP BY p.id_proveedor, p.nombre, p.ruc, p.contacto, p.telefono, p.activo
+            GROUP BY p.id_proveedor, p.nombre, p.ruc, p.contacto, p.telefono
             ORDER BY p.id_proveedor ASC
             """);
 
@@ -71,12 +64,11 @@ public class ProveedorDAO {
                    p.ruc,
                    p.contacto,
                    p.telefono,
-                   p.activo,
                    COUNT(DISTINCT o.id_producto) AS productos_asociados
             FROM proveedores p
             LEFT JOIN ofertas o ON o.id_proveedor = p.id_proveedor
             WHERE p.id_proveedor = ?
-            GROUP BY p.id_proveedor, p.nombre, p.ruc, p.contacto, p.telefono, p.activo
+            GROUP BY p.id_proveedor, p.nombre, p.ruc, p.contacto, p.telefono
             """;
 
         List<Proveedor> lista = jdbcTemplate.query(sql, (rs, rowNum) -> mapProveedor(rs), idProveedor);
@@ -85,23 +77,22 @@ public class ProveedorDAO {
 
     public int registrar(Proveedor proveedor) {
         String sql = """
-            INSERT INTO proveedores (nombre, ruc, contacto, telefono, activo)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO proveedores (nombre, ruc, contacto, telefono)
+            VALUES (?, ?, ?, ?)
             """;
         return jdbcTemplate.update(
             sql,
             proveedor.getNombre(),
             proveedor.getRuc(),
             proveedor.getContacto(),
-            proveedor.getTelefono(),
-            proveedor.isActivo()
+            proveedor.getTelefono()
         );
     }
 
     public int actualizar(Proveedor proveedor) {
         String sql = """
             UPDATE proveedores
-            SET nombre = ?, ruc = ?, contacto = ?, telefono = ?, activo = ?
+            SET nombre = ?, ruc = ?, contacto = ?, telefono = ?
             WHERE id_proveedor = ?
             """;
         return jdbcTemplate.update(
@@ -110,14 +101,8 @@ public class ProveedorDAO {
             proveedor.getRuc(),
             proveedor.getContacto(),
             proveedor.getTelefono(),
-            proveedor.isActivo(),
             proveedor.getIdProveedor()
         );
-    }
-
-    public int actualizarEstado(Long idProveedor, boolean activo) {
-        String sql = "UPDATE proveedores SET activo = ? WHERE id_proveedor = ?";
-        return jdbcTemplate.update(sql, activo, idProveedor);
     }
 
     public int eliminar(Long idProveedor) {
@@ -132,7 +117,6 @@ public class ProveedorDAO {
         p.setRuc(rs.getString("ruc"));
         p.setContacto(rs.getString("contacto"));
         p.setTelefono(rs.getString("telefono"));
-        p.setActivo(rs.getBoolean("activo"));
         p.setProductosAsociados(rs.getInt("productos_asociados"));
         return p;
     }

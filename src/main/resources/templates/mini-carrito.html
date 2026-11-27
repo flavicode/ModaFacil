@@ -13,7 +13,7 @@
 
         <div class="mini-carrito-header">
             <h2 id="titulo-carrito">
-                Carrito de Compras
+                Carrito de Compras -
                 <span th:text="${carritoCantidad}">0</span>
             </h2>
 
@@ -32,12 +32,34 @@
             </p>
 
             <div class="mini-carrito-item"
-                 th:each="item : ${carritoItems}">
+                th:each="item : ${carritoItems}">
+
+                <!-- BOTÓN ELIMINAR (X) ARRIBA A LA DERECHA -->
+                <form th:action="@{/comparar/carrito/cantidad}"
+                    method="post"
+                    class="mini-carrito-eliminar-form">
+                    <input type="hidden" name="idProducto" th:value="${item.idProducto}">
+                    <input type="hidden" name="idProveedor" th:value="${item.idProveedor}">
+                    <input type="hidden" name="talla" th:value="${item.talla}">
+                    <input type="hidden" name="cambio" th:value="${-item.cantidad}">
+
+                    <input th:if="${_csrf != null}"
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="mini-carrito-btn-eliminar"
+                            title="Eliminar producto"
+                            aria-label="Eliminar producto">
+                        &times;
+                    </button>
+                </form>
 
                 <!-- IMAGEN -->
                 <img th:src="@{'/img/' + ${item.imagen}}"
-                     th:alt="${item.nombre}"
-                     class="mini-carrito-imagen">
+                    th:alt="${item.nombre}"
+                    class="mini-carrito-imagen">
 
                 <!-- DATOS -->
                 <div class="mini-carrito-detalle">
@@ -66,18 +88,19 @@
                     <div class="mini-carrito-cantidad">
 
                         <form th:action="@{/comparar/carrito/cantidad}"
-                              method="post">
+                            method="post">
 
-                            <input type="hidden" name="idProducto"
-                                   th:value="${item.idProducto}">
-                            <input type="hidden" name="idProveedor"
-                                   th:value="${item.idProveedor}">
-                            <input type="hidden" name="talla"
-                                   th:value="${item.talla}">
+                            <input type="hidden" name="idProducto" th:value="${item.idProducto}">
+                            <input type="hidden" name="idProveedor" th:value="${item.idProveedor}">
+                            <input type="hidden" name="talla" th:value="${item.talla}">
                             <input type="hidden" name="cambio" value="-1">
 
-                            <button type="submit"
-                                    th:disabled="${item.cantidad <= 1}">
+                            <input th:if="${_csrf != null}"
+                                type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}">
+
+                            <button type="submit">
                                 −
                             </button>
                         </form>
@@ -85,15 +108,17 @@
                         <span th:text="${item.cantidad}">1</span>
 
                         <form th:action="@{/comparar/carrito/cantidad}"
-                              method="post">
+                            method="post">
 
-                            <input type="hidden" name="idProducto"
-                                   th:value="${item.idProducto}">
-                            <input type="hidden" name="idProveedor"
-                                   th:value="${item.idProveedor}">
-                            <input type="hidden" name="talla"
-                                   th:value="${item.talla}">
+                            <input type="hidden" name="idProducto" th:value="${item.idProducto}">
+                            <input type="hidden" name="idProveedor" th:value="${item.idProveedor}">
+                            <input type="hidden" name="talla" th:value="${item.talla}">
                             <input type="hidden" name="cambio" value="1">
+
+                            <input th:if="${_csrf != null}"
+                                type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}">
 
                             <button type="submit">+</button>
                         </form>
@@ -110,6 +135,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- RESUMEN -->
         <div class="mini-carrito-footer">

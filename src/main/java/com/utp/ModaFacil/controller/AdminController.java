@@ -21,7 +21,10 @@ import org.springframework.dao.DataAccessException;
 import com.utp.ModaFacil.dao.InventarioDAO;
 import com.utp.ModaFacil.model.ProductoDetalleAdmin;
 import com.utp.ModaFacil.model.Usuario;
+import com.utp.ModaFacil.model.ProductoInventario;
 import com.utp.ModaFacil.service.ProductoAdminService;
+import java.io.IOException;
+import com.utp.ModaFacil.service.ImagenProductoService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,10 +33,12 @@ import jakarta.servlet.http.HttpSession;
 public class AdminController {
     private final ProductoAdminService productoAdminService;
     private final InventarioDAO inventarioDAO;
+    private final ImagenProductoService imagenProductoService;
 
-    public AdminController(ProductoAdminService productoAdminService, InventarioDAO inventarioDAO) {
+    public AdminController(ProductoAdminService productoAdminService, InventarioDAO inventarioDAO, ImagenProductoService imagenProductoService) {
         this.productoAdminService = productoAdminService;
         this.inventarioDAO = inventarioDAO;
+        this.imagenProductoService = imagenProductoService;
     }
 
     @GetMapping({"", "/", "/dashboard"})
@@ -101,7 +106,6 @@ public class AdminController {
                     );
         }
 
-        //
         @PostMapping("/productos/{id}/actualizar")
         @ResponseBody
         public ResponseEntity<Map<String, Object>> actualizarProducto(
@@ -119,18 +123,25 @@ public class AdminController {
                     )
                 );
             }
+
+            String nombreImagen = null;
+            boolean actualizado = false;
+
             try {
-                // El almacenamiento de imágenes se implementará después
+
+                // Guardar nueva imagen si fue seleccionada
                 if (imagen != null && !imagen.isEmpty()) {
-                    throw new IllegalArgumentException(
-                        "El cambio de imagen todavía no está habilitado."
-                    );
+                    nombreImagen = imagenProductoService.guardarImagen(imagen);
                 }
-                boolean actualizado = productoAdminService.actualizarProducto(
+
+                // Actualizar información del producto
+                actualizado = productoAdminService.actualizarProducto(
                     idProducto,
                     producto,
-                    null
+                    nombreImagen
                 );
+
+                // Validar resultado
                 if (!actualizado) {
                     return ResponseEntity.status(404).body(
                         Map.of(
@@ -139,30 +150,55 @@ public class AdminController {
                         )
                     );
                 }
+
+                // Respuesta exitosa
                 return ResponseEntity.ok(
                     Map.of(
                         "ok", true,
                         "mensaje", "Producto actualizado correctamente."
                     )
                 );
+
             } catch (IllegalArgumentException e) {
+
                 return ResponseEntity.badRequest().body(
                     Map.of(
                         "ok", false,
                         "mensaje", e.getMessage()
                     )
                 );
-            } catch (DataAccessException e) {
+
+            } catch (IOException e) {
+
                 e.printStackTrace();
+
+                return ResponseEntity.status(500).body(
+                    Map.of(
+                        "ok", false,
+                        "mensaje", "No se pudo almacenar la imagen."
+                    )
+                );
+
+            } catch (DataAccessException e) {
+
+                e.printStackTrace();
+
                 return ResponseEntity.status(500).body(
                     Map.of(
                         "ok", false,
                         "mensaje", "Ocurrió un error al actualizar el producto."
                     )
                 );
+
+            } finally {
+
+                // Eliminar la nueva imagen si no se actualizó el producto
+                if (!actualizado && nombreImagen != null) {
+                    imagenProductoService.eliminarImagen(nombreImagen);
+                }
             }
         }
-
+    //
     @GetMapping("/inventario")
     public String inventario(HttpSession session, Model model) {
         if (!esAdmin(session)) {
@@ -205,78 +241,47 @@ public class AdminController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        // VALIDAR PERMISOS
         if (!esAdmin(session)) {
             return "redirect:/login";
         }
 
-        inventarioDAO.actualizarStockPorTallas(productoId, proveedores, tallas, cantidades);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Stock actualizado correctamente.");
+        try {
+
+            // ACTUALIZAR STOCK
+            inventarioDAO.actualizarStockPorTallas(
+                productoId,
+                proveedores,
+                tallas,
+                cantidades
+            );
+
+            redirectAttributes.addFlashAttribute(
+                "mensajeExito",
+                "Stock actualizado correctamente."
+            );
+
+        } catch (IllegalArgumentException e) {
+
+            redirectAttributes.addFlashAttribute(
+                "mensajeError",
+                e.getMessage()
+            );
+
+        } catch (DataAccessException e) {
+
+            e.printStackTrace();
+
+            redirectAttributes.addFlashAttribute(
+                "mensajeError",
+                "Ocurrió un error al actualizar el inventario."
+            );
+        }
+
         return "redirect:/admin/inventario";
     }
-
     private boolean esAdmin(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("logged");
         return usuario != null && "ADMIN".equalsIgnoreCase(String.valueOf(usuario.getRol()));
-    }
-
-    public static class ProductoInventario {
-        private final Long id;
-        private final String codigo;
-        private final String nombre;
-        private final String categoria;
-        private final String imagen;
-        private final int stockTotal;
-        private final List<ProveedorStock> proveedores;
-        
-
-        public ProductoInventario(Long id, String codigo, String nombre, String categoria, String imagen, int stockTotal, List<ProveedorStock> proveedores) {
-            this.id = id;
-            this.codigo = codigo;
-            this.nombre = nombre;
-            this.categoria = categoria;
-            this.imagen = imagen;
-            this.stockTotal = stockTotal;
-            this.proveedores = proveedores;
-        }
-
-        public Long getId() { return id; }
-        public String getCodigo() { return codigo; }
-        public String getNombre() { return nombre; }
-        public String getCategoria() { return categoria; }
-        public String getImagen() { return imagen; }
-        public int getStockTotal() { return stockTotal; }
-        public List<ProveedorStock> getProveedores() { return proveedores; }
-    }
-
-public static class ProveedorStock {
-        private final Long idProveedor;
-        private final String nombreProveedor;
-        private final int subtotal;
-        private final List<TallaStock> tallas;
-
-        public ProveedorStock(Long idProveedor, String nombreProveedor, int subtotal, List<TallaStock> tallas) {
-            this.idProveedor = idProveedor;
-            this.nombreProveedor = nombreProveedor;
-            this.subtotal = subtotal;
-            this.tallas = tallas;
-        }
-
-        public Long getIdProveedor() { return idProveedor; }
-        public String getNombreProveedor() { return nombreProveedor; }
-        public int getSubtotal() { return subtotal; }
-        public List<TallaStock> getTallas() { return tallas; }
-    }
-
-    public static class TallaStock {
-        private final String talla;
-        private final int stock;
-
-        public TallaStock(String talla, int stock) {
-            this.talla = talla;
-            this.stock = stock;
-        }
-
-        public String getTalla() { return talla; }
-        public int getStock() { return stock; }
     }
 }
